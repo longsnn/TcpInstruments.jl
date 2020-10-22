@@ -1,27 +1,22 @@
-# GenericInstruments
+# TcpInstruments
 
-[![Build Status](https://travis-ci.com/iuliancioarca/GenericInstruments.jl.svg?branch=master)](https://travis-ci.com/iuliancioarca/GenericInstruments.jl)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/iuliancioarca/GenericInstruments.jl?svg=true)](https://ci.appveyor.com/project/iuliancioarca/GenericInstruments-jl)
-[![Codecov](https://codecov.io/gh/iuliancioarca/GenericInstruments.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/iuliancioarca/GenericInstruments.jl)
-[![Coveralls](https://coveralls.io/repos/github/iuliancioarca/GenericInstruments.jl/badge.svg?branch=master)](https://coveralls.io/github/iuliancioarca/GenericInstruments.jl?branch=master)
+[![Build Status](https://travis-ci.com/github/Orchard-Ultrasound-Innovation/TcpInstruments.jl.svg?branch=master)](https://travis-ci.com/github/Orchard-Ultrasound-Innovation/TcpInstruments.jl)
 
-Bundles similar functionalities of instruments under a single generic object: power supplies, arbitrary waveform generators, scopes,etc.
-Part of the visa routines borrowed from https://github.com/BBN-Q/Instruments.jl. 
-This package fully wraps the visa lib, along with the niScope, niDmm and niFgen.
 
-Please install the following before adding this package:
-1. Install NIVISA
-2. Install PXI instrument drivers (if needed; currently supports scopes such as NI5122/5114)
-4. ]add GenericInstruments
-5. using GenericInstruments
+Control common lab equipment via SCPI over Ethernet and specifically not be dependent on the NIVISA library that other similar packages often have depend on.
 
-Supported instruments:
-1. Scope: Lecroy 6054A (should work for the entire 6xxx-8xxx series), NIScope 5122/5114/5152
-2. Arbitrary waveform generators: Agilent 33500 series dual channel, Agilent 33250A single channel. NIFGen5421(only api exposed)
-3. Power supplies: Agilent E36xx series, single or dual channel (E3645/E3646/E3649)
-4. Digital multimeters: WIP on Ketihley 2000/20001/7510. NIDmm4071(only api exposed)
+This package is based on the code from: https://ci.appveyor.com/project/iuliancioarca/GenericInstruments-jl
+which again is based on https://github.com/BBN-Q/Instruments.jl. 
 
-See examples folder for usage.
-This package is under development so expect breaking changes. It's best to add the master branch in order to be up to date with bugfixes.
-Important Note: Because of the large number of libs necessary, a fully automated path discovery is not implemented yet. Currently only the Windows default paths are populated in: src/lib_locations.jl.
-Feel free to modify them as needed and rebuild the package in order to use it.
+SCPI is supported on almost all modern pieces of lab equipment but this code has been tested on the following devices:
+- [ ] Oscilloscope Keysight DSOX4034A
+- [ ] Multimeter Keysight DMM34465A
+- [ ] Signal generator Keysight 33612A
+- [ ] Power supply Agilent E3631A
+- [ ] Power supply Keysight 36312A
+- [ ] HV power supply SRS PS310 via Prologix GPIB to Ethernet adaptor
+- [ ] Power supply Versatile Power 100-10 XR
+- [ ] Impedance analyser Agilent 4395A (with 43961A imp. probe)
+
+
+This package is under active development so expect breaking changes. 
