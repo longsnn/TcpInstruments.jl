@@ -1,10 +1,9 @@
-name = "GenericInstruments"
-uuid = "b8d24480-b8ee-42fe-a917-db159b4b1a29"
-authors = ["iuliancioarca"]
-version = "0.2.0"
+name = "TcpInstruments"
+uuid = "aaee30c5-7b57-4441-b61a-ab7186f11903"
+authors = ["mofii"]
+version = "0.0.1"
 
 [deps]
-Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [compat]
