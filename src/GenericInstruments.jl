@@ -1,11 +1,9 @@
-module GenericInstruments
+module TcpInstruments
 
 # lib locations
 include("lib_locations.jl")
 # common instrument containers
 include("INSTR_TYPES.jl")
-# visa wrapper,constants and utils
-include("visa/VISA.jl")
 # instruments
 include("psu/PSU.jl")
 include("awg/AWG.jl")
