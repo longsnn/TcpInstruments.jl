@@ -1,11 +1,11 @@
-# TcpInstruments
+# TcpInstruments.jl
 
 [![Build Status](https://travis-ci.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl.svg?branch=master)](https://travis-ci.com/github/Orchard-Ultrasound-Innovation/TcpInstruments.jl)
 
-Control common lab equipment via SCPI over Ethernet and specifically not be dependent on the NIVISA library that other similar packages often have depend on.
+Control common lab equipment via SCPI over Ethernet and specifically not be dependent on the NIVISA library that other similar packages often have depended on.
 
-This package is based on the code from: https://ci.appveyor.com/project/iuliancioarca/GenericInstruments-jl
-which again is based on https://github.com/BBN-Q/Instruments.jl. 
+This package is based on code from [GenericInstruments.jl](https://ci.appveyor.com/project/iuliancioarca/GenericInstruments-jl)
+which was again based on [Instruments.jl](https://github.com/BBN-Q/Instruments.jl). 
 
 SCPI is supported on almost all modern pieces of lab equipment but this code has been tested on the following devices:
 - [ ] Oscilloscope Keysight DSOX4034A
