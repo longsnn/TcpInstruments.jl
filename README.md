@@ -12,6 +12,7 @@ which was again based on [Instruments.jl](https://github.com/BBN-Q/Instruments.j
 
 SCPI is supported on almost all modern pieces of lab equipment but this code has been tested on the following devices:
 - [ ] Oscilloscope Keysight DSOX4034A
+- [ ] Oscilloscope Keysight DSOX4024A
 - [ ] Multimeter Keysight DMM34465A
 - [ ] Signal generator Keysight 33612A
 - [ ] Power supply Agilent E3631A
