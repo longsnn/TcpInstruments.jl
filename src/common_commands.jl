@@ -7,9 +7,13 @@ instrument_beep_off(obj) = write(obj,"SYST:BEEP:STAT off")
 instrument_query_complete(obj) = query(obj,"*OPC?")
 instrument_wait_complete(obj)  = query(obj,"*WAI")
 instrument_query_error(obj)    = query(obj,"SYST:ERR?")
+function instrument_empty_buffer(instr)  
+    dummy = read(instr)
+    return nothing
+end
 
 ## TRIGGER
-instrument_trigger_set_source(obj;ch="1",sour="BUS")    = write(obj,"TRIG$ch:SOUR $sour")
+instrument_trigger_set_source(obj;ch="1",sour="CHAN1")    = write(obj,"TRIG$ch:SOUR $sour")
 instrument_trigger_set_delay(obj;ch="1",del=0)          = write(obj,"TRIG$ch:DEL $del")
 instrument_trigger_set_slope(obj;ch="1",slp="positive") = write(obj,"TRIG$ch:SLOP $slp")
 instrument_trigger_set_out_stat(obj;st="normal")        = write(obj,"OUTP:TRIG $st")

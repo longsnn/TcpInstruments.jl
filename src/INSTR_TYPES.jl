@@ -1,15 +1,15 @@
 # Generic instrument struct
 abstract type Instrument end
 
-mutable struct INSTR{instr_name} <: Instrument
+mutable struct instr <: Instrument
     name::Symbol
     address::String
-    handle# this needs to be anything, to accept PXI instruments
+    handle::Float64
 	initialized::Bool
-	bufSize::UInt32
+	bufSize::UInt64
 end
 # Generic instrument constructor
-INSTR(instr_name, address) = INSTR{instr_name}(instr_name, address, 0, false,UInt32(1024))
+instr(instr_name, address) = intsr(instr_name, address, 0, false,UInt64(1024))
 
 ##############################################
 # PSU

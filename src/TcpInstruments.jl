@@ -1,7 +1,7 @@
 module TcpInstruments
 
 # common instrument containers
-include("INSTR_TYPES.jl")
+include("instrument_type_definitions.jl")
 # instruments
 include("psu/PSU.jl")
 include("awg/AWG.jl")
