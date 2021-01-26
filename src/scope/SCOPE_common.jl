@@ -17,8 +17,8 @@ const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
 function scope_parse_raw_waveform(wfm_data, wfm_info::Waveform_info) 
-    volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) * wfm_info.y_increment) + wfm_info.y_origin
-    time = (((1:wfm_info.num_points) - wfm_info.y_reference) * wfm_info.increment) + wfm_info.origin
+    volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
+    time = (((1:wfm_info.num_points) .- wfm_info.y_reference) .* wfm_info.increment) .+ wfm_info.origin
     return waveform_data(wfm_info, volt, time)
 end
 
