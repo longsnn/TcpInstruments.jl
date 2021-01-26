@@ -45,7 +45,7 @@ function split_str_into_host_and_port(str)
 	if length(spl_str) == 1
 		port = []
 	else
-		port = parse(Int, split_str[2])
+		port = parse(Int, spl_str[2])
 	end
 	return (host, port)
 end
