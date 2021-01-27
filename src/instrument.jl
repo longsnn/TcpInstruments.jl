@@ -16,6 +16,7 @@ mutable struct GenericInstrument <: Instrument
 	connected::Bool
 	id_str::String
 end
+
 # Generic instrument constructor
 GenericInstrument(instr_name::Symbol, address::String) = GenericInstrument(instr_name, address, 1024, TCPSocket(), false, "empty-ID")
 
@@ -45,6 +46,22 @@ function close!(instr::Instrument)
 	@assert instr.connected "Cannot disconnect. Instrument is not connected!"
 	close(instr.sock)
 	instr.connected = false;
+end
+
+function write(instr::Instrument, message::AbstractString)
+	@assert instr.connected "Instrument is not connected, cannot write to it!"
+	println(instr.sock, message)
+end
+
+# TODO: Have a timeout parameter
+function read(instr::Instrument)
+	@assert instr.connected "Instrument is not connected, cannot read from it!"
+	return rstrip(readline(instr.sock), ['\r', '\n'])
+end
+
+function query(instr::Instrument, message::AbstractString)
+	write(instr, message)
+	return read(instr)
 end
 
 """

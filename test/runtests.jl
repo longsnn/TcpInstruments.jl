@@ -19,6 +19,4 @@ end
     @test host_out == host
     @test port_out == nothing
 
-
-
 end

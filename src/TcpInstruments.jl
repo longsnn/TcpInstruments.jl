@@ -1,4 +1,11 @@
 module TcpInstruments
+export GenericInstrument, connect!, disconnect!
+
+include("instrument.jl")
+
+include("common_commands.jl")
+include("scope/SCOPE.jl")
+
 
 export 
         Instrument,
