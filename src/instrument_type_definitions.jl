@@ -17,7 +17,20 @@ mutable struct GenericInstrument <: Instrument
 	id_str::String
 end
 # Generic instrument constructor
-GenericInstrument(instr_name, address) = GenericInstrument(instr_name, address, 1024, TCPSocket(), false, "empty-ID")
+GenericInstrument(instr_name::Symbol, address::String) = GenericInstrument(instr_name, address, 1024, TCPSocket(), false, "empty-ID")
+
+
+
+""" Initializes a connection to the instrument at the given (input) IP address."""
+function instrument_initialize(model::Symbol, address)
+    instr_h = GenericInstrument(model, address)
+    connect!(instr_h)
+    return instr_h
+end
+
+""" Closes the TCP connection."""
+instrument_close(instr) = close!(instr)
+
 
 function connect!(instr::Instrument)
 	@assert !instr.connected "Cannot connect. Instrument is already connected!"
@@ -28,7 +41,7 @@ function connect!(instr::Instrument)
 	instr.connected = true;
 end
 
-function disconnect!(instr::Instrument)
+function close!(instr::Instrument)
 	@assert instr.connected "Cannot disconnect. Instrument is not connected!"
 	close(instr.sock)
 	instr.connected = false;
@@ -55,7 +68,7 @@ function write(instr::Instrument, message::AbstractString)
 	println(instr.sock, message)
 end
 
-# TODO: Have a timeout parameter
+# TODO: Implement a timeout parameter
 function read(instr::Instrument)
 	@assert instr.connected "Instrument is not connected, cannot read from it!"
 	return rstrip(readline(instr.sock), ['\r', '\n'])
