@@ -112,4 +112,6 @@ function scope_get_ch_data(instr::Instrument, ch::Int)
     return scope_parse_raw_waveform(raw_data, wfm_info) 
 end
 
+# TODO: Make ch-vector only contain each channel maximum one time
+scope_get_ch_data(instr::Instrument, ch_vec::Vector{Int}) = [scope_get_ch_data(instrument, ch) for ch in ch_vec]
 
