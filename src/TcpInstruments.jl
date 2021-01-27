@@ -10,15 +10,22 @@ export
         connect!,
         close!,
 
-        instrument_initialize,
+
+        initialize,
+        terminate,
         instrument_reset,
         instrument_clear,
         instrument_get_id,
         instrument_beep_on,
         instrument_beep_off,
         # Scope specific commends
-        scope_get_ch_data
+        scope_get_ch_data,
 
+        # Devices // could also be mapped to symbol names
+        # to avoid exporting
+        KeysightDSOX4024A,
+        KeysightDSOX4034A,
+        Keysight33612A
 
 
 # common instrument containers

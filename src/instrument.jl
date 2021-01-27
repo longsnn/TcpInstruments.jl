@@ -1,10 +1,4 @@
-# Generic instrument struct
-abstract type Instrument end
-abstract type Oscilloscope <: Instrument end
-abstract type MultiMeter <: Instrument end
-abstract type PowerSupply <: Instrument end
-abstract type WaveformGenerator <: Instrument end
-
+include("./instr.jl")
 using Sockets
 import Base.write, Base.read
 
@@ -17,32 +11,45 @@ mutable struct GenericInstrument <: Instrument
 	id_str::String
 end
 
+mutable struct Instr{ T <: Instrument } <: Instrument
+    model::Type
+    address::String
+    buffer_size::Int
+    sock::TCPSocket
+    connected::Bool
+    id_str::String
+end
+
+function CreateTcpInstr(model, address)
+    Instr{model}(model, address, 1024, TCPSocket(), false, "empty-ID")
+end
+
 # Generic instrument constructor
-GenericInstrument(instr_name::Symbol, address::String) = GenericInstrument(instr_name, address, 1024, TCPSocket(), false, "empty-ID")
+GenericInstrument(instr_name, address) = GenericInstrument(instr_name, address, 1024, TCPSocket(), false, "empty-ID")
 
 
 
 """ Initializes a connection to the instrument at the given (input) IP address."""
-function instrument_initialize(model::Symbol, address)
-    instr_h = GenericInstrument(model, address)
+function initialize(model, address)
+    instr_h = CreateTcpInstr(model, address)
     connect!(instr_h)
     return instr_h
 end
 
 """ Closes the TCP connection."""
-instrument_close(instr) = close!(instr)
+terminate(instr::Instrument) = close!(instr)
 
 
 function connect!(instr::Instrument)
 	@assert !instr.connected "Cannot connect. Instrument is already connected!"
 	SCPI_port = 5025
 	host,port = split_str_into_host_and_port(instr.address)
-	isempty(port) && (port = SCPI_port)
+	port == 0 && (port = SCPI_port)
 	instr.sock = connect(host,port)
 	instr.connected = true;
 end
 
-function close!(instr::Instrument)
+function close!(instr::Instrument)::Bool
 	@assert instr.connected "Cannot disconnect. Instrument is not connected!"
 	close(instr.sock)
 	instr.connected = false;
@@ -68,12 +75,12 @@ end
 	split_str_into_host_and_port(str)
 Splits a string like "192.168.1.1:5056" into ("192.168.1.1", 5056)
 """
-function split_str_into_host_and_port(str) 
+function split_str_into_host_and_port(str::AbstractString)::Tuple{String, Int}
 	spl_str = split(str, ":")
 	@assert !isempty(spl_str) "IP address string is empty!"
 	host = spl_str[1]
 	if length(spl_str) == 1
-		port = []
+		port = 0
 	else
 		port = parse(Int, spl_str[2])
 	end

@@ -2,7 +2,7 @@ using TcpInstruments
 using Test
 
 @info "Creating dummy instrument at 10.1.30.32"
-scope = TcpInstruments.GenericInstrument(:dummy, "10.1.30.32")
+scope = TcpInstruments.GenericInstrument(:dummy, "10.1.150.54")
 @info scope
 @info "Connecting..."
 

@@ -26,7 +26,12 @@ function emulator()
                 end
                 line = readline(conn)
                 if !isempty(line)
-                  tcp(line)
+                    if line == "*IDN?"
+                        write(conn, "1\n")
+                        tcp("1")
+                    else
+                        tcp(line)
+                    end
                 end
                 sleep(0.0001)
             end
