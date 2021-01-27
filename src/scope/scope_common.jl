@@ -6,6 +6,7 @@ using Printf
 scope_stop(instr::Instrument) = write(instr, "STOP")
 scope_continue(instr::Instrument) = write(instr, "RUN")
 
+scope_waveform_preamble_get(instr) = query(instr, "waveform:preamble?")
 scope_waveform_source_set(instr, ch::Int) = write(instr, @sprintf("waveform:source chan%i", ch))
 scope_waveform_source_get(instr) = query(instr, "waveform:source?")
 scope_waveform_mode_8bit(instr::Instrument) = write(instr, "waveform:format BYTE")
@@ -61,19 +62,19 @@ struct Waveform_data
 end
 
 function scope_waveform_info_get(instr::Instrument)
-    str = query(instr, "waveform:preamble?")
+    str = scope_waveform_preamble_get(instr)
     str_array = split(str, ",")
     #@printf("str: %s\n", str)
     #@printf("str_array: %s\n", str_array)
-    format = RESOLUTION_MODE[str_array[1]]
-    type = TYPE[str_array[2]]
-    num_points = parse(Int64, str_array[3])
-    count = parse(Int64, str_array[4]) # is always one
+    format      = RESOLUTION_MODE[str_array[1]]
+    type        = TYPE[str_array[2]]
+    num_points  = parse(Int64,   str_array[3])
+    count       = parse(Int64,   str_array[4]) # is always one
     x_increment = parse(Float64, str_array[5])
-    x_origin = parse(Float64, str_array[6])
+    x_origin    = parse(Float64, str_array[6])
     x_reference = parse(Float64, str_array[7])
     y_increment = parse(Float64, str_array[8])
-    y_origin = parse(Float64, str_array[9])
+    y_origin    = parse(Float64, str_array[9])
     y_reference = parse(Float64, str_array[10])
     return Waveform_info(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference)
 end 
@@ -101,17 +102,18 @@ end
 
 function scope_get_ch_data(instr::Instrument, ch::Int)
     scope_waveform_source_set(instr, ch)
-    instrument_clear(instr)
-    #scope_stop(instr)
     #instrument_empty_buffer(instr)
     wfm_info = scope_waveform_info_get(instr)
-    #@show wfm_info
+    @show wfm_info
     raw_data = scope_read_raw_waveform(instr);
-    #scope_continue(instr)
-
     return scope_parse_raw_waveform(raw_data, wfm_info) 
 end
 
 # TODO: Make ch-vector only contain each channel maximum one time
-scope_get_ch_data(instr::Instrument, ch_vec::Vector{Int}) = [scope_get_ch_data(instrument, ch) for ch in ch_vec]
+function scope_get_ch_data(instr::Instrument, ch_vec::Vector{Int})
+    scope_stop(instr) # Makes sure the data from each channel is from the same trigger event
+    wfm_data = [scope_get_ch_data(instrument, ch) for ch in ch_vec]
+    scope_continue(instr)
+    return wfm_data
+end
 
