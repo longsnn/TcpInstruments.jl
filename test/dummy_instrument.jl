@@ -19,9 +19,9 @@ catch e
     @info "Please run `make e` in another terminal if you haven't"
     @info e
 end
-dummy |> TcpInstruments.instrument_reset
+instrument_reset(dummy)
 write(dummy, "hi")
-@info dummy |> disconnect! == false
+@info close!(dummy) == false
 @info "Successfully disconnected"
 @info "Goodbye"
 try

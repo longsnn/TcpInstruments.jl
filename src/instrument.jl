@@ -79,19 +79,3 @@ function split_str_into_host_and_port(str)
 	end
 	return (host, port)
 end
-
-function write(instr::Instrument, message::AbstractString)
-	@assert instr.connected "Instrument is not connected, cannot write to it!"
-	println(instr.sock, message)
-end
-
-# TODO: Implement a timeout parameter
-function read(instr::Instrument)
-	@assert instr.connected "Instrument is not connected, cannot read from it!"
-	return rstrip(readline(instr.sock), ['\r', '\n'])
-end
-
-function query(instr::Instrument, message::AbstractString)
-	write(instr, message)
-	return read(instr)
-end

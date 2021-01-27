@@ -1,11 +1,4 @@
 module TcpInstruments
-export GenericInstrument, connect!, disconnect!
-
-include("instrument.jl")
-
-include("common_commands.jl")
-include("scope/SCOPE.jl")
-
 
 export 
         Instrument,
@@ -14,6 +7,8 @@ export
         PowerSupply,
         WaveformGenerator,
         GenericInstrument,
+        connect!,
+        close!,
 
         instrument_initialize,
         instrument_reset,
@@ -27,8 +22,9 @@ export
 
 
 # common instrument containers
-include("instrument_type_definitions.jl")
+include("instrument.jl")
 include("common_commands.jl")
+
 # instruments
 include("scope/scope.jl")
 #include("psu/psu.jl")
