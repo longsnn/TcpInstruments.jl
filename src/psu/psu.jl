@@ -1,4 +1,4 @@
-include("../INSTR_TYPES.jl")
+include("../instrument_type_definitions.jl")
 ## include all PSU files
-include("./AgilentE36xx/AgilentE364x.jl")
+include("./AgilentE364x.jl")
 
