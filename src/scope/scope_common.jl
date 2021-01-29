@@ -18,8 +18,9 @@ const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
 function scope_parse_raw_waveform(wfm_data, wfm_info::Waveform_info) 
+    # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
-    time = (((1:wfm_info.num_points) .- wfm_info.y_reference) .* wfm_info.increment) .+ wfm_info.origin
+    time = (((0:wfm_info.num_points-1)   .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
     return waveform_data(wfm_info, volt, time)
 end
 
