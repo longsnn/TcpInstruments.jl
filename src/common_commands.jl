@@ -1,5 +1,5 @@
 ## Utils
-instrument_reset(obj)    = write(obj, "*RST")
+instrument_reset(obj::Instrument)    = write(obj, "*RST")
 instrument_clear(obj)    = write(obj, "*CLS")
 instrument_get_id(obj)   = query(obj, "*IDN?")
 instrument_beep_on(obj)  = write(obj,"SYST:BEEP:STAT on")
@@ -32,8 +32,8 @@ instrument_set_period(obj;ch="1",func="sin",per=0.001) = write(obj,"SOURce$ch:FU
 instrument_set_phase(obj;ch="1",unit="deg",phase=90) = write(obj,"UNIT:ANGL $unit\n;SOURce$ch:PHAS $phase")
 instrument_set_symmetry(obj;ch="1",func="ramp",sym=50) = write(obj,"SOURce$ch:FUNC:$func:SYMM $sym")
 instrument_set_both_edge_times(obj;ch="1",func="pulse",dt=10e-9) = write(obj,"SOURce$ch:FUNC:$func:TRAN $dt")
-instrument_set_lead_edge_time(obj;ch="1",func="pulse",dt=10e-9) where {T<:F335x2} = write(obj,"SOURce$ch:FUNC:$func:TRAN:LEAD $dt")
-instrument_set_trail_edge_time(obj;ch="1",func="pulse",dt=10e-9) where {T<:F335x2} = write(obj,"SOURce$ch:FUNC:$func:TRAN:TRA $dt")
+#instrument_set_lead_edge_time(obj;ch="1",func="pulse",dt=10e-9) where {T<:F335x2} = write(obj,"SOURce$ch:FUNC:$func:TRAN:LEAD $dt")
+#instrument_set_trail_edge_time(obj;ch="1",func="pulse",dt=10e-9) where {T<:F335x2} = write(obj,"SOURce$ch:FUNC:$func:TRAN:TRA $dt")
 instrument_set_width_time(obj;ch="1",func="pulse",wd=1e-4) = write(obj,"SOURce$ch:FUNC:$func:WIDTh $wd")
 
 ## OUTPUT

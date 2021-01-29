@@ -1,7 +1,25 @@
-
 using Printf
 
+const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
+const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
+struct Waveform_info
+    format::String
+    type::String
+    num_points::Int64
+    x_increment::Float64
+    x_origin::Float64
+    x_reference::Float64
+    y_increment::Float64
+    y_origin::Float64
+    y_reference::Float64
+end
+
+struct Waveform_data
+    info::Waveform_info
+    volt::Array{Float64,1}
+    time::Array{Float64,1}
+end
 
 scope_stop(instr::Instrument) = write(instr, "STOP")
 scope_continue(instr::Instrument) = write(instr, "RUN")
@@ -11,9 +29,9 @@ scope_waveform_source_set(instr, ch::Int) = write(instr, @sprintf("waveform:sour
 scope_waveform_source_get(instr) = query(instr, "waveform:source?")
 scope_waveform_mode_8bit(instr::Instrument) = write(instr, "waveform:format BYTE")
 scope_waveform_mode_16bit(instr::Instrument) = write(instr, "waveform:format WORD")
-scope_waveform_num_points(instr::Intrument, num_points::Int) = write(instr, @sprintf("waveform:points %i", num_points))
-scope_waveform_num_points(instr::Intrument, mode::String) = write(instr, @sprintf("waveform:points %s", mode))
-scope_waveform_points_mode(instr::Intrument, mode_idx::Int) = write(instr, @sprintf("waveform:points:mode %s", WAVEFORM_POINTS_MODE[mode_idx])) #norm, max, raw
+scope_waveform_num_points(instr::Instrument, num_points::Int) = write(instr, @sprintf("waveform:points %i", num_points))
+scope_waveform_num_points(instr::Instrument, mode::String) = write(instr, @sprintf("waveform:points %s", mode))
+scope_waveform_points_mode(instr::Instrument, mode_idx::Int) = write(instr, @sprintf("waveform:points:mode %s", WAVEFORM_POINTS_MODE[mode_idx])) #norm, max, raw
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
@@ -39,27 +57,6 @@ function scope_speed_mode(instr::Instrument, speed::Int)
         scope_waveform_points_mode(instr, 0)
 
     end
-end
-
-const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
-const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
-
-struct Waveform_info
-    format::String
-    type::String
-    num_points::Int64
-    x_increment::Float64
-    x_origin::Float64
-    x_reference::Float64
-    y_increment::Float64
-    y_origin::Float64
-    y_reference::Float64
-end
-
-struct Waveform_data
-    info::waveform_info
-    volt::Array{Float64,1}
-    time::Array{Float64,1}
 end
 
 function scope_waveform_info_get(instr::Instrument)
