@@ -45,6 +45,7 @@ function scope_parse_raw_waveform(wfm_data, wfm_info::Waveform_info)
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
     time = (((0:wfm_info.num_points-1)   .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
     return Waveform_data(wfm_info, volt, time)
+end
 
 function scope_speed_mode(instr::Instrument, speed::Int)
     if speed == 1
