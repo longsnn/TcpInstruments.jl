@@ -1,11 +1,8 @@
 using TcpInstruments
 using Test
 
-@info "Creating dummy instrument at 10.1.30.32"
-#scope = initialize(AgilentDSOX4034A,  "10.1.30.32")
-scope = GenericInstrument(:dummy, "10.1.30.32")
-connect!(scope)
-
+@info "Creating AgilentDSOX4034A at 10.1.30.32"
+scope = initialize(AgilentDSOX4034A,  "10.1.30.32")
 
 """
 Spec:
@@ -18,14 +15,50 @@ Grab data from channel 1
 Grab data from channel 2 and 4
 > data_struct = get_data(scope_h, [2,4])
 
+Low Pass Filter
+Turn on Low Pass Filter 25
+> lpf_on!(scope)
+
+Check if low pass filter is on
+> get_lpf_state(scope) == "1"
+
+Turn on Low Pass Filter 25
+> lpf_off!(scope)
+> get_lpf_state(scope) == "0"
+
+Impedance
+
+> set_impedance_one!(scope_h)
+
+> get_impedance(scope_h) == ONEM
+
+> set_impedance_fifty!(scope_h)
+
+> get_impedance(scope_h) == FIFT
+
 Terminate TCP connection
 > terminate(scope_h)
+
+
 """
 
 @info reset!(scope)
 data = get_data(scope, 1)
 @test !isempty(data.volt)
 @test !isempty(data.time)
+
+@info get_lpf_state(scope)
+lpf_on!(scope)
+@info get_lpf_state(scope)
+lpf_off!(scope)
+@info get_lpf_state(scope)
+
+@info get_impedance(scope)
+set_impedance_one!(scope)
+@info get_impedance(scope)
+set_impedance_fifty!(scope)
+@info get_impedance(scope)
+
 
 # plot(data)
 

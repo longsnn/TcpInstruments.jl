@@ -28,6 +28,15 @@ export
         set_channel!,
         get_channel,
 
+        lpf_on!,
+        lpf_off!,
+        get_lpf_state,
+
+        set_impedance_one!,
+        set_impedance_fifty!,
+        get_impedance,
+
+
         AgilentDSOX4024A,
         AgilentDSOX4034A,
         Keysight33612A,

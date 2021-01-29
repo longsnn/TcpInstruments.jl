@@ -26,6 +26,14 @@ end
     return data.time, data.volt
 end
 
+lpf_on!(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit ON")
+lpf_off!(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit OFF")
+get_lpf_state(instr::Instrument, chan=1) = query(instr, "CHANnel$chan:BWLimit?")
+
+set_impedance_one!(instr::Instrument, chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
+set_impedance_fifty!(instr::Instrument, chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
+get_impedance(instr::Instrument, chan=1) = query(instr, ":CHANnel$chan:IMPedance?")
+
 scope_stop(instr::Instrument) = write(instr, "STOP")
 scope_continue(instr::Instrument) = write(instr, "RUN")
 
@@ -42,8 +50,10 @@ const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 function scope_parse_raw_waveform(wfm_data, wfm_info::Waveform_info) 
     # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
+    
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
-    time = (((0:wfm_info.num_points-1)   .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
+    time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
+    @info "TIME", wfm_data[1:5]
     return Waveform_data(wfm_info, volt, time)
 end
 
@@ -117,7 +127,7 @@ end
 # TODO: Make ch-vector only contain each channel maximum one time
 function get_data(instr::Instrument, ch_vec::Vector{Int})
     #scope_stop(instr) # Makes sure the data from each channel is from the same trigger event
-    wfm_data = [scope_get_ch_data(instr, ch) for ch in ch_vec]
+    wfm_data = [get_data(instr, ch) for ch in ch_vec]
     #scope_continue(instr)
     return wfm_data
 end

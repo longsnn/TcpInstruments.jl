@@ -102,6 +102,13 @@ end
 @info query(pwr, "APPLy? CH2"), 2
 @info query(pwr, "APPLy? CH3"), 3
 
+set_channel!(pwr, 3)
+set_voltage!(pwr, 7.7; chan=2)
+@test get_channel(pwr) == "+3"
+set_voltage!(pwr, 7.7)
+@info get_voltage(pwr)
+@info get_channel(pwr)
+
 terminate(pwr)
 
 @info "Successfully disconnected"
