@@ -1,4 +1,3 @@
-include("./instr.jl")
 using Sockets
 import Base.write, Base.read
 
@@ -9,19 +8,6 @@ mutable struct GenericInstrument <: Instrument
     sock::TCPSocket
 	connected::Bool
 	id_str::String
-end
-
-mutable struct Instr{ T <: Instrument } <: Instrument
-    model::Type
-    address::String
-    buffer_size::Int
-    sock::TCPSocket
-    connected::Bool
-    id_str::String
-end
-
-function CreateTcpInstr(model, address)
-    Instr{model}(model, address, 1024, TCPSocket(), false, "empty-ID")
 end
 
 # Generic instrument constructor
@@ -61,7 +47,7 @@ function write(instr::Instrument, message::AbstractString)
 end
 
 # TODO: Have a timeout parameter
-function read(instr::Instrument)
+function read(instr::Instrument; timeout=5)
 	@assert instr.connected "Instrument is not connected, cannot read from it!"
 	return rstrip(readline(instr.sock), ['\r', '\n'])
 end
