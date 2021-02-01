@@ -1,5 +1,9 @@
 module TcpInstruments
 
+using Printf
+using RecipesBase
+using Sockets
+
 export 
         Instrument,
         Oscilloscope, 
