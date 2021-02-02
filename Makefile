@@ -7,6 +7,8 @@ c: # Console
 s: # Scope
 	julia --project=. test/AGILENTDSOX4034A.jl
 p: # Power Supply
-	julia --project=. test/power_supply.jl
+	julia test/power_supply.jl
+x: # Power Supply
+	julia test/bench_xr.jl
 plot:
 	julia --project=. test/test_plot.jl

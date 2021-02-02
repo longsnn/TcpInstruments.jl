@@ -1,12 +1,15 @@
 using TcpInstruments
 using Test
+using TestSetExtensions
+
 
 @testset "TcpInstruments.jl" begin
     # Write your own tests here.
-
+    @includetests ARGS
 end
 
 @testset "split_str_into_host_and_port" begin
+    return
     host = "192.168.1.1"
     port = 5055
     host_str = string(host, ":", port)

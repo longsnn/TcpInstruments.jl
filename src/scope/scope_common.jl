@@ -22,14 +22,71 @@ struct Waveform_data
     time::Array{Float64,1}
 end
 
-@recipe function plot(data::Waveform_data)
-    return data.time, data.volt
+@recipe function plot(data::Waveform_data; label="Channel 1")
+    time_unit, scaled_time = autoscale_seconds(data)
+    title := "Oscilloscope ~ Volts Vs. Time (" * time_unit * ")"
+    label := label
+    return scaled_time, data.volt
 end
 
+function autoscale_seconds(data::Waveform_data)
+    # temp = filter(x->x != 0, abs.(data.time))
+    # @info "test", temp == data.time
+    # m = min(temp...)
+    unit = "seconds"
+    time_array = data.time
+    m = abs(min(data.time...))
+    @info "MIN", m
+    if m >= 1
+        @info "SECONDS"
+    elseif m < 1 && m >= 1e-3
+        @info "MILISECONDS"
+        unit = "miliseconds"
+        time_array = data.time * 1e3
+    elseif m < 1e-3 && m >= 1e-6
+        @info "Microseconds"
+        unit = "microseconds"
+        time_array = data.time * 1e6
+    elseif m < 1e-6 && m >= 1e-9
+        @info "Nanoseconds"
+        unit = "nanoseconds"
+        time_array = data.time * 1e9
+    else
+        @info "Seconds unit not found"
+    end
+    return unit, time_array
+end
+
+"""
+    lpf_on!(scope, chan=1)
+
+Turn on an internal low-pass filter. When the filter is on, the bandwidth of
+the specified channel is limited to approximately 25 MHz.
+
+"""
 lpf_on!(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit ON")
+
+"""
+    lpf_off!(scope, chan=1)
+
+Turn off an internal low-pass filter.
+"""
 lpf_off!(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit OFF")
+
+"""
+    get_lpf_state(scope, chan=1)
+
+See state the internal low-pass filter:
+
+returns "0" or "1"
+"""
 get_lpf_state(instr::Instrument, chan=1) = query(instr, "CHANnel$chan:BWLimit?")
 
+"""
+    set_impedance_one(scope, chan=1)
+
+Set impedance to ONEMEg
+"""
 set_impedance_one!(instr::Instrument, chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
 set_impedance_fifty!(instr::Instrument, chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
 get_impedance(instr::Instrument, chan=1) = query(instr, ":CHANnel$chan:IMPedance?")
@@ -38,7 +95,7 @@ scope_stop(instr::Instrument) = write(instr, "STOP")
 scope_continue(instr::Instrument) = write(instr, "RUN")
 
 scope_waveform_preamble_get(instr) = query(instr, "waveform:preamble?")
-scope_waveform_source_set(instr, ch::Int) = write(instr, @sprintf("waveform:source chan%i", ch))
+scope_waveform_source_set(instr, ch::Int) = write(instr, "waveform:source chan$ch")
 scope_waveform_source_get(instr) = query(instr, "waveform:source?")
 scope_waveform_mode_8bit(instr::Instrument) = write(instr, "waveform:format BYTE")
 scope_waveform_mode_16bit(instr::Instrument) = write(instr, "waveform:format WORD")
@@ -126,9 +183,9 @@ end
 
 # TODO: Make ch-vector only contain each channel maximum one time
 function get_data(instr::Instrument, ch_vec::Vector{Int})
-    #scope_stop(instr) # Makes sure the data from each channel is from the same trigger event
+    scope_stop(instr) # Makes sure the data from each channel is from the same trigger event
     wfm_data = [get_data(instr, ch) for ch in ch_vec]
-    #scope_continue(instr)
+    scope_continue(instr)
     return wfm_data
 end
 

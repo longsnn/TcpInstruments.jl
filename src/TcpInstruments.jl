@@ -13,6 +13,8 @@ export
         reset!,
         connect!,
         close!,
+        lock!,
+        unlock!,
         query,
         write,
 
@@ -41,6 +43,7 @@ export
         AgilentDSOX4034A,
         Keysight33612A,
         AgilentE36312A,
+        BenchXR,
 
 
         instrument_reset,

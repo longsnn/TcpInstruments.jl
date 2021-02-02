@@ -1,17 +1,14 @@
 using TcpInstruments
 using Test
 
-@info "Creating AgilentE36312A at 10.1.30.34"
+@info "Creating Bench Power at 10.1.30.35"
 @info "Connecting..."
-pwr = initialize(AgilentE36312A, "10.1.30.34")
-#pwr = TcpInstruments.GenericInstrument(:dummy, "10.1.30.34")
+pwr = initialize(BenchXR, "10.1.30.35:8003")
 @info pwr
 
 # pwr |> TcpInstruments.instrument_reset
 #
 @info query(pwr, "*IDN?")
-@info query(pwr, "*PSC?")
-@info query(pwr, "*TST?"), "TST?"
 
 """
 Spec:
@@ -43,32 +40,18 @@ write(pwr, ":OUTPUT:STATe OFF")
 @info query(pwr, "SOURce:CURRent?"), "current?"
 """
 
+lock!(pwr)
 @testset "Output" begin
     @info get_output(pwr), "OUTPUT"
     enable_output!(pwr)
 
     @info get_output(pwr), "OUTPUT"
     disable_output!(pwr)
-    set_channel!(pwr, 3)
-    @test get_output(pwr) == "0"
-    set_channel!(pwr, 2)
-    disable_output!(pwr)
-    @test get_output(pwr) == "0"
-    set_channel!(pwr, 1)
-    disable_output!(pwr)
-    @test get_output(pwr) == "0"
+    @test get_output(pwr) == "OFF"
 
     enable_output!(pwr)
+    @test get_output(pwr) == "ON"
 
-    @test get_output(pwr) == "1"
-    set_channel!(pwr, 2)
-    @test get_output(pwr) == "0"
-    set_channel!(pwr, 3)
-    @test get_output(pwr) == "0"
-
-    set_channel!(pwr, 2)
-    enable_output!(pwr)
-    @test get_output(pwr) == "1"
 end
 
 @testset "Current" begin
@@ -92,42 +75,29 @@ end
 end
 
 @testset "Voltage" begin
-    for i in 1:3
-        @info "CHANNEL: $i"
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, 2; chan=i)
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, 4; chan=i)
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, 6; chan=i)
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, 8; chan=i)
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, 20; chan=i)
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, 25; chan=i)
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, 0; chan=i)
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, "MAX"; chan=i)
-        @info get_voltage(pwr; chan=i)
-        set_voltage!(pwr, "MIN"; chan=i)
-        @info get_voltage(pwr; chan=i)
-    end
+    @info get_voltage(pwr)
+    set_voltage!(pwr, 2)
+    @info get_voltage(pwr)
+    set_voltage!(pwr, 4)
+    @info get_voltage(pwr)
+    set_voltage!(pwr, 6)
+    @info get_voltage(pwr)
+    set_voltage!(pwr, 8)
+    @info get_voltage(pwr)
+    set_voltage!(pwr, 20)
+    @info get_voltage(pwr)
+    set_voltage!(pwr, 25)
+    @info get_voltage(pwr)
+    set_voltage!(pwr, 0)
+    @info get_voltage(pwr)
+    set_voltage!(pwr, "MAX")
+    @info get_voltage(pwr)
+    set_voltage!(pwr, "MIN")
+    @info get_voltage(pwr)
 end
 
-@info query(pwr, "INST:NSEL?")
-@info query(pwr, "APPLy? CH1"), 1
-@info query(pwr, "APPLy? CH2"), 2
-@info query(pwr, "APPLy? CH3"), 3
 
-set_channel!(pwr, 3)
-set_voltage!(pwr, 7.7; chan=2)
-@test get_channel(pwr) == "+3"
-set_voltage!(pwr, 7.7)
-@info get_voltage(pwr)
-@info get_channel(pwr)
-
+unlock!(pwr)
 terminate(pwr)
 
 @info "Successfully disconnected"

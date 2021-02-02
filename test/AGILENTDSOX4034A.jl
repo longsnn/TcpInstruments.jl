@@ -22,7 +22,7 @@ Turn on Low Pass Filter 25
 Check if low pass filter is on
 > get_lpf_state(scope) == "1"
 
-Turn on Low Pass Filter 25
+Turn on Low Pass Filter 25MHz
 > lpf_off!(scope)
 > get_lpf_state(scope) == "0"
 
@@ -42,8 +42,11 @@ Terminate TCP connection
 
 """
 
-@info reset!(scope)
 data = get_data(scope, 1)
+
+data2 = get_data(scope, [1,2])
+@info typeof(data2)
+
 @test !isempty(data.volt)
 @test !isempty(data.time)
 
@@ -62,8 +65,6 @@ set_impedance_fifty!(scope)
 
 # plot(data)
 
-data2 = get_data(scope, [2,4])
-@info typeof(data2)
 @test terminate(scope)  == false
 @info "Successfully disconnected"
 @info "Goodbye"
