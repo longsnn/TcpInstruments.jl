@@ -23,26 +23,6 @@ set_current_limit(x)
 get_current_limit()
 """
 
-"""
-@info query(pwr, ":OUTPUT:STATE?"), "STATE"
-write(pwr, ":OUTPUT:STATe ON")
-@info query(pwr, ":OUTPUT:STATE?"), "STATE"
-write(pwr, ":OUTPUT:STATe OFF")
-@info query(pwr, ":OUTPUT:STATE?"), "STATE"
-"""
-
-"""
-@info query(pwr, "SOURce:CURRent?"), "current?"
-@info query(pwr, "SOURce:VOLTage?"), "volts?"
-@info write(pwr, "SOURce:VOLTage 5"), "volts"
-@info query(pwr, "SOURce:CURRent?"), "current?"
-@info query(pwr, "SOURce:VOLTage?"), "volts?"
-@info write(pwr, "SOURce:VOLTage 0"), "volts"
-@info query(pwr, "SOURce:VOLTage?"), "volts?"
-@info write(pwr, "SOURce:CURRent 5"), "current?"
-@info query(pwr, "SOURce:CURRent?"), "current?"
-"""
-
 @testset "Output" begin
     @info get_output(pwr), "OUTPUT"
     enable_output!(pwr)

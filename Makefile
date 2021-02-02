@@ -1,14 +1,18 @@
 e: # Emulate
-	julia test/fake_scope.jl
+	julia --project=. test/emulate/fake_device.jl
 t: # Test
-	julia test/dummy_instrument.jl
+	julia --project=. test/emulate/test_fake_device.jl
 c: # Console
 	julia --project=.
 s: # Scope
-	julia --project=. test/AGILENTDSOX4034A.jl
+	julia --project=. test/scope/agilent_dsox4034a.jl
 p: # Power Supply
-	julia test/power_supply.jl
+	julia --project=. test/pwr/agilent_e36312a.jl
 x: # Power Supply
-	julia test/bench_xr.jl
+	julia --project=. test/pwr/bench_xr.jl
 plot:
 	julia --project=. test/test_plot.jl
+
+
+
+

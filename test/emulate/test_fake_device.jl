@@ -39,9 +39,7 @@ end
     id = instrument_get_id(scope_h)
     @test id == "1"
 
-    #TODO: Implement
     data_struct = get_data(scope_h, 1)
-
 
     @test terminate(dummy) == false
     @info "Successfully disconnected"
