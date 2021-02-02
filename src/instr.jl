@@ -1,4 +1,3 @@
-using Sockets
 # Generic instrument struct
 abstract type Instrument end
 abstract type Oscilloscope <: Instrument end
