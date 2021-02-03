@@ -90,7 +90,16 @@ disable_output!(obj) = write(obj, ":OUTPUT:STATe OFF")
     Returns:
       String: {"0"|"1"}
 """
-get_output(obj) = query(obj, ":OUTPUT:STATE?")
+function get_output(obj) 
+    output = query(obj, ":OUTPUT:STATE?")
+    if output == "0"
+        return false
+    elseif output == "1"
+        return true
+    else
+        error("Undefined output: $output")
+    end
+end
 
 """
     This will change the voltage output voltage of a device.
@@ -232,10 +241,4 @@ set_channel!(obj::Instrument; v=false) = error("$(@codeLocation) not implemented
         - when v == true: "P6V", .. etc
 """
 get_channel(obj::Instrument; v=false) = error("$(@codeLocation) not implemented")
-
-lock!(obj) =  error("$(@codeLocation) not implemented")
-
-unlock!(onj) =  error("$(@codeLocation) not implemented")
-
-
 

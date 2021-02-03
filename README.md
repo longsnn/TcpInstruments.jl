@@ -11,15 +11,25 @@ This package is based on code from [GenericInstruments.jl](https://ci.appveyor.c
 which was again based on [Instruments.jl](https://github.com/BBN-Q/Instruments.jl). 
 
 SCPI is supported on almost all modern pieces of lab equipment but this code has been tested on the following devices:
-- [ ] Oscilloscope Keysight DSOX4034A
+- [X] Oscilloscope Keysight DSOX4034A
 - [ ] Oscilloscope Keysight DSOX4024A
 - [ ] Multimeter Keysight DMM34465A
-- [ ] Signal generator Keysight 33612A
-- [ ] Power supply Agilent E3631A
+- [X] Signal generator Keysight 33612A
+- [X] Power supply Agilent E36312A
 - [ ] Power supply Keysight 36312A
 - [ ] HV power supply SRS PS310 via Prologix GPIB to Ethernet adaptor
-- [ ] Power supply Versatile Power 100-10 XR
+- [X] Power supply Versatile Power 100-10 XR
 - [ ] Impedance analyser Agilent 4395A (with 43961A imp. probe)
 
 
 This package is under active development so expect breaking changes. 
+
+For more information on every type of instrument as well as
+their available functions and how they work:
+
+```
+julia --project=.
+julia>using TcpInstruments
+julia>?
+help>Instrument
+```

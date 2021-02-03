@@ -34,13 +34,33 @@ export
         set_channel!,
         get_channel,
 
+        run!,
+        stop!,
         lpf_on!,
         lpf_off!,
         get_lpf_state,
-
         set_impedance_one!,
         set_impedance_fifty!,
         get_impedance,
+        get_coupling,
+
+        get_function,
+        set_function!,
+        get_frequency,
+        set_frequency!,
+        get_amplitude,
+        set_amplitude!,
+        get_voltage_offset,
+        set_voltage_offset!,
+
+        get_burst_mode,
+        get_mode,
+
+
+        set_mode_burst!,
+        set_mode_cw!,
+        set_burst_mode_gated!,
+        set_burst_mode_triggered!,
 
 
         AgilentDSOX4024A,
@@ -68,7 +88,7 @@ include("common_commands.jl")
 # instruments
 include("scope/scope.jl")
 include("psu/psu.jl")
-#include("awg/awg.jl")
+include("awg/awg.jl")
 #include("dmm/dmm.jl")
 
 end #endmodule

@@ -1,3 +1,30 @@
+"""
+This device only has one channel so channel specific functions
+and optional arguments are not available.
+
+# Available functions
+- enable_output!()
+- disable_output!()
+- set_voltage!(volts)
+- get_voltage()
+- set_current_limit!(current)
+- get_current_limit()
+
+# Helpers
+- `lock!()`: sets the device to remote mode. Automatically called on initialize
+- unlock!(): sets the device to local mode. Automatically called on terminate
+
+This instrument has a remote and local mode. Some commands do not
+work while the device is in local mode, thus when initializing this
+device `lock!` is called automatically and the device is always in
+remote mode by default.
+
+These functions should not be directly needed but if
+for some reason you need to switch modes while using the device
+you can use TcpInstruments.unlock! to turn the device back to
+local mode.
+
+"""
 struct BenchXR <: PowerSupply end
 
 
@@ -85,6 +112,6 @@ set_current_limit!(obj::Instr{BenchXR}, num) = write(obj, "CURRent $num")
 get_current_limit(obj::Instr{BenchXR}) = query(obj, "CURRent?")
 
 
-lock!(obj::Instr{BenchXR}) = write(obj, "SYSTem:MODe RWLock")
+lock!(obj::Instr{BenchXR}) = write(obj, "SYSTem:MODe REMote")
 
 unlock!(obj::Instr{BenchXR}) =   write(obj, "SYSTem:MODe LOCal")

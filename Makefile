@@ -10,6 +10,9 @@ p: # Power Supply
 	julia --project=. test/pwr/agilent_e36312a.jl
 x: # Power Supply
 	julia --project=. test/pwr/bench_xr.jl
+w: # Waveform
+	julia --project=. test/waveform/33612a.jl
+
 plot:
 	julia --project=. test/test_plot.jl
 

@@ -11,6 +11,9 @@ struct Waveform_info
     y_increment::Float64
     y_origin::Float64
     y_reference::Float64
+    impedance::String
+    coupling::String
+    low_pass_filter::String
 end
 
 struct Waveform_data
@@ -19,10 +22,18 @@ struct Waveform_data
     time::Array{Float64,1}
 end
 
-@recipe function plot(data::Waveform_data; label="Channel 1")
+status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
+
+@recipe function plot(data::Waveform_data; label="Channel 1", xlabel="0", ylabel="Volts")
     time_unit, scaled_time = autoscale_seconds(data)
     title := "Oscilloscope ~ Volts Vs. Time (" * time_unit * ")"
     label := label
+    if xlabel == "0"
+        xlabel := "Time / " * time_unit
+    else
+        xlabel := xlabel
+    end
+    ylabel := ylabel * " / " * data.info.coupling
     return scaled_time, data.volt
 end
 
@@ -55,6 +66,13 @@ function autoscale_seconds(data::Waveform_data)
 end
 
 """
+    get_coupling(scope, chan=1)
+
+returns "AC" or "DC"
+"""
+get_coupling(instr::Instrument; chan=1) = query(instr, "CHANnel$chan:COUPLing?")
+
+"""
     lpf_on!(scope, chan=1)
 
 Turn on an internal low-pass filter. When the filter is on, the bandwidth of
@@ -77,16 +95,16 @@ See state the internal low-pass filter:
 
 returns "0" or "1"
 """
-get_lpf_state(instr::Instrument, chan=1) = query(instr, "CHANnel$chan:BWLimit?")
+get_lpf_state(instr::Instrument; chan=1) = query(instr, "CHANnel$chan:BWLimit?")
 
 """
     set_impedance_one(scope, chan=1)
 
 Set impedance to ONEMEg
 """
-set_impedance_one!(instr::Instrument, chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
-set_impedance_fifty!(instr::Instrument, chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
-get_impedance(instr::Instrument, chan=1) = query(instr, ":CHANnel$chan:IMPedance?")
+set_impedance_one!(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
+set_impedance_fifty!(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
+get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANnel$chan:IMPedance?")
 
 scope_stop(instr::Instrument) = write(instr, "STOP")
 scope_continue(instr::Instrument) = write(instr, "RUN")
@@ -128,7 +146,7 @@ function scope_speed_mode(instr::Instrument, speed::Int)
     end
 end
 
-function scope_waveform_info_get(instr::Instrument)
+function scope_waveform_info_get(instr::Instrument, ch::Int)
     str = scope_waveform_preamble_get(instr)
     @info "preamble", str
     str_array = split(str, ",")
@@ -144,7 +162,10 @@ function scope_waveform_info_get(instr::Instrument)
     y_increment = parse(Float64, str_array[8])
     y_origin    = parse(Float64, str_array[9])
     y_reference = parse(Float64, str_array[10])
-    return Waveform_info(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference)
+    imp = get_impedance(instr; chan=ch)
+    coupling = get_coupling(instr; chan=ch)
+    low_pass_filter = get_lpf_state(instr; chan=ch)
+    return Waveform_info(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter)
 end 
 
 
@@ -172,7 +193,7 @@ end
 function get_data(instr::Instrument, ch::Int)
     scope_waveform_source_set(instr, ch)
     #instrument_empty_buffer(instr)
-    wfm_info = scope_waveform_info_get(instr)
+    wfm_info = scope_waveform_info_get(instr, ch)
     @show wfm_info
     raw_data = scope_read_raw_waveform(instr);
     return scope_parse_raw_waveform(raw_data, wfm_info) 
@@ -180,6 +201,12 @@ end
 
 # TODO: Make ch-vector only contain each channel maximum one time
 function get_data(instr::Instrument, ch_vec::Vector{Int})
+    for ch in ch_vec
+        @info status(instr, ch)
+        if !status(instr, ch)
+            error("Channel $ch is offline, data cannot be read")
+        end
+    end
     scope_stop(instr) # Makes sure the data from each channel is from the same trigger event
     wfm_data = [get_data(instr, ch) for ch in ch_vec]
     scope_continue(instr)

@@ -2,9 +2,11 @@ include("scope_common.jl")
 
 struct AgilentDSOX4024A <: Oscilloscope end
 struct AgilentDSOX4034A <: Oscilloscope end
-struct Keysight33612A <: WaveformGenerator end
 
-const SignalGenAndScope = Union{AgilentDSOX4024A, Keysight33612A}
+#const SignalGenAndScope = Union{AgilentDSOX4024A, Keysight33612A}
+
+run!(obj::Instr{AgilentDSOX4034A})    = scope_continue(obj)
+stop!(obj::Instr{AgilentDSOX4034A})    = scope_stop(obj)
 
 # Priority 1 when defined
 #instrument_reset(obj::Instr{AgilentDSOX4024A})    = write(obj, "*RST for 402")

@@ -1,3 +1,15 @@
+"""
+
+# Available functions
+- `enable_output!()`
+- `disable_output!()`
+- `set_voltage!(voltage)`
+- `get_voltage()`
+- `set_current_limit!(current)`
+- `get_current_limit()`
+- `set_channel!(channel)`
+- `get_channel()`
+"""
 struct AgilentE36312A <: PowerSupply end
 
 """
