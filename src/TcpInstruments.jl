@@ -10,6 +10,7 @@ export
         MultiMeter,
         PowerSupply,
         WaveformGenerator,
+        ImpedanceAnalyzer,
         GenericInstrument,
 
         initialize,
@@ -80,12 +81,20 @@ export
         set_temp_kelvin,
 
         # Devices
+        ## Impedance Analyzer
+        Agilent4294A,
+        Agilent4395A,
+        ## Multimeter
+        #KeysightDMM34465A,
+        ## Scope
         AgilentDSOX4024A,
         AgilentDSOX4034A,
-        Keysight33612A,
+        ## Power Supply
         AgilentE36312A,
         BenchXR,
         PS310,
+        ## Waveform Generator
+        Keysight33612A,
 
 
         instrument_reset,

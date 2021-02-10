@@ -1,5 +1,8 @@
+using Base.Threads: @spawn
 using Sockets
+
 import Base.write, Base.read
+
 
 mutable struct GenericInstrument <: Instrument
     name::Symbol
@@ -39,8 +42,6 @@ function read(instr::Instrument; timeout=5)
 	return rstrip(readline(instr.sock), ['\r', '\n'])
 end
 
-using Base.Threads: @spawn
-
 """
 Writes a message to a device then listens for and returns any output from
 the device.
@@ -55,11 +56,11 @@ error will be thrown.
 - `timeout`: _Optional flag_ ~ How long to try and listen for a response before giving up and throwing an error. The default time is half a second. _Note_: if timeout is set to 0 then this will turn off the timeout functionality and `query` may listen/block indefinitely for a response
 """
 function query(instr::Instrument, message::AbstractString; timeout=1)
-	write(instr, message)
+    write(instr, message)
     if timeout == 0
         return read(instr)
     end
-	proc = @spawn read(instr)
+    proc = @spawn read(instr)
     sleep(timeout)
     if proc.state == :runnable
         schedule(proc, ErrorException("Query timed out"), error=true)

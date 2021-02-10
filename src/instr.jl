@@ -53,8 +53,9 @@ abstract type MultiMeter <: Instrument end
 
 """
 # Supported Instruments
-- `BenchXR`
 - `AgilentE36312A`
+- `BenchXR`
+- `PS310`
 """
 abstract type PowerSupply <: Instrument end
 
@@ -65,6 +66,13 @@ abstract type PowerSupply <: Instrument end
 - `Keysight33612A`: Default ip ~ "10.1.30.36"
 """
 abstract type WaveformGenerator <: Instrument end
+
+"""
+# Supported Instruments:
+- `Agilent4395A`
+
+"""
+abstract type ImpedanceAnalyzer <: Instrument end
 
 mutable struct Instr{ T <: Instrument } <: Instrument
     model::Type

@@ -3,7 +3,6 @@
 - initialize()
 - terminate()
 - get_tc_temperature() # tc = thermocouple
-- set_tc_type()
 - get_volt()
 - get_amp()
 """
@@ -22,9 +21,6 @@ default is equivalent to 10 PLC.
 """
 get_tc_temperature(obj::Instr{KeysightDMM34465A}; probe="TC" ) =
     query(obj, "MEAS:TEMP? TC") # TODO: Resolution adujstable if neccessary/Change probe
-
-# TODO: Implement
-set_tc_type(obj::Instr{KeysightDMM34465A}) = udef(@codeLocation)
 
 """
 

@@ -17,7 +17,7 @@ SCPI is supported on almost all modern pieces of lab equipment but this code has
 - [X] Signal generator Keysight 33612A
 - [X] Power supply Agilent E36312A
 - [ ] Power supply Keysight 36312A
-- [ ] HV power supply SRS PS310 via Prologix GPIB to Ethernet adaptor
+- [X] HV power supply SRS PS310 via Prologix GPIB to Ethernet adaptor
 - [X] Power supply Versatile Power 100-10 XR
 - [ ] Impedance analyser Agilent 4395A (with 43961A imp. probe)
 
