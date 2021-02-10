@@ -1,0 +1,34 @@
+# Call TcpInstruments.init_tcp_yaml() after modifying this file
+
+AgilentDSOX4034A: "10.1.30.32"
+AgilentE36312A: "10.1.30.34"
+BenchXR: "10.1.30.35:8003"
+Keysight33612A: "10.1.30.36"
+Prologix:
+    Address: "10.1.30.37:1234"
+    Devices:
+        PS310: 2
+        PS330: 3
+        PS440: 4
+PS310:
+    Prologix: 2
+    Address: "10.1.30.37:1234"
+Agilent4395A:
+    Prologix: 5
+    Address: "10.1.30.38:1234"
+Prologix:
+    PS310:
+        Address: "10.1.30.37:1234"
+        Channel: 2
+    PS330:
+        Address: "10.1.30.37:1234"
+        Channel: 3
+Prologix:
+    10.1.30.37:1234: 
+        PS310: 2
+        PS330: 3
+    10.1.30.377:1234: 
+        PS310: 2
+        PS330: 3
+        PS430: 4
+

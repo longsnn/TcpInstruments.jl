@@ -1,14 +1,8 @@
 using TcpInstruments
 using Test
 
-@info "Creating Bench Power at 10.1.30.35"
-@info "Connecting..."
-pwr = initialize(BenchXR, "10.1.30.35:8003")
-@info pwr
-
-# pwr |> TcpInstruments.instrument_reset
-#
-@info query(pwr, "*IDN?")
+pwr = initialize(BenchXR)
+@info "Successfully connected $(pwr.model) at $(pwr.address)" 
 
 """
 Spec:
@@ -24,36 +18,39 @@ unlock!()
 
 lock!(pwr)
 @testset "Output" begin
-    @info get_output(pwr), "OUTPUT"
-    enable_output!(pwr)
+    @info get_output(pwr)
 
-    @info get_output(pwr), "OUTPUT"
+    enable_output!(pwr)
+    @test get_output(pwr) == true
+
     disable_output!(pwr)
-    @test get_output(pwr) == "OFF"
-
-    enable_output!(pwr)
-    @test get_output(pwr) == "ON"
-
+    @test get_output(pwr) == false
 end
 
 @testset "Current" begin
-    @info get_current_limit(pwr)
-    set_current_limit!(pwr, 1)
-    @info get_current_limit(pwr)
-    set_current_limit!(pwr, 2)
-    @info get_current_limit(pwr)
-    set_current_limit!(pwr, 3)
-    @info get_current_limit(pwr)
-    set_current_limit!(pwr, 4)
-    @info get_current_limit(pwr)
-    set_current_limit!(pwr, 0)
-    @info get_current_limit(pwr)
+    function test_current(cur)
+        set_current_limit!(pwr, cur)
+        @info get_current_limit(pwr)
+        @test get_current_limit(pwr) == cur
+    end
+
+    test_current(0)
+    test_current(1)
+    test_current(1.5)
+    test_current("1.6")
+    test_current(1.72e0)
+    test_current(2)
+    test_current(3)
+    test_current(4)
+
     set_current_limit!(pwr, "MAX")
     @info get_current_limit(pwr)
+
     set_current_limit!(pwr, "MIN")
     @info get_current_limit(pwr)
-    set_current_limit!(pwr, 5)
-    @info get_current_limit(pwr)
+
+    test_current(5)
+    test_current(0)
 end
 
 @testset "Voltage" begin

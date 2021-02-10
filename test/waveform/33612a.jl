@@ -4,9 +4,9 @@ using Test
 w = write
 q = query
 
-@info "Howdy Partner! Initializing Waveform Generator at 10.1.30.36"
-@info "Connecting..."
-wg = initialize(Keysight33612A, "10.1.30.36")
+wg = initialize(Keysight33612A)
+@info "Successfully connected $(wg.model) at $(wg.address)"
+
 @info get_output(wg)
 enable_output!(wg)
 @test get_output(wg) == true

@@ -47,7 +47,7 @@ abstract type Oscilloscope <: Instrument end
 
 """
 # Supported Instruments
-- I am lonely
+- KeysightDMM34465A
 """
 abstract type MultiMeter <: Instrument end
 
@@ -95,13 +95,25 @@ Initializes a connection to the instrument at the given (input) IP address.
 - `model`: They device type you are connecting to. Use `help>Instrument` to see available options.
 - `address::String`: The ip address of the device. Ex. "10.3.30.23"
 """
-function initialize(model, address)
+function initialize(model, address; prologix_chan=-1)
     instr_h = CreateTcpInstr(model, address)
     connect!(instr_h)
     lock!(instr_h)
+    if prologix_chan >= 0
+        set_prologix_chan!(instr_h, prologix_chan)
+    end
     return instr_h
 end
 
+function initialize(model)
+    data = TCP_CONFIG[string(model)]
+    if data isa String
+        return initialize(model, data)
+    end
+    return initialize(model,
+                      data["Address"],
+                      prologix_chan=data["Prologix"])
+end
 
 """
     terminate(instr)
@@ -117,4 +129,5 @@ reset!(obj) = write(obj, "*RST")
 
 lock!(obj)   = nothing
 unlock!(obj) = nothing
-
+set_prologix_chan!(obj, chan) = write(obj, "++addr $chan")
+get_prologix_chan(obj) = query(obj, "++addr")

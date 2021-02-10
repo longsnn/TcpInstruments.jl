@@ -36,8 +36,6 @@ enable_output!(wave) # Starts wave
 struct Keysight33612A <: WaveformGenerator end
 #instrument_reset(obj::Instr{AgilentDSOX4024A})    = write(obj, "*RST for 402")
 
-f_query(obj, ins) = parse(Float64, query(obj, ins))
-
 get_voltage_offset(obj::Instr{Keysight33612A}; chan=1) =
     f_query(obj, "SOUR$chan:VOLTage:OFFset?")
 set_voltage_offset!(obj::Instr{Keysight33612A}, num; chan=1) =

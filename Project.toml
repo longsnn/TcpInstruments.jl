@@ -4,12 +4,14 @@ authors = ["mofii"]
 version = "0.0.1"
 
 [deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
 TestSetExtensions = "98d24dd4-01ad-11ea-1b02-c9a08f80db04"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [compat]
 julia = "1"

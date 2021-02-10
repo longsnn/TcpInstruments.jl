@@ -1,8 +1,9 @@
 using TcpInstruments
 using Test
 
-@info "Creating AgilentDSOX4034A at 10.1.30.32"
-scope = initialize(AgilentDSOX4034A,  "10.1.30.32")
+scope = initialize(AgilentDSOX4034A)
+@info "Successfully connected $(scope.model) at $(scope.address)"
+
 
 """
 Spec:
@@ -65,6 +66,6 @@ set_impedance_fifty!(scope)
 
 # plot(data)
 
-@test terminate(scope)  == false
+terminate(scope)
 @info "Successfully disconnected"
 @info "Goodbye"
