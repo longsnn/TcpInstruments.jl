@@ -1,7 +1,7 @@
 using TcpInstruments
 using Test
 
-p = initialize(PS310)
+p = initialize(SRSPS310)
 @info "Successfully connected $(p.model) at $(p.address)"
 """
 # Available functions

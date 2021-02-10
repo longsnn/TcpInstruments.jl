@@ -92,7 +92,7 @@ export
         ## Power Supply
         AgilentE36312A,
         BenchXR,
-        PS310,
+        SRSPS310,
         ## Waveform Generator
         Keysight33612A,
 
