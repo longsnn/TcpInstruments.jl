@@ -1,6 +1,13 @@
 include("./Agilent4294A.jl")
 include("./Agilent4395A.jl")
 
+get_frequency_limits(i::Instr{T}) where (T <: ImpedanceAnalyzer) =
+    query(obj, "STAR?"), query(obj, "STOP?")
+
+set_frequency_limits(i::Instr{T}, start, stop)
+                                where (T <: ImpedanceAnalyzer) =
+    write(obj, "STAR $start; STOP $stop")
+
 set_num_data_points(i::Instr{T}, n) where (T <: ImpedanceAnalyzer) =
     write(obj, "POIN $n")
 

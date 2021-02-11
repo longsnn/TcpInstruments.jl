@@ -1,4 +1,5 @@
 """
+http://literature.cdn.keysight.com/litweb/pdf/04395-90031.pdf
 # Available functions
 - `initialize()`
 - `terminate()`
@@ -18,18 +19,9 @@
 struct Agilent4395A <: ImpedanceAnalyzer end
 
 """
-[Start] Lower Frequency
-[Stop] Upper Frequency
+Returns device bandwidth
 """
-set_frequency_limits(i::Instr{Agilent4294A}, start, stop) =
-    write(obj, "STAR $start; STOP $stop")
-
-"""
-[Start] Lower Frequency
-[Stop] Upper Frequency
-"""
-get_frequency_limits(obj::Instr{Agilent4294A}) =
-    query(obj, "STAR?"), query(obj, "STOP?")
+get_bandwith(i::Instr{Agilent4395A}) = query(i, "BW?")
 
 """
 Pg.  B-3
@@ -37,13 +29,8 @@ Pg.  B-3
 2, 10, 30, 100, 300, 1000 (=1k), 3000 (=3k), 10000 (=10k),
 30000 (=30k) (Network and impedance analyzers)
 """
-set_bandwith(i::Instr{Agilent4294A}, n) = write(i, "BW $n")
+set_bandwith(i::Instr{Agilent4395A}, n) = write(i, "BW $n")
 
-
-set_num_data_points(obj::Instr{Agilent4294A}, num) =
-    write(obj, "POIN")
-get_num_data_points(obj::Instr{Agilent4294A}, num) =
-    query(obj, "POIN?")
 
 """
 P. 3-10
@@ -63,9 +50,19 @@ function get_impedance(obj::Instr{Agilent4294A})
     @info query(obj, "OUTPSWPRM?")
 end
 
-# TODO: Spectrum or impedance mode query(obj, "ZA?")
-# TODO: initialize? write(obj, "PRES; ZA; CHAN 1")
+"""
+Returns 1 or 2 depending on current channel
+"""
+get_channel(i::Instr{Agilent4395A}) = query(i, "CHAN?")
 
-get_channel(i::Instr{Agilent4395A}) = query(i, "TRAC?") == "A" ? 1 : 2
+"""
+    set_channel(i, channel_number)
 
+Uses.
+```
+set_channel(i, 1)
+
+set_channel(i, 2)
+```
+"""
 set_channel!(i::Instr{Agilent4395A}, n) = write(i, "CHAN $n")
