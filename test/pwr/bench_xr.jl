@@ -1,7 +1,7 @@
 using TcpInstruments
 using Test
 
-pwr = initialize(BenchXR)
+pwr = initialize(VersatilePowerBench100_10XR)
 @info "Successfully connected $(pwr.model) at $(pwr.address)" 
 
 """

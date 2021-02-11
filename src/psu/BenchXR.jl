@@ -25,7 +25,7 @@ you can use TcpInstruments.unlock! to turn the device back to
 local mode.
 
 """
-struct BenchXR <: PowerSupply end
+struct VersatilePowerBench100_10XR <: PowerSupply end
 
 
 """
@@ -37,7 +37,7 @@ Arguments:
 Supported Instruments:
    - Power supply
 """
-enable_output!(obj::Instr{BenchXR}) = write(obj, "OUTPut ON")
+enable_output!(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPut ON")
 
 """
 This will disable an output on a device.
@@ -48,7 +48,7 @@ Arguments:
 Supported Instruments:
    - Power supply
 """
-disable_output!(obj::Instr{BenchXR}) = write(obj, "OUTPut OFF")
+disable_output!(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPut OFF")
 
 
 """
@@ -63,7 +63,7 @@ Supported Instruments:
 Returns:
   String: {"OFF"|"ON"}
 """
-get_output(obj::Instr{BenchXR}) = query(obj, "OUTPut?")
+get_output(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "OUTPut?")
 
 """
 This will change the voltage output of a device.
@@ -75,7 +75,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage!(obj::Instr{BenchXR}, num) = write(obj, "VOLTage $num")
+set_voltage!(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "VOLTage $num")
 
 """
 This will return the voltage of a device
@@ -86,7 +86,7 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage(obj::Instr{BenchXR}) = query(obj, "VOLTage?")
+get_voltage(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "VOLTage?")
 
 """
 This will change the current limit of a device 
@@ -97,7 +97,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit!(obj::Instr{BenchXR}, num) = write(obj, "CURRent $num")
+set_current_limit!(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "CURRent $num")
 
 """
 This will return the current limit of a device.
@@ -109,9 +109,9 @@ Supported Instruments:
 Returns:
   Current Limit
 """
-get_current_limit(obj::Instr{BenchXR}) = query(obj, "CURRent?")
+get_current_limit(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "CURRent?")
 
 
-lock!(obj::Instr{BenchXR}) = write(obj, "SYSTem:MODe REMote")
+lock!(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "SYSTem:MODe REMote")
 
-unlock!(obj::Instr{BenchXR}) =   write(obj, "SYSTem:MODe LOCal")
+unlock!(obj::Instr{VersatilePowerBench100_10XR}) =   write(obj, "SYSTem:MODe LOCal")

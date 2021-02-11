@@ -1,6 +1,6 @@
 include("./AgilentE36312A.jl")
 include("./BenchXR.jl")
-include("./PS310.jl")
+include("./SRSPS310.jl")
 
 """
     This will set the global channel on a device.

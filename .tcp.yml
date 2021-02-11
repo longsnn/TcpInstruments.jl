@@ -4,7 +4,7 @@
 AgilentDSOX4034A: "10.1.30.32"
 # Power Supply
 AgilentE36312A: "10.1.30.34"
-BenchXR: "10.1.30.35:8003"
+VersatilePowerBench100_10XR: "10.1.30.35:8003"
 SRSPS310:
     Prologix: 2
     Address: "10.1.30.37:1234"
