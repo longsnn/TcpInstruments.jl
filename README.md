@@ -26,11 +26,22 @@ This package is under active development so expect breaking changes.
 For more information on every type of instrument as well as
 their available functions and how they work:
 
+Get our latest lab config:
 ```
-julia --project=.
+wget https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp.yml
+```
+Now install the package
+```
+julia 
+julia>] add https://github.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl
 julia>using TcpInstruments
 julia>?
 help>Instrument
+```
+
+Get the newest version:
+```
+julia>] up
 ```
 
 # Using this library
