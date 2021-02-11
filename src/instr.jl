@@ -106,9 +106,9 @@ Initializes a connection to the instrument at the given (input) IP address.
 function initialize(model, address; prologix_chan=-1)
     instr_h = CreateTcpInstr(model, address)
     connect!(instr_h)
-    lock!(instr_h)
+    lock(instr_h)
     if prologix_chan >= 0
-        set_prologix_chan!(instr_h, prologix_chan)
+        set_prologix_chan(instr_h, prologix_chan)
     end
     return instr_h
 end
@@ -130,12 +130,12 @@ Closes the TCP connection.
 """
 function terminate(instr::Instrument)
     close!(instr)
-    unlock!(instr)
+    unlock(instr)
 end
 
-reset!(obj) = write(obj, "*RST")
+reset(obj) = write(obj, "*RST")
 
-lock!(obj)   = nothing
-unlock!(obj) = nothing
-set_prologix_chan!(obj, chan) = write(obj, "++addr $chan")
+lock(obj)   = nothing
+unlock(obj) = nothing
+set_prologix_chan(obj, chan) = write(obj, "++addr $chan")
 get_prologix_chan(obj) = query(obj, "++addr")

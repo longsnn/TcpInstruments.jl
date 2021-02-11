@@ -42,7 +42,7 @@ Formatted data
 This is the array of data being displayed. It reflects all post-processing functions such as
 electrical delay, and the units of the array read out depends on the current display format.
 """
-function get_impedance(obj::Instr{Agilent4294A}) 
+function get_impedance(obj::Instr{Agilent4395A}) 
     write(obj, "MEAS IMAG")
     #write(obj, "FORM3")
     write(obj, "FORM4")
@@ -65,4 +65,4 @@ set_channel(i, 1)
 set_channel(i, 2)
 ```
 """
-set_channel!(i::Instr{Agilent4395A}, n) = write(i, "CHAN $n")
+set_channel(i::Instr{Agilent4395A}, n) = write(i, "CHAN $n")

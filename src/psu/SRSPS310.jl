@@ -4,15 +4,15 @@ to work.
 
 
 # Available functions
-- `enable_output!()`
-- `disable_output!()`
-- `set_voltage!(volts)`
+- `enable_output()`
+- `disable_output()`
+- `set_voltage(volts)`
 - `get_voltage()`
-- `set_voltage_limit!(volts)`
+- `set_voltage_limit(volts)`
 - `get_voltage_limit()`
-- `set_current_limit!(current)`
+- `set_current_limit(current)`
 - `get_current_limit()`
-- `set_prologix_chan!(chan)`
+- `set_prologix_chan(chan)`
 - `get_prologix_chan(chan)`
 """
 struct SRSPS310 <: PowerSupply end
@@ -27,7 +27,7 @@ struct SRSPS310 <: PowerSupply end
     Supported Instruments:
        - Power supply
 """
-enable_output!(obj::Instr{SRSPS310}) = write(obj, "HVON")
+enable_output(obj::Instr{SRSPS310}) = write(obj, "HVON")
 
 """
     This will disable an output on a device.
@@ -38,7 +38,7 @@ enable_output!(obj::Instr{SRSPS310}) = write(obj, "HVON")
     Supported Instruments:
        - Power supply
 """
-disable_output!(obj::Instr{SRSPS310}) = write(obj, "HVOF")
+disable_output(obj::Instr{SRSPS310}) = write(obj, "HVOF")
 
 """
 This will disable an output on a device.
@@ -66,7 +66,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage!(obj::Instr{SRSPS310}, num) = write(obj, "VSET$num")
+set_voltage(obj::Instr{SRSPS310}, num) = write(obj, "VSET$num")
 
 """
     This will return the voltage of a device
@@ -82,7 +82,7 @@ set_voltage!(obj::Instr{SRSPS310}, num) = write(obj, "VSET$num")
 get_voltage(obj::Instr{SRSPS310}) = f_query(obj, "VSET?") # VLIM?
 
 """
-    set_voltage_limit!(::SRSPS310, voltage_limit)
+    set_voltage_limit(::SRSPS310, voltage_limit)
 
 This will change the voltage limit of a device.
 
@@ -94,7 +94,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage_limit!(obj::Instr{SRSPS310}, num) = write(obj, "VLIM$num")
+set_voltage_limit(obj::Instr{SRSPS310}, num) = write(obj, "VLIM$num")
 
 """
     This will return the voltage limit of a device
@@ -121,7 +121,7 @@ get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") # VLIM?
     Returns:
       Nothing
 """
-set_current_limit!(obj::Instr{SRSPS310}, num) = write(obj, "ILIM$num")
+set_current_limit(obj::Instr{SRSPS310}, num) = write(obj, "ILIM$num")
 
 """
     This will return the current limit of a device.

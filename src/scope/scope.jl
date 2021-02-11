@@ -5,8 +5,8 @@ struct AgilentDSOX4034A <: Oscilloscope end
 
 #const SignalGenAndScope = Union{AgilentDSOX4024A, Keysight33612A}
 
-run!(obj::Instr{AgilentDSOX4034A})    = scope_continue(obj)
-stop!(obj::Instr{AgilentDSOX4034A})    = scope_stop(obj)
+run(obj::Instr{AgilentDSOX4034A})    = scope_continue(obj)
+stop(obj::Instr{AgilentDSOX4034A})    = scope_stop(obj)
 
 # Priority 1 when defined
 #instrument_reset(obj::Instr{AgilentDSOX4024A})    = write(obj, "*RST for 402")

@@ -49,7 +49,7 @@ get_volt_ac(i::Instr{Agilent4294A}) = query(i, "POWE?")
 """
 Range For voltage setting: 5E-3 to 1
 """
-set_volt_ac!(i::Instr{Agilent4294A}, n) = write(i, "POWE $n"*"V")
+set_volt_ac(i::Instr{Agilent4294A}, n) = write(i, "POWE $n"*"V")
 
 """
 P. 188
@@ -63,7 +63,7 @@ end
 
 get_channel(i::Instr{Agilent4294A}) = query(i, "TRAC?") == "A" ? 1 : 2
 
-function set_channel!(i::Instr{Agilent4294A}, n::Int)
+function set_channel(i::Instr{Agilent4294A}, n::Int)
     @assert n in [1,2] "Channel cannot be: $n (must be 1 or 2)"
     n == 1 ? write(i, "TRAC A") :  write(i, "TRAC B")
 end

@@ -18,22 +18,22 @@ Grab data from channel 2 and 4
 
 Low Pass Filter
 Turn on Low Pass Filter 25
-> lpf_on!(scope)
+> lpf_on(scope)
 
 Check if low pass filter is on
 > get_lpf_state(scope) == "1"
 
 Turn on Low Pass Filter 25MHz
-> lpf_off!(scope)
+> lpf_off(scope)
 > get_lpf_state(scope) == "0"
 
 Impedance
 
-> set_impedance_one!(scope_h)
+> set_impedance_one(scope_h)
 
 > get_impedance(scope_h) == ONEM
 
-> set_impedance_fifty!(scope_h)
+> set_impedance_fifty(scope_h)
 
 > get_impedance(scope_h) == FIFT
 
@@ -52,15 +52,15 @@ data2 = get_data(scope, [1,2])
 @test !isempty(data.time)
 
 @info get_lpf_state(scope)
-lpf_on!(scope)
+lpf_on(scope)
 @info get_lpf_state(scope)
-lpf_off!(scope)
+lpf_off(scope)
 @info get_lpf_state(scope)
 
 @info get_impedance(scope)
-set_impedance_one!(scope)
+set_impedance_one(scope)
 @info get_impedance(scope)
-set_impedance_fifty!(scope)
+set_impedance_fifty(scope)
 @info get_impedance(scope)
 
 

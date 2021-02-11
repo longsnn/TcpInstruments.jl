@@ -16,7 +16,6 @@ SCPI is supported on almost all modern pieces of lab equipment but this code has
 - [ ] Multimeter Keysight DMM34465A
 - [X] Signal generator Keysight 33612A
 - [X] Power supply Agilent E36312A
-- [ ] Power supply Keysight 36312A
 - [X] HV power supply SRS PS310 via Prologix GPIB to Ethernet adaptor
 - [X] Power supply Versatile Power 100-10 XR
 - [ ] Impedance analyser Agilent 4395A (with 43961A imp. probe)
@@ -52,12 +51,12 @@ in the documentation or in the repl: `help>{name-of-device}`
 ###  Creating a Sin Wave Example:
 ```
 wave = initialize(Keysight33612A, "10.1.30.36")
-set_mode_cw!(wave) # Set to continuous waveform mode
-set_function!(wave, "SIN")
-set_frequency!(wave, 1000)
-set_amplitude!(wave, 0.1)
-set_voltage_offset!(wave, 0)
-enable_output!(wave) # Starts wave
+set_mode_cw(wave) # Set to continuous waveform mode
+set_function(wave, "SIN")
+set_frequency(wave, 1000)
+set_amplitude(wave, 0.1)
+set_voltage_offset(wave, 0)
+enable_output(wave) # Starts wave
 
 ```
 ## GPIB Power Supply (SRSPS310) used with Prologix Controller
@@ -75,17 +74,17 @@ julia>using TcpInstruments
 julia>p = initialize(SRSPS310, "10.1.30.37:1234")
 julia>scan_prologix(p)
 2 => "PS310"
-julia>set_prologix!(p, 2)
+julia>set_prologix(p, 2)
 julia>get_prologix(p)
 2
 ```
 ### Using SRSPS310 Power Supply
 ```
 p = initialize(SRSPS310, "10.1.30.37:1234"; prologix_chan=2)
-set_voltage_limit!(p, 1250)
-set_voltage!(p, 1250)
-set_current_limit!(p, 0.021) # 21mA
-enable_output!(p)
+set_voltage_limit(p, 1250)
+set_voltage(p, 1250)
+set_current_limit(p, 0.021) # 21mA
+enable_output(p)
 ```
 
 ## Autoinitialize
@@ -114,6 +113,12 @@ SRSPS310:
     Address: "10.1.30.37:1234"
 ```
 
+Recompile new config
+```
+julia --project=.
+julia>using TcpInstruments; TcpInstruments.init_tcp_yaml()
+```
+
 The .tcp.yml file must be in the current directory of our project. If you have multiple scripts in different directories you can
 can also place the config file in your home directory: `~/.tcp.yml`.
 
@@ -130,9 +135,9 @@ p = initialize(SRSPS310)
 # Initialize automatically puts this power supply in remote mode
 pwr = initialize(VersatilePowerBench100_10XR)
 
-set_voltage!(pwr, 20)
-set_current_limit!(pwr, 4)
-enable_output!(pwr)
+set_voltage(pwr, 20)
+set_current_limit(pwr, 4)
+enable_output(pwr)
 
 # Closes connection as with other devices but also puts this
 # device back into local mode
@@ -144,25 +149,25 @@ terminate(pwr)
 ```
 pwr = initialize(AgilentE36312A)
 
-set_channel!(pwr, 1)
-set_current_limit!(pwr, 1)
-set_voltage!(pwr, 2)
-enable_output!(pwr) # Enables output on channel 1
+set_channel(pwr, 1)
+set_current_limit(pwr, 1)
+set_voltage(pwr, 2)
+enable_output(pwr) # Enables output on channel 1
 
-set_channel!(pwr, 2)
-set_voltage!(pwr, "10")
-enable_output!(pwr) # Enables output on channel 2
+set_channel(pwr, 2)
+set_voltage(pwr, "10")
+enable_output(pwr) # Enables output on channel 2
 
-set_channel!(pwr, 3)
-set_voltage!(pwr, "MAX")
+set_channel(pwr, 3)
+set_voltage(pwr, "MAX")
 
-set_voltage!(pwr, "MIN"; chan=1) # Changes voltage of channel 1
+set_voltage(pwr, "MIN"; chan=1) # Changes voltage of channel 1
 
 get_voltage(pwr) # Get voltage channel 3
 get_voltage(pwr; chan=2)
 get_voltage(pwr; chan=1)
 
-enable_output!(pwr) # Enables output on channel 3
+enable_output(pwr) # Enables output on channel 3
 ```
 
 ## Scope
@@ -171,22 +176,22 @@ enable_output!(pwr) # Enables output on channel 3
 scope = initialize(AgilentDSOX4034A)
 
 # Turn on Low Pass Filter 25MHz
-lpf_on!(scope)
+lpf_on(scope)
 
 # See that low pass filter is on
 get_lpf_state(scope)
 
 # Turn Off Low Pass Filter 25MHz
-lpf_off!(scope)
+lpf_off(scope)
 
 # See that low pass filter is off
 get_lpf_state(scope)
 
 
-set_impedance_one!(scope)
+set_impedance_one(scope)
 @info get_impedance(scope)
 
-set_impedance_fifty!(scope)
+set_impedance_fifty(scope)
 @info get_impedance(scope)
 
 # Get data from channel 1
@@ -222,16 +227,16 @@ scope = initialize(AgilentDSOX4034A)
 pwr = initialize(VersatilePowerBench100_10XR)
 wave = initialize(Keysight33612A)
 
-set_mode_cw!(wave)
-set_function!(wave, "SIN")
-set_frequency!(wave, 1000)
-set_amplitude!(wave, 0.1)
-set_voltage_offset!(wave, 0)
-enable_output!(wave)
+set_mode_cw(wave)
+set_function(wave, "SIN")
+set_frequency(wave, 1000)
+set_amplitudewave, 0.1)
+set_voltage_offset(wave, 0)
+enable_output(wave)
 
-set_voltage!(pwr, 20)
-set_current_limit!(pwr, 4)
-enable_output!(pwr)
+set_voltage(pwr, 20)
+set_current_limit(pwr, 4)
+enable_output(pwr)
 
 chan1, chan2 = get_data(scope, [1,2])
 plot(chan1)

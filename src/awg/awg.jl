@@ -3,8 +3,8 @@ Device has two channels: 1 & 2
 # Supported functions
 - `initialize()`
 - `terminate()`
-- `enable_output!()`
-- `disable_output!()`
+- `enable_output()`
+- `disable_output()`
 - `get_output()`
 - `get_frequency()`
 - `set_frequency()`
@@ -19,18 +19,18 @@ Device has two channels: 1 & 2
 - `get_burst_period()`
 - `set_burst_period()`
 - `get_mode()`
-- `set_mode_burst!(; mode=:trigger, trig_src=:timer)`
-- `set_mode_cw!()`
+- `set_mode_burst(; mode=:trigger, trig_src=:timer)`
+- `set_mode_cw()`
 
 Creating a Sin Wave Example:
 ```
 wave = initialize(Keysight33612A, "10.1.30.36")
-set_mode_cw!(wave) # Set to continuous waveform mode
-set_function!(wave, "SIN")
-set_frequency!(wave, "1e3") # Frequency val can be string or number
-set_amplitude!(wave, 0.1)
-set_voltage_offset!(wave, 0)
-enable_output!(wave) # Starts wave
+set_mode_cw(wave) # Set to continuous waveform mode
+set_function(wave, "SIN")
+set_frequency(wave, "1e3") # Frequency val can be string or number
+set_amplitude(wave, 0.1)
+set_voltage_offset(wave, 0)
+enable_output(wave) # Starts wave
 ```
 """
 struct Keysight33612A <: WaveformGenerator end
@@ -38,18 +38,18 @@ struct Keysight33612A <: WaveformGenerator end
 
 get_voltage_offset(obj::Instr{Keysight33612A}; chan=1) =
     f_query(obj, "SOUR$chan:VOLTage:OFFset?")
-set_voltage_offset!(obj::Instr{Keysight33612A}, num; chan=1) =
+set_voltage_offset(obj::Instr{Keysight33612A}, num; chan=1) =
     write(obj, "SOUR$chan:VOLTage:OFFset $num")
 
 get_amplitude(obj::Instr{Keysight33612A}; chan=1) =
     f_query(obj, "SOUR$chan:VOLTage?")
-set_amplitude!(obj::Instr{Keysight33612A}, num; chan=1) =
+set_amplitude(obj::Instr{Keysight33612A}, num; chan=1) =
     write(obj, "SOUR$chan:VOLTage $num")
 
 
 get_frequency(obj::Instr{Keysight33612A}; chan=1) =
     f_query(obj, "SOUR$chan:FREQuency?") # +4.0E+05
-set_frequency!(obj::Instr{Keysight33612A}, num; chan=1) =
+set_frequency(obj::Instr{Keysight33612A}, num; chan=1) =
     write(obj, "SOUR$chan:FREQuency $num") # +4.0E+05
 
 get_function(obj::Instr{Keysight33612A}; chan=1) =
@@ -59,19 +59,19 @@ get_function(obj::Instr{Keysight33612A}; chan=1) =
 Acceptable inputs
 {SINusoid|SQUare|TRIangle|RAMP|PULSe|PRBS|NOISe|ARB|DC}
 """
-set_function!(obj::Instr{Keysight33612A}, func; chan=1) = write(obj, "SOUR$chan:FUNCtion $func") # +4.0E+05
+set_function(obj::Instr{Keysight33612A}, func; chan=1) = write(obj, "SOUR$chan:FUNCtion $func") # +4.0E+05
 
 """
     Sets the burst mode of a device to Triggered Mode
 
 """
-set_burst_mode_trigger!(obj::Instr{Keysight33612A}; chan=1) =
+set_burst_mode_trigger(obj::Instr{Keysight33612A}; chan=1) =
     write(obj, "SOUR$chan:BURSt:MODE TRIG")
 """
     Sets the burst mode of a device to Gated Mode
 
 """
-set_burst_mode_gated!(obj::Instr{Keysight33612A}; chan=1) =
+set_burst_mode_gated(obj::Instr{Keysight33612A}; chan=1) =
     write(obj, "SOUR$chan:BURSt:MODE GATed")
 
 """
@@ -86,7 +86,7 @@ get_burst_mode(obj::Instr{Keysight33612A}; chan=1) =
 
 """
 ```
-    set_mode_burst!(instr)
+    set_mode_burst(instr)
 ```
 Changes Waveform Generator mode from continous waveform to burst
 
@@ -94,7 +94,7 @@ By default it sets the type of burst mode to triggered mode. Gated
 mode can also be set by using the optional flag:
 
 ```
-    set_mode_burst!(instr; mode=:gated)
+    set_mode_burst(instr; mode=:gated)
 ```
 
 The optional trig_src flag sets the trigger source for burst
@@ -102,14 +102,14 @@ triggered mode. Right now the default is Timer. To implement
 more trigger sources see page 130 of the manual for 33612A
 
 """
-function set_mode_burst!(obj::Instr{Keysight33612A}; 
+function set_mode_burst(obj::Instr{Keysight33612A}; 
                          chan=1,
                          mode=:trigger,
                          trig_src=:timer)
     if mode == :trigger
-        set_burst_mode_trigger!(obj)
+        set_burst_mode_trigger(obj)
     elseif mode == :gated
-        set_burst_mode_gated!(obj)
+        set_burst_mode_gated(obj)
     else
         error("""mode flag cannot be set to: $mode\n 
               available modes are [:trigger, :gated]""")
@@ -127,7 +127,7 @@ end
 Puts the device in continuous waveform/turns off burst mode
 
 """
-set_mode_cw!(obj::Instr{Keysight33612A}; chan=1) =
+set_mode_cw(obj::Instr{Keysight33612A}; chan=1) =
     write(obj, "SOURce$chan:BURSt:STATe OFF")
 
 """
@@ -155,7 +155,7 @@ chan=<1|2>
 
 num = {<seconds>|MINimum|MAXimum}
 """
-set_burst_period!(obj, num; chan=1) =
+set_burst_period(obj, num; chan=1) =
     write(obj, "SOURce$chan:BURSt:INTernal:PERiod $num")
 
 get_burst_period(obj; chan=1) =

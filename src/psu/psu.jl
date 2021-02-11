@@ -5,7 +5,7 @@ include("./SRSPS310.jl")
 """
     This will set the global channel on a device.
 
-    Any commands like set_voltage! that affect the
+    Any commands like set_voltage that affect the
     device with respect to a specific channel will be impacted
     by this command.
 
@@ -25,7 +25,7 @@ include("./SRSPS310.jl")
     Returns:
       Nothing
 """
-set_channel!(obj::Instrument; v=false) = udef(@codeLocation)
+set_channel(obj::Instrument; v=false) = udef(@codeLocation)
 
 """
     This will return the global or default channel of a device.
@@ -53,5 +53,5 @@ set_channel!(obj::Instrument; v=false) = udef(@codeLocation)
 """
 get_channel(obj::Instrument; v=false) = udef(@codeLocation)
 
-enable_output!(obj::Instrument; v=false) = udef(@codeLocation)
-disable_output!(obj::Instrument; v=false) = udef(@codeLocation)
+enable_output(obj::Instrument; v=false) = udef(@codeLocation)
+disable_output(obj::Instrument; v=false) = udef(@codeLocation)

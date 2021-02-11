@@ -3,25 +3,25 @@ This device only has one channel so channel specific functions
 and optional arguments are not available.
 
 # Available functions
-- enable_output!()
-- disable_output!()
-- set_voltage!(volts)
+- enable_output()
+- disable_output()
+- set_voltage(volts)
 - get_voltage()
-- set_current_limit!(current)
+- set_current_limit(current)
 - get_current_limit()
 
 # Helpers
-- `lock!()`: sets the device to remote mode. Automatically called on initialize
-- unlock!(): sets the device to local mode. Automatically called on terminate
+- `lock()`: sets the device to remote mode. Automatically called on initialize
+- unlock(): sets the device to local mode. Automatically called on terminate
 
 This instrument has a remote and local mode. Some commands do not
 work while the device is in local mode, thus when initializing this
-device `lock!` is called automatically and the device is always in
+device `lock` is called automatically and the device is always in
 remote mode by default.
 
 These functions should not be directly needed but if
 for some reason you need to switch modes while using the device
-you can use TcpInstruments.unlock! to turn the device back to
+you can use TcpInstruments.unlock to turn the device back to
 local mode.
 
 """
@@ -37,7 +37,7 @@ Arguments:
 Supported Instruments:
    - Power supply
 """
-enable_output!(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPut ON")
+enable_output(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPut ON")
 
 """
 This will disable an output on a device.
@@ -48,7 +48,7 @@ Arguments:
 Supported Instruments:
    - Power supply
 """
-disable_output!(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPut OFF")
+disable_output(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPut OFF")
 
 
 """
@@ -75,7 +75,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage!(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "VOLTage $num")
+set_voltage(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "VOLTage $num")
 
 """
 This will return the voltage of a device
@@ -97,7 +97,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit!(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "CURRent $num")
+set_current_limit(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "CURRent $num")
 
 """
 This will return the current limit of a device.
@@ -112,6 +112,6 @@ Returns:
 get_current_limit(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "CURRent?")
 
 
-lock!(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "SYSTem:MODe REMote")
+lock(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "SYSTem:MODe REMote")
 
-unlock!(obj::Instr{VersatilePowerBench100_10XR}) =   write(obj, "SYSTem:MODe LOCal")
+unlock(obj::Instr{VersatilePowerBench100_10XR}) =   write(obj, "SYSTem:MODe LOCal")

@@ -73,20 +73,20 @@ returns "AC" or "DC"
 get_coupling(instr::Instrument; chan=1) = query(instr, "CHANnel$chan:COUPLing?")
 
 """
-    lpf_on!(scope, chan=1)
+    lpf_on(scope, chan=1)
 
 Turn on an internal low-pass filter. When the filter is on, the bandwidth of
 the specified channel is limited to approximately 25 MHz.
 
 """
-lpf_on!(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit ON")
+lpf_on(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit ON")
 
 """
-    lpf_off!(scope, chan=1)
+    lpf_off(scope, chan=1)
 
 Turn off an internal low-pass filter.
 """
-lpf_off!(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit OFF")
+lpf_off(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit OFF")
 
 """
     get_lpf_state(scope, chan=1)
@@ -102,8 +102,8 @@ get_lpf_state(instr::Instrument; chan=1) = query(instr, "CHANnel$chan:BWLimit?")
 
 Set impedance to ONEMEg
 """
-set_impedance_one!(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
-set_impedance_fifty!(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
+set_impedance_one(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
+set_impedance_fifty(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
 get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANnel$chan:IMPedance?")
 
 scope_stop(instr::Instrument) = write(instr, "STOP")

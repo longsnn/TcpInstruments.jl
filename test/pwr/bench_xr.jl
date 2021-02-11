@@ -12,24 +12,24 @@ set_voltage(x)
 get_voltage()
 set_current_limit(x)
 get_current_limit()
-lock!()
-unlock!()
+lock()
+unlock()
 """
 
-lock!(pwr)
+lock(pwr)
 @testset "Output" begin
     @info get_output(pwr)
 
-    enable_output!(pwr)
+    enable_output(pwr)
     @test get_output(pwr) == true
 
-    disable_output!(pwr)
+    disable_output(pwr)
     @test get_output(pwr) == false
 end
 
 @testset "Current" begin
     function test_current(cur)
-        set_current_limit!(pwr, cur)
+        set_current_limit(pwr, cur)
         @info get_current_limit(pwr)
         @test get_current_limit(pwr) == cur
     end
@@ -43,10 +43,10 @@ end
     test_current(3)
     test_current(4)
 
-    set_current_limit!(pwr, "MAX")
+    set_current_limit(pwr, "MAX")
     @info get_current_limit(pwr)
 
-    set_current_limit!(pwr, "MIN")
+    set_current_limit(pwr, "MIN")
     @info get_current_limit(pwr)
 
     test_current(5)
@@ -55,28 +55,28 @@ end
 
 @testset "Voltage" begin
     @info get_voltage(pwr)
-    set_voltage!(pwr, 2)
+    set_voltage(pwr, 2)
     @info get_voltage(pwr)
-    set_voltage!(pwr, 4)
+    set_voltage(pwr, 4)
     @info get_voltage(pwr)
-    set_voltage!(pwr, 6)
+    set_voltage(pwr, 6)
     @info get_voltage(pwr)
-    set_voltage!(pwr, 8)
+    set_voltage(pwr, 8)
     @info get_voltage(pwr)
-    set_voltage!(pwr, 20)
+    set_voltage(pwr, 20)
     @info get_voltage(pwr)
-    set_voltage!(pwr, 25)
+    set_voltage(pwr, 25)
     @info get_voltage(pwr)
-    set_voltage!(pwr, 0)
+    set_voltage(pwr, 0)
     @info get_voltage(pwr)
-    set_voltage!(pwr, "MAX")
+    set_voltage(pwr, "MAX")
     @info get_voltage(pwr)
-    set_voltage!(pwr, "MIN")
+    set_voltage(pwr, "MIN")
     @info get_voltage(pwr)
 end
 
 
-unlock!(pwr)
+unlock(pwr)
 terminate(pwr)
 
 @info "Successfully disconnected"
