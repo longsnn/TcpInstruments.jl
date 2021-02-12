@@ -96,6 +96,7 @@ export
         ## Waveform Generator
         Keysight33612A,
 
+        scan_network,
 
         instrument_reset,
         instrument_clear,

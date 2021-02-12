@@ -2,6 +2,10 @@
 
 Documentation for TcpInstruments.jl
 
+```@contents
+```
+
+## Index
 ```@index
 ```
 
