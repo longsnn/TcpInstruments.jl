@@ -49,3 +49,8 @@ macro codeLocation()
 
 
 
+function alias_print(msg)
+    printstyled("[ Aliasing: ", color = :blue, bold = true)
+    println(msg)
+end
+

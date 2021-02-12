@@ -13,6 +13,10 @@ export
         ImpedanceAnalyzer,
         GenericInstrument,
 
+        create_config,
+        edit_config,
+        load_config,
+
         initialize,
         terminate,
         reset,
@@ -39,8 +43,6 @@ export
         get_channel,
 
         # Scope
-        run,
-        stop,
         get_data,
         lpf_on,
         lpf_off,
@@ -119,7 +121,8 @@ include("scope/scope.jl")
 include("psu/psu.jl")
 include("awg/awg.jl")
 include("ia/ia.jl")
+
 #include("dmm/dmm.jl")
 
-init_tcp_yaml()
+load_config()
 end #endmodule

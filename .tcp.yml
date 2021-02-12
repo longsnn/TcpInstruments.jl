@@ -1,19 +1,30 @@
 # Call TcpInstruments.init_tcp_yaml() after modifying this file
 
 # Scope
-AgilentDSOX4034A: "10.1.30.32"
+
+AgilentDSOX4034A:
+    alias: "big_scope"
+    address: "10.1.30.32"
+
 # Power Supply
-AgilentE36312A: "10.1.30.34"
-VersatilePowerBench100_10XR: "10.1.30.35:8003"
+
+AgilentE36312A:
+    address: "10.1.30.34"
+VersatilePowerBench100_10XR:
+    address: "10.1.30.35:8003"
 SRSPS310:
-    Prologix: 2
-    Address: "10.1.30.37:1234"
+    prologix: 2
+    address: "10.1.30.37:1234"
+
 # Waveform Generator
+
 Keysight33612A: "10.1.30.36"
+
 # Impedance Analyzer
+
 Agilent4294A:
-    Prologix: 5
-    Address: "10.1.30.38:1234"
+    prologix: 5
+    address: "10.1.30.38:1234"
 Agilent4395A:
-    Prologix: 5
-    Address: "10.1.30.38:1234"
+    prologix: 5
+    address: "10.1.30.38:1234"

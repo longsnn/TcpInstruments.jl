@@ -26,10 +26,6 @@ This package is under active development so expect breaking changes.
 For more information on every type of instrument as well as
 their available functions and how they work:
 
-Get our latest lab config:
-```
-wget https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp.yml
-```
 Now install the package
 ```
 julia 
@@ -39,9 +35,18 @@ julia>?
 help>Instrument
 ```
 
-Get the newest version:
+To make things easier you can also use a config file.
+This will preset the ip addresses of the instruments so you don't need to remember them.
+You can write your own or ask your lab advisor for the lab's config file.
+
+To get Orchard's config or update your config to the latest version use:
 ```
-julia>] up
+julia>create_config()
+```
+
+Should you ever need to update your config you can always use:
+```
+julia>edit_config()
 ```
 
 # Using this library
@@ -118,10 +123,11 @@ Let's create a new .tcp.yml file or ensure the two previous
 devices are found in our .tcp.yml file
 ```
 Keysight33612A:
-    "10.1.30.36"
+    address: "10.1.30.36"
+    alias: "OleBigWave"
 SRSPS310:
-    Prologix: 2
-    Address: "10.1.30.37:1234"
+    prologix: 2
+    address: "10.1.30.37:1234"
 ```
 
 Recompile new config
@@ -140,6 +146,12 @@ The two devices from above can now be initialized as follows:
 wave = initialize(Keysight33612A)
 p = initialize(SRSPS310)
 ```
+
+__Cool tip__: Since we specified an alias for the waveform generator we can initialize it this way as well:
+```
+wave = initialize(OleBigWave)
+```
+(No dashes, spaces or other special characters in alias names, treat them like variables because they are)
 ## Power Supplies
 # VersatilePowerBench100_10XR
 ```

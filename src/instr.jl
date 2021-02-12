@@ -116,7 +116,7 @@ end
 function initialize(model)
     @assert TCP_CONFIG != nothing """
     No .tcp.yml file found! To use ours:
-    `wget https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp.yml`
+    `create_config()`
 
     If you want to initialize this device without a config file please specify an ip address:
     `initialize($(string(model)), "10.1.30.XX")`
@@ -129,7 +129,7 @@ function initialize(model)
         @assert false """
         $(string(model)) was not found in your .tcp.yml file.
         To update to the latest version:
-        `wget https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp.yml`
+        `create_config()`
 
         Otherwise please add it to your .tcp.yml config file or specify an ip address:
         `initialize($(string(model)), "10.1.30.XX")`
@@ -139,9 +139,13 @@ function initialize(model)
     if data isa String
         return initialize(model, data)
     end
+    address, prologix = get(data, "address", ""), get(data, "prologix", "")
+    if isempty(prologix)
+        return initialize(model, address)
+    end
     return initialize(model,
-                      data["Address"],
-                      prologix_chan=data["Prologix"])
+                      address,
+                      prologix_chan=prologix)
 end
 
 """
