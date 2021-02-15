@@ -135,8 +135,6 @@ set_current_limit(obj::Instr{SRSPS310}, num) = write(obj, "ILIM$num")
 """
 get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?")
 
-info(obj::Instr{SRSPS310}) = query(obj, "*IDN?")
-
 function scan_prologix(obj::Instr{SRSPS310}) 
     devices = Dict()
     for i in 0:15

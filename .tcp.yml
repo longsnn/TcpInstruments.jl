@@ -1,5 +1,9 @@
 # Call TcpInstruments.init_tcp_yaml() after modifying this file
 
+# Digital Multimeter
+
+KeysightDMM34465A: "10.1.30.38"
+
 # Scope
 
 AgilentDSOX4034A:

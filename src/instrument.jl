@@ -4,18 +4,6 @@ using Sockets
 import Base.write, Base.read
 
 
-mutable struct GenericInstrument <: Instrument
-    name::Symbol
-    address::String
-	buffer_size::Int
-    sock::TCPSocket
-	connected::Bool
-	id_str::String
-end
-
-# Generic instrument constructor
-GenericInstrument(instr_name, address) = GenericInstrument(instr_name, address, 1024, TCPSocket(), false, "empty-ID")
-
 function connect!(instr::Instrument)
 	@assert !instr.connected "Cannot connect. Instrument is already connected!"
 	SCPI_port = 5025
@@ -85,19 +73,3 @@ error will be thrown.
 Differs from query in that it will return a Float64 and not a String
 """
 f_query(obj, ins; timeout=0.5) = parse(Float64, query(obj, ins; timeout=timeout))
-
-"""
-	split_str_into_host_and_port(str)
-Splits a string like "192.168.1.1:5056" into ("192.168.1.1", 5056)
-"""
-function split_str_into_host_and_port(str::AbstractString)::Tuple{String, Int}
-	spl_str = split(str, ":")
-	@assert !isempty(spl_str) "IP address string is empty!"
-	host = spl_str[1]
-	if length(spl_str) == 1
-		port = 0
-	else
-		port = parse(Int, spl_str[2])
-	end
-	return (host, port)
-end

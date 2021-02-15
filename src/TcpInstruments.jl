@@ -11,7 +11,6 @@ export
         PowerSupply,
         WaveformGenerator,
         ImpedanceAnalyzer,
-        GenericInstrument,
 
         create_config,
         edit_config,
@@ -76,18 +75,19 @@ export
         # DMM
         get_tc_temperature,
         set_tc_type,
-        get_volt,
-        get_amp,
-        set_temp_celsius,
-        set_temp_farenheit,
-        set_temp_kelvin,
+        get_current,
+        get_resistance,
+        set_temp_unit_celsius,
+        set_temp_unit_farenheit,
+        set_temp_unit_kelvin,
+        get_temp_unit,
 
         # Devices
         ## Impedance Analyzer
         Agilent4294A,
         Agilent4395A,
         ## Multimeter
-        #KeysightDMM34465A,
+        KeysightDMM34465A,
         ## Scope
         AgilentDSOX4024A,
         AgilentDSOX4034A,
@@ -121,8 +121,7 @@ include("scope/scope.jl")
 include("psu/psu.jl")
 include("awg/awg.jl")
 include("ia/ia.jl")
-
-#include("dmm/dmm.jl")
+include("dmm/dmm.jl")
 
 load_config()
 end #endmodule

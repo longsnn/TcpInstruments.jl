@@ -1,4 +1,3 @@
-
 """
 An instrument is a generic device with which you can take and read measurements
 
@@ -164,3 +163,5 @@ lock(obj)   = nothing
 unlock(obj) = nothing
 set_prologix_chan(obj, chan) = write(obj, "++addr $chan")
 get_prologix_chan(obj) = query(obj, "++addr")
+info(obj) = query(obj, "*IDN?")
+

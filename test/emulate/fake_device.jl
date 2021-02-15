@@ -42,7 +42,7 @@ function emulator()
     end
 end
 
-if PROGRAM_FILE == "test/fake_scope.jl"
+if PROGRAM_FILE == "test/emulator/fake_device.jl"
     emulator()
 else
     @spawn emulator()

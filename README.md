@@ -27,7 +27,7 @@ For more information on every type of instrument as well as
 their available functions and how they work:
 
 Now install the package
-```
+```julia
 julia 
 julia>] add https://github.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl
 julia>using TcpInstruments
@@ -40,12 +40,12 @@ This will preset the ip addresses of the instruments so you don't need to rememb
 You can write your own or ask your lab advisor for the lab's config file.
 
 To get Orchard's config or update your config to the latest version use:
-```
+```julia
 julia>create_config()
 ```
 
 Should you ever need to update your config you can always use:
-```
+```julia
 julia>edit_config()
 ```
 
@@ -62,10 +62,20 @@ Thus `"10.1.30.36"` defaults to `"10.1.30.36:5025"`
 To see the list of commands for this device, look up this device
 in the documentation or in the repl: `help>{name-of-device}`
 
+## Util Commands
+To see a list of all available ip addresses and devices:
+```julia
+julia> scan_network()
+3-element Vector{Pair{String, B} where B}:
+ "10.1.30.28:????" => ""
+ "10.1.30.34:5025" => "Keysight Technologies,E36312A,MY59002391,2.1.0-1.0.4-1.12"
+ "10.1.30.38:5025" => "Keysight Technologies,34465A,MY59008389,A.03.01-03.15-03.01-00.52-03-02"
+```
+
 # Examples
 ## Waveform Generator
 ###  Creating a Sin Wave Example:
-```
+```julia
 wave = initialize(Keysight33612A, "10.1.30.36")
 set_mode_cw(wave) # Set to continuous waveform mode
 set_function(wave, "SIN")
@@ -80,12 +90,12 @@ enable_output(wave) # Starts wave
 To a initialize a device that is connected with a prologix
 controller you must specify what prologix channel the device
 is on.
-```
+```julia
 p = initialize(SRSPS310, "10.1.30.37:1234"; prologix_chan=2)
 ```
 If you don't know the channel you can figure it out and configure
 it manually:
-```
+```julia
 julia>using TcpInstruments
 julia>p = initialize(SRSPS310, "10.1.30.37:1234")
 julia>scan_prologix(p)
@@ -95,7 +105,7 @@ julia>get_prologix(p)
 2
 ```
 ### Using SRSPS310 Power Supply
-```
+```julia
 p = initialize(SRSPS310, "10.1.30.37:1234"; prologix_chan=2)
 set_voltage_limit(p, 1250)
 set_voltage(p, 1250)
@@ -109,19 +119,19 @@ can save the ip address of all your devices
 in one easy-to-find place so they don't have to be hardcoded in scripts.
 
 Format of .tcp.yml file:
-```
+```julia
 {name-of-device}:
-    "{ip-address}"
+    address: "{ip-address}"
 
 # GPIB Device connected with a prologix controller
 {name-of-device}:
-    Prologix: {channel-number}
-    Address: "{ip-address}"
+    prologix: {channel-number}
+    address: "{ip-address}"
 ```
 
 Let's create a new .tcp.yml file or ensure the two previous
 devices are found in our .tcp.yml file
-```
+```julia
 Keysight33612A:
     address: "10.1.30.36"
     alias: "OleBigWave"
@@ -131,9 +141,9 @@ SRSPS310:
 ```
 
 Recompile new config
-```
+```julia
 julia --project=.
-julia>using TcpInstruments; TcpInstruments.init_tcp_yaml()
+julia>using TcpInstruments; load_config()
 ```
 
 The .tcp.yml file must be in the current directory of our project. If you have multiple scripts in different directories you can
@@ -148,13 +158,13 @@ p = initialize(SRSPS310)
 ```
 
 __Cool tip__: Since we specified an alias for the waveform generator we can initialize it this way as well:
-```
+```julia
 wave = initialize(OleBigWave)
 ```
 (No dashes, spaces or other special characters in alias names, treat them like variables because they are)
 ## Power Supplies
 # VersatilePowerBench100_10XR
-```
+```julia
 # Initialize automatically puts this power supply in remote mode
 pwr = initialize(VersatilePowerBench100_10XR)
 
@@ -169,7 +179,7 @@ terminate(pwr)
 
 ```
 # AgilentE36312A
-```
+```julia
 pwr = initialize(AgilentE36312A)
 
 set_channel(pwr, 1)
@@ -195,7 +205,7 @@ enable_output(pwr) # Enables output on channel 3
 
 ## Scope
 ### AgilentDSOX4034A
-```
+```julia
 scope = initialize(AgilentDSOX4034A)
 
 # Turn on Low Pass Filter 25MHz
@@ -242,7 +252,7 @@ plot(multi_data[3])
 # Multiple devices
 Lets say you want to use a waveform generator, power supply
 and oscilloscope all at once.
-```
+```julia
 using TcpInstruments
 using Plots; gr()
 
@@ -264,3 +274,6 @@ enable_output(pwr)
 chan1, chan2 = get_data(scope, [1,2])
 plot(chan1)
 ```
+
+For more examples of how to use different devices look in the
+test folder
