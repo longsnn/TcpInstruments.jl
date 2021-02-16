@@ -221,10 +221,10 @@ lpf_off(scope)
 get_lpf_state(scope)
 
 
-set_impedance_one(scope)
+set_impedance_1Mohm(scope)
 @info get_impedance(scope)
 
-set_impedance_fifty(scope)
+set_impedance_50ohm(scope)
 @info get_impedance(scope)
 
 # Get data from channel 1

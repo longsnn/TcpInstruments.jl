@@ -105,7 +105,7 @@ Initializes a connection to the instrument at the given (input) IP address.
 function initialize(model, address; prologix_chan=-1)
     instr_h = CreateTcpInstr(model, address)
     connect!(instr_h)
-    lock(instr_h)
+    remote_mode(instr_h)
     if prologix_chan >= 0
         set_prologix_chan(instr_h, prologix_chan)
     end
@@ -154,13 +154,13 @@ Closes the TCP connection.
 """
 function terminate(instr::Instrument)
     close!(instr)
-    unlock(instr)
+    local_mode(instr)
 end
 
 reset(obj) = write(obj, "*RST")
 
-lock(obj)   = nothing
-unlock(obj) = nothing
+remote_mode(obj)   = nothing
+local_mode(obj) = nothing
 set_prologix_chan(obj, chan) = write(obj, "++addr $chan")
 get_prologix_chan(obj) = query(obj, "++addr")
 info(obj) = query(obj, "*IDN?")

@@ -98,16 +98,30 @@ returns "0" or "1"
 get_lpf_state(instr::Instrument; chan=1) = query(instr, "CHANnel$chan:BWLimit?")
 
 """
-    set_impedance_one(scope, chan=1)
+    set_impedance_1Mohm(scope, chan=1)
 
-Set impedance to ONEMEg
+Set impedance to 1MΩ
 """
-set_impedance_one(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
-set_impedance_fifty(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
-get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANnel$chan:IMPedance?")
+set_impedance_1Mohm(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
 
-scope_stop(instr::Instrument) = write(instr, "STOP")
-scope_continue(instr::Instrument) = write(instr, "RUN")
+"""
+    set_impedance_50ohm(scope, chan=1)
+
+Set impedance to 50Ω
+"""
+set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
+get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANnel$chan:IMPedance?")
+ 
+"""
+    run(scope)
+Run Oscilloscope
+"""
+run(obj::Instr{T}) where (T <: Oscilloscope) = write(instr, "RUN")   
+"""
+    stop(scope)
+Stop Oscilloscope
+"""
+stop(obj::Instr{T}) where (T <: Oscilloscope) = write(instr, "STOP") 
 
 scope_waveform_preamble_get(instr) = query(instr, "waveform:preamble?")
 scope_waveform_source_set(instr, ch::Int) = write(instr, "waveform:source chan$ch")

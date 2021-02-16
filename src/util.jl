@@ -1,16 +1,16 @@
 using Sockets
 using Base.Threads: @spawn
 
-function scan_network(; ip_network="10.1.30.", ip_range=1:255)
+function scan_network(; ip_network="10.1.30.", ip_range=1:255, v=false)
     @info "Scanning $ip_network$(ip_range[1])-$(ip_range[end])"
     ips = asyncmap(
-        x->connect_to_scpy(x),
+        x->connect_to_scpy(x; v=v),
         [ip_network*"$ip" for ip in ip_range]
     )
     return [s for s in ips if !isempty(s)]
 end
 
-function connect_to_scpy(ip_str)
+function connect_to_scpy(ip_str; v=false)
     scpy_port = 5025
     temp_ip = ip_str * ":$scpy_port"
     proc = @spawn temp_ip => info(initialize(Instrument, temp_ip))
@@ -21,7 +21,8 @@ function connect_to_scpy(ip_str)
     elseif proc.state == :done
         return fetch(proc)
     elseif proc.state == :failed
-        return ip_str * ":????"
+        v && return ip_str * ":????"
+        return ""
     else
         error("Undefined $(proc.state)")
     end

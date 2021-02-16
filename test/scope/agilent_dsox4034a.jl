@@ -29,11 +29,11 @@ Turn on Low Pass Filter 25MHz
 
 Impedance
 
-> set_impedance_one(scope_h)
+> set_impedance_1Mohm(scope_h)
 
 > get_impedance(scope_h) == ONEM
 
-> set_impedance_fifty(scope_h)
+> set_impedance_50ohm(scope_h)
 
 > get_impedance(scope_h) == FIFT
 
@@ -58,9 +58,9 @@ lpf_off(scope)
 @info get_lpf_state(scope)
 
 @info get_impedance(scope)
-set_impedance_one(scope)
+set_impedance_1Mohm(scope)
 @info get_impedance(scope)
-set_impedance_fifty(scope)
+set_impedance_50ohm(scope)
 @info get_impedance(scope)
 
 

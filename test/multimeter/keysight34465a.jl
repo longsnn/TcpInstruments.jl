@@ -3,13 +3,25 @@ using Test
 
 m = initialize(KeysightDMM34465A)
 
-@info "V" get_voltage(m)
+V = get_voltage(m)
+@info get_voltage V
+@test V isa Float64
 
-@info "A" get_current(m)
+A = get_current(m)
+@info get_current A
+@test A isa Float64
 
-@info "Ω" get_resistance(m; wire=2)
+Ω = get_resistance(m; wire=2)
+@info "get_resistance(; wire=2)" Ω
+@test Ω isa Float64
 
-@info "Ω" get_resistance(m; wire=4)
+Ω = get_resistance(m; wire=4)
+@info "get_resistance(; wire=4)" Ω
+@test Ω isa Float64
+
+channel = get_channel(m)
+@info get_channel channel
+@test channel in ["FRON", "REAR"]
 
 @info "°" get_tc_temperature(m) get_temp_unit(m)
 

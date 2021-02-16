@@ -12,11 +12,11 @@ set_voltage(x)
 get_voltage()
 set_current_limit(x)
 get_current_limit()
-lock()
-unlock()
+remote_mode()
+local_mode()
 """
 
-lock(pwr)
+remote_mode(pwr)
 @testset "Output" begin
     @info get_output(pwr)
 
@@ -76,7 +76,7 @@ end
 end
 
 
-unlock(pwr)
+local_mode(pwr)
 terminate(pwr)
 
 @info "Successfully disconnected"

@@ -18,7 +18,7 @@ Page. 288
 Perform take a measurement with the probe mode set to thermocouple
 """
 get_tc_temperature(obj::Instr{KeysightDMM34465A}) =
-    f_query(obj, "MEAS:TEMP? TC"; timeout=0)
+    f_query(obj, "MEASURE:TEMPERATURE? TC"; timeout=0)
 
 #TODO: Was default K?
 """
@@ -29,7 +29,7 @@ get_tc_temperature(obj::Instr{KeysightDMM34465A}) =
 """
 function set_tc_type(obj::Instr{KeysightDMM34465A}; type="K")
     @assert string(type) in ["E", "J", "K", "N", "R", "T"]
-    write(obj, "CONFigure:TEMPerature TC,$type")
+    write(obj, "CONFIGURE:TEMPERATURE TC,$type")
 end
 
 """
@@ -41,7 +41,7 @@ Returns voltage
 """
 function get_voltage(obj::Instr{KeysightDMM34465A}; type="DC")
     @assert type in ["AC","DC"] "$type not valid!\nMust be AC or DC"
-    f_query(obj, "MEASure:VOLTage:$type?"; timeout=0)
+    f_query(obj, "MEASURE:VOLTAGE:$type?"; timeout=0)
 end
 
 
@@ -54,7 +54,7 @@ Returns current
 """
 function get_current(obj::Instr{KeysightDMM34465A}; type="DC")
     @assert type in ["AC","DC"] "$type not valid!\nMust be AC or DC"
-    f_query(obj, "MEASure:CURRent:$type?"; timeout=0)
+    f_query(obj, "MEASURE:CURRENT:$type?"; timeout=0)
 end
 
 """
@@ -66,9 +66,9 @@ Returns resistance
 """
 function get_resistance(obj::Instr{KeysightDMM34465A}; wire)
     if wire == 2
-        f_query(obj, "MEASure:RESistance?"; timeout=0)
+        f_query(obj, "MEASURE:RESISTANCE?"; timeout=0)
     elseif wire == 4
-        f_query(obj, "MEASure:FRESistance?"; timeout=0)
+        f_query(obj, "MEASURE:FRESISTANCE?"; timeout=0)
     else
         error("wire flag must be 2 or 4 not $wire")
     end
@@ -80,7 +80,7 @@ end
 Sets the temperature unit to celcius
 """
 set_temp_unit_celsius(obj::Instr{KeysightDMM34465A}) =
-    write(obj, "UNIT:TEMP C")
+    write(obj, "UNIT:TEMPERATURE C")
 
 """
     set_temp_unit_farenheit(multimeter)
@@ -88,7 +88,7 @@ set_temp_unit_celsius(obj::Instr{KeysightDMM34465A}) =
 Sets the temperature unit to farenheit
 """
 set_temp_unit_farenheit(obj::Instr{KeysightDMM34465A}) =
-    write(obj, "UNIT:TEMP F")
+    write(obj, "UNIT:TEMPERATURE F")
 
 """
     set_temp_unit_kelvin(multimeter)
@@ -96,7 +96,7 @@ set_temp_unit_farenheit(obj::Instr{KeysightDMM34465A}) =
 Sets the temperature unit to kelvin
 """
 set_temp_unit_kelvin(obj::Instr{KeysightDMM34465A}) =
-    write(obj, "UNIT:TEMP K")
+    write(obj, "UNIT:TEMPERATURE K")
 
 """
     get_temp_unit(multimeter)
@@ -104,7 +104,7 @@ set_temp_unit_kelvin(obj::Instr{KeysightDMM34465A}) =
 Returns C, F or K depending on the set temperature unit
 """
 get_temp_unit(obj::Instr{KeysightDMM34465A}) =
-    query(obj, "UNIT:TEMP?")
+    query(obj, "UNIT:TEMPERATURE?")
 
 
 """
@@ -120,4 +120,4 @@ instrument's safety features.
 - "FRON" or "REAR"
 """
 get_channel(obj::Instr{KeysightDMM34465A}) =
-    query(obj, "ROUTe:TERMinals?")
+    query(obj, "ROUTE:TERMINALS?")

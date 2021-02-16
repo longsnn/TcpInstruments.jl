@@ -11,17 +11,17 @@ and optional arguments are not available.
 - get_current_limit()
 
 # Helpers
-- `lock()`: sets the device to remote mode. Automatically called on initialize
-- unlock(): sets the device to local mode. Automatically called on terminate
+- `remote_mode()`: sets the device to remote mode. Automatically called on initialize
+- `local_mode()`: sets the device to local mode. Automatically called on terminate
 
 This instrument has a remote and local mode. Some commands do not
 work while the device is in local mode, thus when initializing this
-device `lock` is called automatically and the device is always in
+device `remote_mode` is called automatically and the device is always in
 remote mode by default.
 
 These functions should not be directly needed but if
 for some reason you need to switch modes while using the device
-you can use TcpInstruments.unlock to turn the device back to
+you can use `local_mode` to turn the device back to
 local mode.
 
 """
@@ -112,6 +112,6 @@ Returns:
 get_current_limit(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "CURRent?")
 
 
-lock(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "SYSTem:MODe REMote")
+remote_mode(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "SYSTem:MODe REMote")
 
-unlock(obj::Instr{VersatilePowerBench100_10XR}) =   write(obj, "SYSTem:MODe LOCal")
+local_mode(obj::Instr{VersatilePowerBench100_10XR}) =   write(obj, "SYSTem:MODe LOCal")
