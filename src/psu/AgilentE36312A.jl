@@ -117,7 +117,7 @@ Arguments:
 Supported Instruments:
    - Power supply
 """
-disable_output(obj::Instr{AgilentE36312A}) = write(obj, ":OUTPUT:STATe OFF")
+disable_output(obj::Instr{AgilentE36312A}) = write(obj, ":OUTPUT:STATE OFF")
 
 
 """
@@ -173,7 +173,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURce:VOLTage $num")
+set_voltage(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE $num")
 
 """
 This will return the voltage of a device's channel.
@@ -194,7 +194,7 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURce:VOLTage?"; float=true)
+get_voltage(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE?"; float=true)
 
 """
 This will change the current limit of a device on a given 
@@ -218,7 +218,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURce:CURRent $num")
+set_current_limit(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURCE:CURRENT $num")
 
 """
 This will return the current limit of a device.
@@ -239,4 +239,4 @@ Supported Instruments:
 Returns:
   Current Limit
 """
-get_current_limit(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURce:CURRent?"; float=false)
+get_current_limit(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURCE:CURRENT?"; float=false)

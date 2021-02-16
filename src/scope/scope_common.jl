@@ -70,7 +70,7 @@ end
 
 returns "AC" or "DC"
 """
-get_coupling(instr::Instrument; chan=1) = query(instr, "CHANnel$chan:COUPLing?")
+get_coupling(instr::Instrument; chan=1) = query(instr, "CHANNEL$chan:COUPLING?")
 
 """
     lpf_on(scope, chan=1)
@@ -79,14 +79,14 @@ Turn on an internal low-pass filter. When the filter is on, the bandwidth of
 the specified channel is limited to approximately 25 MHz.
 
 """
-lpf_on(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit ON")
+lpf_on(instr::Instrument, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
 
 """
     lpf_off(scope, chan=1)
 
 Turn off an internal low-pass filter.
 """
-lpf_off(instr::Instrument, chan=1) = write(instr, "CHANnel$chan:BWLimit OFF")
+lpf_off(instr::Instrument, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
 
 """
     get_lpf_state(scope, chan=1)
@@ -95,42 +95,42 @@ See state the internal low-pass filter:
 
 returns "0" or "1"
 """
-get_lpf_state(instr::Instrument; chan=1) = query(instr, "CHANnel$chan:BWLimit?")
+get_lpf_state(instr::Instrument; chan=1) = query(instr, "CHANNEL$chan:BWLIMIT?")
 
 """
     set_impedance_1Mohm(scope, chan=1)
 
 Set impedance to 1MΩ
 """
-set_impedance_1Mohm(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance ONEMeg")
+set_impedance_1Mohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE ONEMEG")
 
 """
     set_impedance_50ohm(scope, chan=1)
 
 Set impedance to 50Ω
 """
-set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANnel$chan:IMPedance FIFTy")
-get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANnel$chan:IMPedance?")
+set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE FIFTY")
+get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
  
 """
     run(scope)
 Run Oscilloscope
 """
-run(obj::Instr{T}) where (T <: Oscilloscope) = write(instr, "RUN")   
+run(obj::Instr{T}) where T <: Oscilloscope = write(instr, "RUN")   
 """
     stop(scope)
 Stop Oscilloscope
 """
-stop(obj::Instr{T}) where (T <: Oscilloscope) = write(instr, "STOP") 
+stop(obj::Instr{T}) where T <: Oscilloscope = write(instr, "STOP") 
 
-scope_waveform_preamble_get(instr) = query(instr, "waveform:preamble?")
-scope_waveform_source_set(instr, ch::Int) = write(instr, "waveform:source chan$ch")
-scope_waveform_source_get(instr) = query(instr, "waveform:source?")
-scope_waveform_mode_8bit(instr::Instrument) = write(instr, "waveform:format BYTE")
-scope_waveform_mode_16bit(instr::Instrument) = write(instr, "waveform:format WORD")
-scope_waveform_num_points(instr::Instrument, num_points::Int) = write(instr, @sprintf("waveform:points %i", num_points))
-scope_waveform_num_points(instr::Instrument, mode::String) = write(instr, @sprintf("waveform:points %s", mode))
-scope_waveform_points_mode(instr::Instrument, mode_idx::Int) = write(instr, @sprintf("waveform:points:mode %s", WAVEFORM_POINTS_MODE[mode_idx])) #norm, max, raw
+scope_waveform_preamble_get(instr) = query(instr, "WAVEFORM:PREAMBLE?")
+scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
+scope_waveform_source_get(instr) = query(instr, "WAVEFORM:SOURCE?")
+scope_waveform_mode_8bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT BYTE")
+scope_waveform_mode_16bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT WORD")
+scope_waveform_num_points(instr::Instrument, num_points::Int) = write(instr, @sprintf("WAVEFORM:POINTS %i", num_points))
+scope_waveform_num_points(instr::Instrument, mode::String) = write(instr, @sprintf("WAVEFORM:POINTS %s", mode))
+scope_waveform_points_mode(instr::Instrument, mode_idx::Int) = write(instr, @sprintf("WAVEFORM:POINTS:MODE %s", WAVEFORM_POINTS_MODE[mode_idx])) #norm, max, raw
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 

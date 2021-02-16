@@ -37,7 +37,7 @@ Arguments:
 Supported Instruments:
    - Power supply
 """
-enable_output(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPut ON")
+enable_output(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPUT ON")
 
 """
 This will disable an output on a device.
@@ -48,7 +48,7 @@ Arguments:
 Supported Instruments:
    - Power supply
 """
-disable_output(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPut OFF")
+disable_output(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "OUTPUT OFF")
 
 
 """
@@ -63,7 +63,7 @@ Supported Instruments:
 Returns:
   String: {"OFF"|"ON"}
 """
-get_output(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "OUTPut?")
+get_output(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "OUTPUT?")
 
 """
 This will change the voltage output of a device.
@@ -75,7 +75,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "VOLTage $num")
+set_voltage(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "VOLTAGE $num")
 
 """
 This will return the voltage of a device
@@ -86,7 +86,7 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "VOLTage?")
+get_voltage(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "VOLTAGE?")
 
 """
 This will change the current limit of a device 
@@ -97,7 +97,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "CURRent $num")
+set_current_limit(obj::Instr{VersatilePowerBench100_10XR}, num) = write(obj, "CURRENT $num")
 
 """
 This will return the current limit of a device.
@@ -109,9 +109,9 @@ Supported Instruments:
 Returns:
   Current Limit
 """
-get_current_limit(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "CURRent?")
+get_current_limit(obj::Instr{VersatilePowerBench100_10XR}) = query(obj, "CURRENT?")
 
 
-remote_mode(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "SYSTem:MODe REMote")
+remote_mode(obj::Instr{VersatilePowerBench100_10XR}) = write(obj, "SYSTEM:MODE REMOTE")
 
-local_mode(obj::Instr{VersatilePowerBench100_10XR}) =   write(obj, "SYSTem:MODe LOCal")
+local_mode(obj::Instr{VersatilePowerBench100_10XR}) =   write(obj, "SYSTEM:MODE LOCAL")
