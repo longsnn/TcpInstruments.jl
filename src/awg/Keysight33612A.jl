@@ -39,40 +39,40 @@ struct Keysight33612A <: WaveformGenerator end
 get_voltage_offset(obj::Instr{Keysight33612A}; chan=1) =
     f_query(obj, "SOURCE$chan:VOLTAGE:OFFSET?")
 set_voltage_offset(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOUR$chan:VOLTAGE:OFFSET $num")
+    write(obj, "SOURCE$chan:VOLTAGE:OFFSET $num")
 
 get_amplitude(obj::Instr{Keysight33612A}; chan=1) =
-    f_query(obj, "SOUR$chan:VOLTAGE?")
+    f_query(obj, "SOURCE$chan:VOLTAGE?")
 SET_AMPLITUDE(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOUR$chan:VOLTAGE $num")
+    write(obj, "SOURCE$chan:VOLTAGE $num")
 
 
 get_frequency(obj::Instr{Keysight33612A}; chan=1) =
-    f_query(obj, "SOUR$chan:FREQUENCY?") # +4.0E+05
+    f_query(obj, "SOURCE$chan:FREQUENCY?") # +4.0E+05
 set_frequency(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOUR$chan:FREQUENCY $num") # +4.0E+05
+    write(obj, "SOURCE$chan:FREQUENCY $num") # +4.0E+05
 
 get_function(obj::Instr{Keysight33612A}; chan=1) =
-    query(obj, "SOUR$chan:FUNCTION?") # +4.0E+05
+    query(obj, "SOURCE$chan:FUNCTION?") # +4.0E+05
 
 """
 Acceptable inputs
 {SINusoid|SQUare|TRIangle|RAMP|PULSe|PRBS|NOISe|ARB|DC}
 """
-set_function(obj::Instr{Keysight33612A}, func; chan=1) = write(obj, "SOUR$chan:FUNCTION $func") # +4.0E+05
+set_function(obj::Instr{Keysight33612A}, func; chan=1) = write(obj, "SOURCE$chan:FUNCTION $func") # +4.0E+05
 
 """
     Sets the burst mode of a device to Triggered Mode
 
 """
 set_burst_mode_trigger(obj::Instr{Keysight33612A}; chan=1) =
-    write(obj, "SOUR$chan:BURST:MODE TRIG")
+    write(obj, "SOURCE$chan:BURST:MODE TRIG")
 """
     Sets the burst mode of a device to Gated Mode
 
 """
 set_burst_mode_gated(obj::Instr{Keysight33612A}; chan=1) =
-    write(obj, "SOUR$chan:BURST:MODE GATED")
+    write(obj, "SOURCE$chan:BURST:MODE GATED")
 
 """
 
@@ -82,7 +82,7 @@ set_burst_mode_gated(obj::Instr{Keysight33612A}; chan=1) =
         "GAT" ~ If the device is in Gated Mode
 """
 get_burst_mode(obj::Instr{Keysight33612A}; chan=1) =
-    query(obj, "SOUR$chan:BURST:MODE?")
+    query(obj, "SOURCE$chan:BURST:MODE?")
 
 """
 ```
