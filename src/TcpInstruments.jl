@@ -15,6 +15,7 @@ export
         create_config,
         edit_config,
         load_config,
+        load_python,
 
         initialize,
         terminate,
@@ -123,5 +124,10 @@ include("awg/awg.jl")
 include("ia/ia.jl")
 include("dmm/dmm.jl")
 
-load_config()
+include("thorlabs/python.jl")
+
+function __init__()
+    load_config()
+end
+
 end #endmodule

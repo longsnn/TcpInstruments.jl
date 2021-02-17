@@ -143,7 +143,7 @@ SRSPS310:
 Recompile new config
 ```julia
 julia --project=.
-julia>using TcpInstruments; load_config()
+julia>using TcpInstruments
 ```
 
 The .tcp.yml file must be in the current directory of our project. If you have multiple scripts in different directories you can

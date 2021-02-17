@@ -36,10 +36,9 @@ function load_config()
     end
     TCP_CONFIG = YAML.load_file(file)
     TCP_FILE = file
-    @info "NEW CONFIG LOADED"
-    @info TCP_CONFIG
+    @info "CONFIG LOADED"
     for (device, data) in TCP_CONFIG
-        device == "Prologix" && continue
+        (device == "Prologix" || device == "python") && continue
         device_type = nothing
         try
             device_type = eval(Symbol(device))
