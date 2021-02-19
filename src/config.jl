@@ -11,13 +11,21 @@ const FILE_LOCATIONS = [
 ]
 
 function create_config(dir=homedir())
+    if Sys.iswindows()
+        error("create_config() is not supported on windows yet")
+    end
     Base.run(`wget -O $dir/.tcp.yml $EXAMPLE_FILE`)
     load_config()
 end
 
 function edit_config()
     @assert TCP_FILE != nothing "No tcp config found! Use `create_config()` to automatically load ours"
-    Base.run(`$(ENV["EDITOR"]) $(TCP_FILE)`)
+    cmd = "$(ENV["EDITOR"]) $(TCP_FILE)"
+    if Sys.iswindows()
+       Base.run(`cmd /c "$(cmd)"`)
+    else
+        Base.run(`$(cmd)`)
+    end
     load_config()
 end
 
