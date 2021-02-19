@@ -86,13 +86,12 @@ abstract type XYZStage <: Instrument end
 mutable struct Instr{ T <: Instrument } <: Instrument
     model::Type
     address::String
-    buffer_size::Int
     sock::TCPSocket
     connected::Bool
 end
 
 function CreateTcpInstr(model, address)
-    Instr{model}(model, address, 1024, TCPSocket(), false)
+    Instr{model}(model, address, TCPSocket(), false)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", i::TcpInstruments.Instr)
@@ -100,7 +99,6 @@ function Base.show(io::IO, ::MIME"text/plain", i::TcpInstruments.Instr)
     println("    Group: $(supertype(i.model))")
     println("    Model: $(i.model)")
     println("    Address: $(i.address)")
-    println("    Buffer: $(i.buffer_size)")
     println("    Connected: $(i.connected)")
 end
 
