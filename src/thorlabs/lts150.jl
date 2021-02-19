@@ -131,7 +131,7 @@ two(x) = py"one"(x) + py"one"(x)
 function initialize_lts()
     lts = py"LTS()"
     lts.init()
-    return ThorlabsLTS150(lts)
+    return ThorlabsLTS150(lts, 0, 0 ,0)
 end
 
 function goto_position(xyz, x, y, z)
