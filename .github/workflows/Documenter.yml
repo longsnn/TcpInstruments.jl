@@ -1,4 +1,4 @@
-name: Documentation
+name: Documenter
 
 on:
   push:
@@ -19,5 +19,6 @@ jobs:
         run: julia --project=. -e 'using Pkg; Pkg.instantiate()'
       - name: Build and deploy
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key
         run: julia --project=. docs/make.jl
