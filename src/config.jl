@@ -24,7 +24,7 @@ function edit_config()
     if Sys.iswindows()
        Base.run(`cmd /c "$(cmd)"`)
     else
-        Base.run(`$(cmd)`)
+        Base.run(`$(ENV["EDITOR"]) $(TCP_FILE)`)
     end
     load_config()
 end

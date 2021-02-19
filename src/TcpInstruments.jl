@@ -142,6 +142,7 @@ export
 
         ## XYZ
         XYZStage,
+        initialize_lts,
         ThorlabsLTS150,
         goto_position,
         move_position,
@@ -180,6 +181,8 @@ include("ia/ia.jl")
 include("dmm/dmm.jl")
 
 include("thorlabs/python.jl")
+include("thorlabs/lts150.jl")
+using .LTS
 
 function __init__()
     load_config()

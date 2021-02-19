@@ -1,4 +1,29 @@
-if PyCall.python == "python"
+
+module LTS
+export 
+        initialize_lts,
+        ThorlabsLTS150,
+        goto_position,
+        move_position,
+        move_x_abs,
+        move_y_abs,
+        move_z_abs,
+        move_x_rel,
+        move_y_rel,
+        move_z_rel,
+        set_home,
+        move_home
+
+struct ThorlabsLTS150
+    lts
+    x_home
+    y_home
+    z_home
+end
+
+using PyCall
+function __init__()
+PyCall.python != "python" && return
 py"""
 from time import sleep
 import pdb
@@ -81,7 +106,12 @@ class LTS:
     def pos_z(self):
         return ParseDec(self.z_stage.Position)
 """
+
 end
+
+
+two(x) = py"one"(x) + py"one"(x)
+
 """
 # Available Functions
 
@@ -97,14 +127,8 @@ end
 - `set_home(xyz, x, y, z)`
 - `move_home(xyz)`
 """
-struct ThorlabsLTS150 <: XYZStage 
-    lts
-    x_home
-    y_home
-    z_home
-end
 
-function initialize(::Type{ThorlabsLTS150})
+function initialize_lts()
     lts = py"LTS()"
     lts.init()
     return ThorlabsLTS150(lts)
@@ -143,4 +167,4 @@ function move_home(xyz)
     xyz.lts.move_y(xyz.y_home)
     xyz.lts.move_z(xyz.z_home)
 end
-
+end
