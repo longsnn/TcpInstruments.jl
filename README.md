@@ -40,12 +40,12 @@ To make things easier you can also use a config file.
 This will preset the ip addresses of the instruments so you don't need to remember them.
 You can write your own or ask your lab advisor for the lab's config file.
 
-To get Orchard's config or update your config to the latest version use:
+To get Orchard's config or update your config to Orchard's current latest version use:
 ```julia
 julia>create_config()
 ```
 
-Should you ever need to update your config you can always use:
+Should you ever need to change anything in your config you can always use:
 ```julia
 julia>edit_config()
 ```

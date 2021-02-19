@@ -14,7 +14,7 @@ Start a new powershell as administrator.
 
 `Set-ExecutionPolicy -Scope CurrentUser`
 
-`iwr https://chocolatey.org/install.ps1 | iex`
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 ## Install git
 `choco install git`

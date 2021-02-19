@@ -34,6 +34,9 @@ help>AgilentDSOX4034A
 - `MultiMeter`
 - `PowerSupply`
 - `WaveformGenerator`
+- `ImpedanceAnalyzer`
+- `XYZStage`
+
 
 """
 abstract type Instrument end
@@ -72,6 +75,13 @@ abstract type WaveformGenerator <: Instrument end
 
 """
 abstract type ImpedanceAnalyzer <: Instrument end
+
+"""
+# Supported Instruments:
+- `ThorlabsLTS150`
+
+"""
+abstract type XYZStage <: Instrument end
 
 mutable struct Instr{ T <: Instrument } <: Instrument
     model::Type

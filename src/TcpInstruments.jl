@@ -1,3 +1,44 @@
+"""
+TcpInstruments is an ongoing effort to provide a simple unified
+interface to common lab equipment.
+
+To connect to an instrument use:
+```
+handle = initialize({Instrument-Type}, "IP-ADDRESS:PORT")
+```
+
+To prevent hardcoding in scripts and/or to make it simplier for
+your lab or organization to keep track of all the equipment and
+ip addresses a configuration file can also be specified.
+
+To use Orchard Ultrasound's latest lab config use:
+```
+create_config()
+```
+This will create a yaml file in your home directory: ~/.tcp.yml
+
+This yaml file will be loaded everytime you use this package.
+
+You can also create a project-specific config by creating
+the config in your project root directory instead of your home
+directory. You can do this with:
+```
+create_config(pwd())
+```
+
+Once you have created a config file you can change it with
+```
+edit_config()
+```
+
+If the instrument has its address in the config file you can now connect with: 
+```
+handle = initialize({Instrument-Type})
+```
+
+To see the different types of devices you can interface with
+use `help>Instrument`.
+"""
 module TcpInstruments
 
 using Printf
@@ -11,6 +52,7 @@ export
         PowerSupply,
         WaveformGenerator,
         ImpedanceAnalyzer,
+        XYZStage,
 
         create_config,
         edit_config,
