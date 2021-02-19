@@ -52,7 +52,6 @@ export
         PowerSupply,
         WaveformGenerator,
         ImpedanceAnalyzer,
-        XYZStage,
 
         create_config,
         edit_config,
@@ -140,6 +139,20 @@ export
         SRSPS310,
         ## Waveform Generator
         Keysight33612A,
+
+        ## XYZ
+        XYZStage,
+        ThorlabsLTS150,
+        goto_position,
+        move_position,
+        move_x_abs,
+        move_y_abs,
+        move_z_abs,
+        move_x_rel,
+        move_y_rel,
+        move_z_rel,
+        set_home,
+        move_home,
 
         scan_network,
 
