@@ -89,18 +89,19 @@ mutable struct Instr{ T <: Instrument } <: Instrument
     buffer_size::Int
     sock::TCPSocket
     connected::Bool
-    id_str::String
 end
 
 function CreateTcpInstr(model, address)
-    Instr{model}(
-        model, 
-        address, 
-        1024, 
-        TCPSocket(), 
-        false, 
-        "empty-ID"
-    )
+    Instr{model}(model, address, 1024, TCPSocket(), false)
+end
+
+function Base.show(io::IO, ::MIME"text/plain", i::TcpInstruments.Instr)
+    println("TcpInstruments.Instr{$(i.model)}")
+    println("    Group: $(supertype(i.model))")
+    println("    Model: $(i.model)")
+    println("    Address: $(i.address)")
+    println("    Buffer: $(i.buffer_size)")
+    println("    Connected: $(i.connected)")
 end
 
 """
@@ -127,7 +128,8 @@ function initialize(model)
     No .tcp.yml file found! To use ours:
     `create_config()`
 
-    If you want to initialize this device without a config file please specify an ip address:
+    If you want to initialize this device without a config file 
+    please specify an ip address:
     `initialize($(string(model)), "10.1.30.XX")`
     """
 
@@ -140,7 +142,8 @@ function initialize(model)
         To update to the latest version:
         `create_config()`
 
-        Otherwise please add it to your .tcp.yml config file or specify an ip address:
+        Otherwise please add it to your .tcp.yml config file or
+        specify an ip address:
         `initialize($(string(model)), "10.1.30.XX")`
         
         """
@@ -148,13 +151,14 @@ function initialize(model)
     if data isa String
         return initialize(model, data)
     end
-    address, prologix = get(data, "address", ""), get(data, "prologix", "")
+
+    address = get(data, "address", "")
+    prologix = get(data, "prologix", "")
+
     if isempty(prologix)
         return initialize(model, address)
     end
-    return initialize(model,
-                      address,
-                      prologix_chan=prologix)
+    return initialize(model, address, prologix_chan=prologix)
 end
 
 """
