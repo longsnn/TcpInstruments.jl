@@ -81,7 +81,7 @@ class LTS:
     def pos_z(self):
         return ParseDec(self.z_stage.Position)
 """
-
+end
 """
 # Available Functions
 
