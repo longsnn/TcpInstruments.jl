@@ -1,6 +1,7 @@
 using Sockets
 import Base.Threads.@spawn
 
+println(PROGRAM_FILE)
 println("Orchid Emulator")
 port = 8080
 println("port: ", port)
@@ -42,7 +43,7 @@ function emulator()
     end
 end
 
-if PROGRAM_FILE == "test/emulator/fake_device.jl"
+if PROGRAM_FILE == "test/emulate/fake_device.jl"
     emulator()
 else
     @spawn emulator()
