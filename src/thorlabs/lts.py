@@ -57,13 +57,13 @@ class LTS:
         self.z_stage = self.init_stage(self.z_serial)
 
     def move_x(self, pos):
-        self.x_stage.MoveTo(Decimal(pos), self.timeout)
+        self.x_stage.MoveTo(Decimal(pos), IsDone)
 
     def move_y(self, pos):
-        self.y_stage.MoveTo(Decimal(pos), self.timeout)
+        self.y_stage.MoveTo(Decimal(pos), IsDone)
 
     def move_z(self, pos):
-        self.z_stage.MoveTo(Decimal(pos), self.timeout)
+        self.z_stage.MoveTo(Decimal(pos), IsDone)
 
     def home(self):
         self.x_stage.Home(self.timeout)
@@ -78,3 +78,10 @@ class LTS:
 
     def pos_z(self):
         return ParseDec(self.z_stage.Position)
+
+def isDone(taskID):
+    print(taskID)
+
+IsDone = System.Action[System.UInt64](isDone)
+
+pdb.set_trace()

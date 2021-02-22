@@ -116,12 +116,12 @@ get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANNEL$chan:IMPEDANCE
     run(scope)
 Run Oscilloscope
 """
-run(obj::Instr{T}) where T <: Oscilloscope = write(instr, "RUN")   
+run(obj::Instr{T}) where T <: Oscilloscope = write(obj, "RUN")   
 """
     stop(scope)
 Stop Oscilloscope
 """
-stop(obj::Instr{T}) where T <: Oscilloscope = write(instr, "STOP") 
+stop(obj::Instr{T}) where T <: Oscilloscope = write(obj, "STOP") 
 
 scope_waveform_preamble_get(instr) = query(instr, "WAVEFORM:PREAMBLE?")
 scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
@@ -221,9 +221,9 @@ function get_data(instr::Instrument, ch_vec::Vector{Int})
             error("Channel $ch is offline, data cannot be read")
         end
     end
-    scope_stop(instr) # Makes sure the data from each channel is from the same trigger event
+    stop(instr) # Makes sure the data from each channel is from the same trigger event
     wfm_data = [get_data(instr, ch) for ch in ch_vec]
-    scope_continue(instr)
+    run(instr)
     return wfm_data
 end
 
