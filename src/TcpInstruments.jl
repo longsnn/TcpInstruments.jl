@@ -174,11 +174,11 @@ include("instrument.jl")
 include("common_commands.jl")
 
 # instruments
-include("scope/scope.jl")
-include("psu/psu.jl")
-include("awg/awg.jl")
-include("ia/ia.jl")
-include("dmm/dmm.jl")
+include("oscilloscope/scope.jl")
+include("power_supply/psu.jl")
+include("signal_generator/awg.jl")
+include("impedance_analyzer/ia.jl")
+include("multimeter/dmm.jl")
 
 include("thorlabs/python.jl")
 include("thorlabs/lts150.jl")
