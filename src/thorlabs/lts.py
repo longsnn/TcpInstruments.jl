@@ -21,26 +21,47 @@ from Thorlabs.MotionControl.IntegratedStepperMotorsCLI import *
 def ParseDec(d):
     return float(str(d))
 
-class LTS:
+class Stage:
     def __init__(self):
-        self.x_stage = 0
-        self.y_stage = 0
-        self.z_stage = 0
-        self.x_serial = 0
-        self.y_serial = 0
-        self.z_serial = 0
-        self.timeout = 60000
+        self.stage = 0
+        self.serial = 0
+        self.is_moving = False
+        self.is_enabled = False
 
-    def init_stage(self, serial):
+    def init(self, serial):
         d = LongTravelStage.CreateLongTravelStage(serial)
         sleep(1)
         d.Connect(serial)
         sleep(1)
         d.EnableDevice()
         sleep(1)
+        self.is_enabled = True
         d.LoadMotorConfiguration(serial)
-        return d
 
+        self.stage = d
+        self.serial = serial
+
+    def move(self, pos):
+        self.is_moving = True
+        self.stage.MoveTo(Decimal(pos), self.isDone())
+
+    def home(self):
+        self.is_moving = True
+        self.stage.Home(self.isDone())
+
+    def isDone(self):
+        def isDoneHelper(taskID):
+            self.is_moving = False
+        return Action[UInt64](isDoneHelper)
+
+    def pos(self):
+        return ParseDec(self.stage.Position)
+
+class LTS:
+    def __init__(self):
+        self.x_stage = Stage()
+        self.y_stage = Stage()
+        self.z_stage = Stage()
 
     def init(self):
         DeviceManagerCLI.BuildDeviceList()
@@ -56,44 +77,60 @@ class LTS:
             print("Y: ", self.y_serial)
             print("Z: ", self.z_serial)
 
-            self.x_stage = self.init_stage(self.x_serial)
-            self.y_stage = self.init_stage(self.y_serial)
-            self.z_stage = self.init_stage(self.z_serial)
+            self.x_stage.init(self.x_serial)
+            self.y_stage.init(self.y_serial)
+            self.z_stage.init(self.z_serial)
         else:
             raise Exception(str(len(d_list)) + " stages were detected: " + str(d_list))
 
+        return self
+
     def move_x(self, pos):
-        tasks = []
-        self.x_stage.MoveTo(Decimal(pos), isDone(tasks))
-        sleep(5)
-        print(tasks)
+        self.x_stage.move(pos)
+        self.wait()
 
     def move_y(self, pos):
-        self.y_stage.MoveTo(Decimal(pos), IsDone)
+        self.y_stage.move(pos)
+        self.wait()
 
     def move_z(self, pos):
-        self.z_stage.MoveTo(Decimal(pos), IsDone)
+        self.z_stage.move(pos)
+        self.wait()
 
-    def home(self):
-        self.x_stage.Home(self.timeout)
-        self.y_stage.Home(self.timeout)
-        self.z_stage.Home(self.timeout)
+    def move_xyz(self, x, y, z):
+        self.x_stage.move(x)
+        self.y_stage.move(y)
+        self.z_stage.move(z)
+        self.wait()
+
+    def home_x(self):
+        self.x_stage.home()
+        self.wait()
+
+    def home_y(self):
+        self.y_stage.home()
+        self.wait()
+
+    def home_z(self):
+        self.z_stage.home()
+        self.wait()
+
+    def home_xyz(self):
+        self.x_stage.home()
+        self.y_stage.home()
+        self.z_stage.home()
+        self.wait()
 
     def pos_x(self):
-        return ParseDec(self.x_stage.Position)
+        return self.x_stage.pos()
 
     def pos_y(self):
-        return ParseDec(self.y_stage.Position)
+        return self.y_stage.pos()
 
     def pos_z(self):
-        return ParseDec(self.z_stage.Position)
+        return self.z_stage.pos()
 
-def isDone(array):
-    def isDoneHelper(taskID):
-        print(taskID)
-        array.append(taskID)
-    return System.Action[System.UInt64](isDoneHelper)
+    def wait(self):
+        while self.x_stage.is_moving or self.y_stage.is_moving or self.z_stage.is_moving:
+            sleep(0.1)
 
-IsDone = System.Action[System.UInt64](isDone)
-
-pdb.set_trace()
