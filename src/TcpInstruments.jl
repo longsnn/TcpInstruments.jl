@@ -41,8 +41,6 @@ use `help>Instrument`.
 """
 module TcpInstruments
 
-using Printf
-using RecipesBase
 using Sockets
 
 export 
