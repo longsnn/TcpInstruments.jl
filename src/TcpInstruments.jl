@@ -135,7 +135,7 @@ export
         AgilentDSOX4034A,
         ## Power Supply
         AgilentE36312A,
-        VersatilePowerBench100_10XR,
+        VersatilePower,
         SRSPS310,
         ## Waveform Generator
         Keysight33612A,

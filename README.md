@@ -165,10 +165,10 @@ wave = initialize(OleBigWave)
 ```
 (No dashes, spaces or other special characters in alias names, treat them like variables because they are)
 ## Power Supplies
-# VersatilePowerBench100_10XR
+# VersatilePower
 ```julia
 # Initialize automatically puts this power supply in remote mode
-pwr = initialize(VersatilePowerBench100_10XR)
+pwr = initialize(VersatilePower)
 
 set_voltage(pwr, 20)
 set_current_limit(pwr, 4)
@@ -259,7 +259,7 @@ using TcpInstruments
 using Plots; gr()
 
 scope = initialize(AgilentDSOX4034A)
-pwr = initialize(VersatilePowerBench100_10XR)
+pwr = initialize(VersatilePower)
 wave = initialize(Keysight33612A)
 
 set_mode_cw(wave)

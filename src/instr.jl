@@ -56,7 +56,7 @@ abstract type MultiMeter <: Instrument end
 """
 # Supported Instruments
 - `AgilentE36312A`
-- `VersatilePowerBench100_10XR`
+- `VersatilePower`
 - `PS310`
 """
 abstract type PowerSupply <: Instrument end

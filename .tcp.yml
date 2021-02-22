@@ -17,7 +17,7 @@ AgilentDSOX4024A:
 
 AgilentE36312A:
     address: "10.1.30.34"
-VersatilePowerBench100_10XR:
+VersatilePower:
     address: "10.1.30.35:8003"
 SRSPS310:
     prologix: 2
