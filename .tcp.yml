@@ -10,6 +10,8 @@ AgilentDSOX4034A:
     alias: "big_scope"
     address: "10.1.30.32"
 
+AgilentDSOX4024A: "10.1.30.44"
+
 # Power Supply
 
 AgilentE36312A:
