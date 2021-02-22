@@ -3,6 +3,6 @@
 *.jl.mem
 *.swp
 .DS_Store
-/Manifest.toml
+Manifest.toml
 /dev/
 __pycache__
