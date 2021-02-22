@@ -265,7 +265,7 @@ wave = initialize(Keysight33612A)
 set_mode_cw(wave)
 set_function(wave, "SIN")
 set_frequency(wave, 1000)
-set_amplitudewave, 0.1)
+set_amplitude(wave, 0.1)
 set_voltage_offset(wave, 0)
 enable_output(wave)
 

@@ -128,9 +128,9 @@ scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$c
 scope_waveform_source_get(instr) = query(instr, "WAVEFORM:SOURCE?")
 scope_waveform_mode_8bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT BYTE")
 scope_waveform_mode_16bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT WORD")
-scope_waveform_num_points(instr::Instrument, num_points::Int) = write(instr, @sprintf("WAVEFORM:POINTS %i", num_points))
-scope_waveform_num_points(instr::Instrument, mode::String) = write(instr, @sprintf("WAVEFORM:POINTS %s", mode))
-scope_waveform_points_mode(instr::Instrument, mode_idx::Int) = write(instr, @sprintf("WAVEFORM:POINTS:MODE %s", WAVEFORM_POINTS_MODE[mode_idx])) #norm, max, raw
+scope_waveform_num_points(instr::Instrument, num_points::Int) = write(instr, "WAVEFORM:POINTS $num_points")
+scope_waveform_num_points(instr::Instrument, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
+scope_waveform_points_mode(instr::Instrument, mode_idx::Int) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])) #norm, max, raw
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
@@ -164,8 +164,6 @@ function scope_waveform_info_get(instr::Instrument, ch::Int)
     str = scope_waveform_preamble_get(instr)
     @info "preamble", str
     str_array = split(str, ",")
-    #@printf("str: %s\n", str)
-    #@printf("str_array: %s\n", str_array)
     format      = RESOLUTION_MODE[str_array[1]]
     type        = TYPE[str_array[2]]
     num_points  = parse(Int64,   str_array[3])
