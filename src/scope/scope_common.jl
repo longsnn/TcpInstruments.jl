@@ -214,9 +214,9 @@ function get_data(instr::Instrument, ch::Int)
 end
 
 # TODO: Make ch-vector only contain each channel maximum one time
-function get_data(instr::Instrument, ch_vec::Vector{Int})
+function get_data(instr::Instrument, ch_vec::Vector{Int} = filter(x -> status(instr, x), 1:4))
+    @info "Loading channels: $ch_vec"
     for ch in ch_vec
-        @info status(instr, ch)
         if !status(instr, ch)
             error("Channel $ch is offline, data cannot be read")
         end
@@ -226,4 +226,3 @@ function get_data(instr::Instrument, ch_vec::Vector{Int})
     run(instr)
     return wfm_data
 end
-
