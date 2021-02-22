@@ -7,11 +7,12 @@ KeysightDMM34465A: "10.1.30.38"
 # Scope
 
 AgilentDSOX4034A:
-    alias: "big_scope"
+    alias: "Scope350MHz"
     address: "10.1.30.32"
 
-AgilentDSOX4024A: "10.1.30.44"
-
+AgilentDSOX4024A:
+    alias: "Scope250MHz"
+    address: "10.1.30.44"
 # Power Supply
 
 AgilentE36312A:
