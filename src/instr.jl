@@ -40,9 +40,9 @@ help>AgilentDSOX4034A
 
 """
 abstract type Instrument end
-
 """
 # Supported Instruments
+- `AgilentDSOX4024A`
 - `AgilentDSOX4034A`
 """
 abstract type Oscilloscope <: Instrument end

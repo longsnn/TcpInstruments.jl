@@ -5,6 +5,14 @@ EXAMPLE_FILE =  "https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation
 TCP_CONFIG = nothing
 TCP_FILE = nothing
 
+function get_config()
+    if TCP_CONFIG == nothing
+        load_config()
+        return TCP_CONFIG
+    end
+    return TCP_CONFIG
+end
+
 const FILE_LOCATIONS = [
     joinpath(pwd(), ".tcp.yml"),
     joinpath(homedir(), ".tcp.yml"),
