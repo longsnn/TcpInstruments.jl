@@ -6,6 +6,18 @@ const shared_lib = dlopen(joinpath(path, ISM_LIB))
 
 lib(x) = dlsym(shared_lib, x)
 
+"""
+Returns the number of device units "microsteps" in one milimeter for Thorlabs LTS150
+
+"""
+ms_per_mm() = 49152
+
+"""
+Returns the number of device units "microsteps" in one meter for Thorlabs LTS150
+
+"""
+ms_per_m() = ms_per_mm() * 1000
+
 BuildDeviceList() = ccall(lib("TLI_BuildDeviceList"), Int, ())
 
 GetDeviceListSize() = ccall(lib("TLI_GetDeviceListSize"), Int, ())
@@ -34,7 +46,7 @@ MoveAbs(serial::String) = ccall(lib(:ISC_MoveAbsolute), Int, (Cstring,), serial)
 
 GetPos(serial) = ccall(lib(:ISC_GetPosition), Int, (Cstring,), serial)
 
-r2d(x)::Int = x * 49152 * 1000
+r2d(x)::Int = x * ms_per_m()
 
 function Real2Device(serial::String, real::Float64)
     device_unit = Ref{Int}(0)

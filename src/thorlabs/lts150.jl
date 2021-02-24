@@ -39,6 +39,7 @@ export
 - `home_z(xyz)`
 - `set_limits(xyz, low, high)`
 - `get_limits(xyz)`
+- `get_limits_x(xyz)`
 - `clear_limits(xyz)`
 
 """
@@ -201,6 +202,16 @@ Returns
 """
 function get_limits(xyz)
     return xyz.lts.get_limits()
+end
+
+"""
+Returns
+
+    (x_low_limit, x_high_limit)
+"""
+function get_limits_x(xyz)
+    low, high = xyz.lts.get_limits()
+    return low[1], high[1]
 end
 
 function clear_limits(xyz)
