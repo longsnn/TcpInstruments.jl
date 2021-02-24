@@ -27,30 +27,46 @@ end
 
 status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 
-@recipe function plot(data::Waveform_data; label="", xguide="0", yguide="Volts")
+function plot_helper(data::Waveform_data; label="", xguide="0", yguide="Volts")
     time_unit, scaled_time = autoscale_seconds(data)
-    title := "Oscilloscope ~ Volts Vs. Time (" * time_unit * ")"
+    title = "Oscilloscope ~ Volts Vs. Time (" * time_unit * ")"
+    @info data.info.channel
     if isempty(label)
-        label := "Channel $(data.info.channel)"
+        @info data.info.channel "empty"
+        label = "Channel $(data.info.channel)"
     else
-        label := label
+        @info data.info.channel label
+        label = label
     end
     if xguide == "0"
-        xguide := "Time / " * time_unit
+        xguide = "Time / " * time_unit
     else
-        xguide := xlabel
+        xguide = xguide
     end
-    yguide := yguide * " / " * data.info.coupling
-    return scaled_time, data.volt
+    yguide = yguide * " / " * data.info.coupling
+    return scaled_time, data.volt, title, label, xguide, yguide
+
+end
+@recipe function plot(data::Waveform_data; label="", xguide="0", yguide="Volts")
+    scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
+    title := t
+    label := l
+    xguide := x
+    yguide := y
+    return scaled_time, volts
 end
 
-@recipe function plot(data::Array{Waveform_data, 1}; label="", yguide="Volts")
-    array = []
-    for i in 1:length(data)
-        time_unit, scaled_time = autoscale_seconds(data)
-        push!(array, (scaled_time, data.volt))
+@recipe function plot(data_array::Array{Waveform_data, 1}; label="", xguide="0", yguide="Volts")
+    for data in data_array
+        @series begin
+            scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
+            title := t
+            label := l
+            xguide := x
+            yguide := y
+            return scaled_time, volts
+        end
     end
-    return array
 end
 
 function autoscale_seconds(data::Waveform_data)
