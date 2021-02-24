@@ -37,18 +37,14 @@ export
 - `home_x(xyz)`
 - `home_y(xyz)`
 - `home_z(xyz)`
+- `set_limits(xyz, low, high)`
+- `get_limits(xyz)`
+- `clear_limits(xyz)`
+
 """
 mutable struct ThorlabsLTS150
     lts
-    x_low_limit::Int64
-    y_low_limit::Int64
-    z_low_limit::Int64
-    x_high_limit::Int64
-    y_high_limit::Int64
-    z_high_limit::Int64
 end
-
-ThorlabsLTS150(lts) = ThorlabsLTS150(lts, -1, -1, -1, -1, -1, -1)
 
 using PyCall
 function __init__()
@@ -182,16 +178,33 @@ Returns the current position of z stage
 """
 pos_z(xyz) = xyz.lts.pos_z()
 
+"""
+    set_limits(xyz, (x_low_lim, y_low_lim, z_low_lim), (x_high_lim, y_high_lim, z_high_lim))
+
+# Arguments
+- `low`: A Pair or an Array of three positions: (lts.x_low_limit, lts.y_low_limit, lts.z_low_limit)
+- `high`: A Pair or an Array of three positions: (lts.x_high_limit, lts.y_high_limit, lts.z_high_limit)
+
+"""
 function set_limits(xyz, low, high)
-    lts = xyz.lts
-    lts.x_low_limit, lts.y_low_limit, lts.z_low_limit = low
-    lts.x_high_limit, lts.y_high_limit, lts.z_high_limit = high
+    if length(low) != 3 || length(high) != 3
+        error("Cannot set device to these limits\nUse `help>set_limits` to see example of proper inputs")
+    end
+    xyz.lts.set_limits(low, high)
 end
 
+"""
+Returns
+
+    (lts.x_low_limit, lts.y_low_limit, lts.z_low_limit),
+       (lts.x_high_limit, lts.y_high_limit, lts.z_high_limit)
+"""
 function get_limits(xyz)
-    lts = xyz.lts
-    return (lts.x_low_limit, lts.y_low_limit, lts.z_low_limit),
-           (lts.x_high_limit, lts.y_high_limit, lts.z_high_limit)
+    return xyz.lts.get_limits()
+end
+
+function clear_limits(xyz)
+    xyz.lts.remove_limits()
 end
 
 end

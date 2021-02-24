@@ -27,6 +27,8 @@ class Stage:
         self.serial = 0
         self.is_moving = False
         self.is_enabled = False
+        self.low_limit = -1
+        self.high_limit = -1
 
     def init(self, serial):
         d = LongTravelStage.CreateLongTravelStage(serial)
@@ -42,6 +44,19 @@ class Stage:
         self.serial = serial
 
     def move(self, pos):
+        if self.high_limit < self.low_limit:
+            raise Exception("Upper limit cannot be smaller than lower limit")
+        if self.low_limit >= 0:
+            if pos < self.low_limit:
+                pos = self.low_limit
+
+        if self.high_limit >= 0:
+            if pos > self.high_limit:
+                pos = self.high_limit
+
+        self.force_move(pos)
+
+    def force_move(self, pos):
         self.is_moving = True
         self.stage.MoveTo(Decimal(pos), self.isDone())
 
@@ -56,6 +71,23 @@ class Stage:
 
     def pos(self):
         return ParseDec(self.stage.Position)
+    
+    def get_limits(self):
+        return self.low_limit, self.high_limit
+
+    def remove_limits(self):
+        self.low_limit = -1
+        self.high_limit = -1
+
+    def set_low_limit(self, lim):
+        self.low_limit = lim
+
+    def set_high_limit(self, lim):
+        self.high_limit = lim
+
+    def set_limits(self, low, high):
+        self.set_low_limit(low)
+        self.set_high_limit(high)
 
 class LTS:
     def __init__(self):
@@ -129,6 +161,24 @@ class LTS:
 
     def pos_z(self):
         return self.z_stage.pos()
+
+    def set_limits(self, low, high):
+        low_x, low_y, low_z = low
+        high_x, high_y, high_z = high
+        self.x_stage.set_limits(low_x, high_x)
+        self.y_stage.set_limits(low_y, high_y)
+        self.z_stage.set_limits(low_z, high_z)
+
+    def get_limits(self):
+        low_x, high_x = self.x_stage.get_limits()
+        low_y, high_y = self.y_stage.set_limits()
+        low_z, high_z = self.z_stage.set_limits()
+        return (low_x, low_y, low_z), (high_x, high_y, high_z)
+
+    def remove_limits(self):
+        self.x_stage.remove_limits()
+        self.y_stage.remove_limits()
+        self.z_stage.remove_limits()
 
     def wait(self):
         while self.x_stage.is_moving or self.y_stage.is_moving or self.z_stage.is_moving:
