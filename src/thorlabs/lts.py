@@ -72,7 +72,7 @@ class Stage:
         return Action[UInt64](isDoneHelper)
 
     def pos(self):
-        return self.pos_mm * 0.001
+        return self.pos_mm() * 0.001
 
     def pos_mm(self):
         return ParseDec(self.stage.Position)
