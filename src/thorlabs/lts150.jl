@@ -53,6 +53,7 @@ PyCall.python != "python" && return
 scriptdir = @__DIR__
 pushfirst!(PyVector(pyimport("sys")."path"), scriptdir)
 pyimport("lts")
+py"test()"
 end
 
 """
@@ -63,7 +64,11 @@ Connect to Thorlabs LTS
 Returns:
    - ThorlabsLTS150: Device Handle 
 """
-initialize_lts() = ThorlabsLTS150(py"LTS().init()")
+function initialize_lts() 
+    lts = py"LTS()"
+    lts.init()
+    ThorlabsLTS150(lts)
+end
 
 """
     move_xyz(xyz, x, y, z)

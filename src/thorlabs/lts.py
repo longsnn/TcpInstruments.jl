@@ -17,6 +17,8 @@ import Thorlabs.MotionControl.Controls
 from Thorlabs.MotionControl.DeviceManagerCLI import *
 from Thorlabs.MotionControl.IntegratedStepperMotorsCLI import *
 
+def test():
+    print("LTS Python Loaded")
 
 def ParseDec(d):
     return float(str(d))
@@ -171,8 +173,8 @@ class LTS:
 
     def get_limits(self):
         low_x, high_x = self.x_stage.get_limits()
-        low_y, high_y = self.y_stage.set_limits()
-        low_z, high_z = self.z_stage.set_limits()
+        low_y, high_y = self.y_stage.get_limits()
+        low_z, high_z = self.z_stage.get_limits()
         return (low_x, low_y, low_z), (high_x, high_y, high_z)
 
     def remove_limits(self):
