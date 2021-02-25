@@ -150,7 +150,7 @@ export
         move_z_rel,
         move_xyz,
         pos_xyz,
-        pos_x
+        pos_x,
         pos_y,
         pos_z,
         home,
