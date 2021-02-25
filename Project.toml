@@ -1,7 +1,7 @@
 name = "TcpInstruments"
 uuid = "aaee30c5-7b57-4441-b61a-ab7186f11903"
 authors = ["egajda", "mofii"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
