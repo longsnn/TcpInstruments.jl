@@ -16,6 +16,7 @@ struct Waveform_info
     impedance::String
     coupling::String
     low_pass_filter::String
+    channel::Int64
 end
 
 struct Waveform_data
@@ -26,17 +27,46 @@ end
 
 status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 
-@recipe function plot(data::Waveform_data; label="Channel 1", xlabel="0", ylabel="Volts")
+function plot_helper(data::Waveform_data; label="", xguide="0", yguide="Volts")
     time_unit, scaled_time = autoscale_seconds(data)
-    title := "Oscilloscope ~ Volts Vs. Time (" * time_unit * ")"
-    label := label
-    if xlabel == "0"
-        xlabel := "Time / " * time_unit
+    title = "Oscilloscope ~ Volts Vs. Time (" * time_unit * ")"
+    @info data.info.channel
+    if isempty(label)
+        @info data.info.channel "empty"
+        label = "Channel $(data.info.channel)"
     else
-        xlabel := xlabel
+        @info data.info.channel label
+        label = label
     end
-    ylabel := ylabel * " / " * data.info.coupling
-    return scaled_time, data.volt
+    if xguide == "0"
+        xguide = "Time / " * time_unit
+    else
+        xguide = xguide
+    end
+    yguide = yguide * " / " * data.info.coupling
+    return scaled_time, data.volt, title, label, xguide, yguide
+
+end
+@recipe function plot(data::Waveform_data; label="", xguide="0", yguide="Volts")
+    scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
+    title := t
+    label := l
+    xguide := x
+    yguide := y
+    return scaled_time, volts
+end
+
+@recipe function plot(data_array::Array{Waveform_data, 1}; label="", xguide="0", yguide="Volts")
+    for data in data_array
+        @series begin
+            scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
+            title := t
+            label := l
+            xguide := x
+            yguide := y
+            return scaled_time, volts
+        end
+    end
 end
 
 function autoscale_seconds(data::Waveform_data)
@@ -179,7 +209,7 @@ function scope_waveform_info_get(instr::Instrument, ch::Int)
     imp = get_impedance(instr; chan=ch)
     coupling = get_coupling(instr; chan=ch)
     low_pass_filter = get_lpf_state(instr; chan=ch)
-    return Waveform_info(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter)
+    return Waveform_info(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
 end 
 
 

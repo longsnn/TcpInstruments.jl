@@ -5,6 +5,14 @@ EXAMPLE_FILE =  "https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation
 TCP_CONFIG = nothing
 TCP_FILE = nothing
 
+function get_config()
+    if TCP_CONFIG == nothing
+        load_config()
+        return TCP_CONFIG
+    end
+    return TCP_CONFIG
+end
+
 const FILE_LOCATIONS = [
     joinpath(pwd(), ".tcp.yml"),
     joinpath(homedir(), ".tcp.yml"),
@@ -46,7 +54,7 @@ function load_config()
     TCP_FILE = file
     @info "CONFIG LOADED"
     for (device, data) in TCP_CONFIG
-        (device == "Prologix" || device == "python") && continue
+        device == "python" && continue
         device_type = nothing
         try
             device_type = eval(Symbol(device))

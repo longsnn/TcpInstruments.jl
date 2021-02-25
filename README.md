@@ -91,9 +91,10 @@ enable_output(wave) # Starts wave
 ### Initialize Prologix Channel
 To a initialize a device that is connected with a prologix
 controller you must specify what prologix channel the device
-is on.
+is on. At this moment the prologix adapter is the only supported
+GPIB to Ethernet adapter.
 ```julia
-p = initialize(SRSPS310, "10.1.30.37:1234"; prologix_chan=2)
+p = initialize(SRSPS310, "10.1.30.37:1234"; GPIB_ID=2)
 ```
 If you don't know the channel you can figure it out and configure
 it manually:
@@ -108,7 +109,7 @@ julia>get_prologix(p)
 ```
 ### Using SRSPS310 Power Supply
 ```julia
-p = initialize(SRSPS310, "10.1.30.37:1234"; prologix_chan=2)
+p = initialize(SRSPS310, "10.1.30.37:1234"; GPIB_ID=2)
 set_voltage_limit(p, 1250)
 set_voltage(p, 1250)
 set_current_limit(p, 0.021) # 21mA
@@ -127,7 +128,7 @@ Format of .tcp.yml file:
 
 # GPIB Device connected with a prologix controller
 {name-of-device}:
-    prologix: {channel-number}
+    gpib: {channel-number}
     address: "{ip-address}"
 ```
 
@@ -138,7 +139,7 @@ Keysight33612A:
     address: "10.1.30.36"
     alias: "OleBigWave"
 SRSPS310:
-    prologix: 2
+    gpib: 2
     address: "10.1.30.37:1234"
 ```
 
