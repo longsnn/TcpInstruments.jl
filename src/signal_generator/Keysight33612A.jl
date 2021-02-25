@@ -34,6 +34,9 @@ enable_output(wave) # Starts wave
 ```
 """
 struct Keysight33612A <: WaveformGenerator end
+
+const k33612a = Instr{Keysight33612A}
+
 #instrument_reset(obj::Instr{AgilentDSOX4024A})    = write(obj, "*RST for 402")
 
 get_voltage_offset(obj::Instr{Keysight33612A}; chan=1) =
@@ -167,3 +170,44 @@ set_trigger_source_timer(obj; chan=1) =
 
 status(obj::Instr{Keysight33612A}) = write(obj, "APPLY?")
 
+
+####### TODO : Implement & Test  ############
+set_arbitary_sample_rate(o::k33612a, sr) = write(o, "FUNC:ARB:SRATE $sr")
+
+function set_arbitary_filter(o::k33612a, filter)
+    f = uppercase(string(filter))
+    @assert f in ["NORMAL", "STEP", "OFF"] "filter must be NORMAL, STEP or OFF"
+    write(o, "FUNC:ARB:FILTER $f")
+end
+
+function set_arbitrary_peak_to_peak(o::k33612a)
+    # FUNC:ARB:PTPEAK 10
+    return nothing
+end
+
+function send_arbitrary_waveform(
+    obj::k33612a, signal::Array{Float64, 1}, sr::Int64
+)
+    @assert length(signal) >= 32
+
+    # Must be sent unquoted and upto 12 characters
+    wave_name = "myArbWave"
+
+    set_arbitary_sample_rate(obj, 10e3)
+    set_arbitary_filter(obj, :off)
+    ex = "DATA:ARB $wave_name, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0"
+    # TODO: Print as comma seperated list
+    cmd = "DATA:ARB $wave_name, $signal"
+    @info cmd
+    write(obj, cmd)
+    """
+    #3128 3 is number of following digitals
+    #    128 is total characters in block command
+    
+    DATA:SEQuence #3128"$wave_name","dc_ramp",0,on-
+    ce,highAtStart,5,"dc5v",2,repeat,maintain,5,
+    "dc2_v",2,repeat,lowAtStart,5,"dc0v",2,repeat,maintain,5
+    """
+
+    set_function(obj, "ARB")
+end
