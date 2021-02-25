@@ -4,10 +4,7 @@ function elapsed_time(start_time)
             seconds = floor(time() - start_time)
             return Time(0) + Second(seconds)
 end
-"""
-Pretty awesome if I do say so myself
-"""
-function elapsed_time(func=x -> x, start_time=time())
+function elapsed_time(func, start_time)
             seconds = floor(time() - start_time)
             return Time(0) + Second(func(seconds))
 end
@@ -54,12 +51,14 @@ struct Hydrophone
 end
 
 mutable struct Waveinfo
-    waveinfo
-    coordinates
+    info::Union{Waveform_info, Nothing}
+    time::Union{Array{Float64, 1}, Nothing}
+    waveinfo::Union{Array{Float64}, Nothing}
+    coordinates::Union{Array{Tuple{Real, Real, Real}}, Nothing}
     unfiltered_waveform
 end
 
-Waveinfo() = Waveinfo(nothing, nothing, nothing)
+Waveinfo() = Waveinfo(nothing, nothing, nothing, nothing, nothing)
 
 
 """
@@ -98,15 +97,14 @@ Waveinfo() = Waveinfo(nothing, nothing, nothing)
 """
 function intensity_scan_x(
     hydro, x_range, x_num;
-    verbose=true, filter=false,
+    verbose=true, filter=false
 )
     num_axis = 3 # Represents the three axis xyz
-    wave_info = Waveinfo() 
     start_time = time()
 
     # Ensure x_range is within xyz limits
     x_low, x_high = hydro.xyz.get_limits_x()
-    if !x_range[1] in x_low:x_high || !x_range[2] in x_low:x_high
+    if !x_range[begin] in x_low:x_high || !x_range[end] in x_low:x_high
         error("Scan range is outside current limits of the xyz stage")
     end
 
@@ -115,7 +113,7 @@ function intensity_scan_x(
         if x_num != 1
             error(
                 "Can't measure multiple points when x_range has one"* 
-                "position"
+                " position"
             )
         end
         x_range
@@ -126,8 +124,14 @@ function intensity_scan_x(
     end
 
     # Pre-Allocate output matrices
+    wave_info = Waveinfo() 
     wave_info.wave_form = zeros(hydro.sample_size, x_num)
     wave_info.coordinates = zeros(num_axis, x_num) 
+    if filter
+        wave_info.unfiltered_waveform = zeros(
+            hydro.sample_size, x_num
+        )
+    end
 
     # Loop to scan positions
     for i in 1:x_num
@@ -136,46 +140,55 @@ function intensity_scan_x(
             @info "Scanning x-direction: $i/$x_num iterations"
         end
 
+        first_pass = i == 1
+
         move_x_abs(hydro.xyz, x_pos[i])
 
-        # TODO: Something is pausing
+        # TODO: Pausing
         
         data = get_data(hydro.scope, hydro.channel)
 
-        if hydro.sample_size != data.info.num_points
+        if data.info.num_points != hydro.sample_size
             error("Scope sample size is different from hydrophone")
         end
 
         # TODO: if remove_amount_data != 0 trim beginning and end of data
 
-        # TODO: Implement
         if filter
-            if i == 1 # Only on first pass
-                wave_info.unfiltered_waveform = zeros(
-                    hydro.sample_size, x_num
-                )
-            end
-            # TODO: What format to save Waveform_info type
-            wave_info.unfiltered_waveform[:, i] = data
+            wave_info.unfiltered_waveform[:, i] = data.volts
         end
 
-        # TODO: Save as point instead of column or destructure data?
-        wave_info.wave_form[:, i] = data
-        wave_info.coordinates[:, i] = pos_xyz(hydro.xyz)
+        if first_pass
+            wave_info.info = data.info
+        end
+        wave_info.wave_form[:, i] = data.volts
+        wave_info.coordinates[i] = pos_xyz(hydro.xyz)
 
         if verbose
-            time_left = elapsed_time(loop_time) do seconds
-                # Multiply seconds this loop took by number of remaining
-                # iterations to get approximate end time
-                seconds * (x_num - i)
+            time_left = elapsed_time(loop_time) do elapsed_seconds
+                # Multiply seconds this loop took by number of
+                # remaining iterations to get approximate end time
+                elapsed_seconds * (x_num - i)
             end
             @info "Estimated time remaining: $time_left"
         end
     end
 
     if verbose
-            time_passed = elapsed_time(start_time)
+        @info """
+            Done!
+            Scan completed from $(x_range[begin]) to $(x_range[end])
+            Total elapsed time: $(elapsed_time(start_time))
+            
+        """
     end
+
+    # TODO: Save data to file
+    if verbose
+        @info "Saving to file"
+    end
+
+    # TODO: Plot
     wave_info
 end
 
