@@ -122,6 +122,9 @@ function initialize(model, address; prologix_chan=-1)
 end
 
 function initialize(model)
+    if model == ThorlabsLTS150
+        return initialize_lts()
+    end
     @assert TCP_CONFIG != nothing """
     No .tcp.yml file found! To use ours:
     `create_config()`
