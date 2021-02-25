@@ -72,7 +72,16 @@ home(lts)
 # Returns x,y,z positions
 pos_xyz(lts)
 
-set_limits(lts, [0.01, 0.01, 0.01], [0.1, 0.1, 0.1])
+# First tuple contains lower limits, second contains upper limits
+# (x_low_lim, y_low_lim, z_low_lim), (x_up_lim, y_up_lim, z_up_lim)
+# Arrays can be used instead of tuples as well []
+set_limits(lts, (0.01, 0.01, 0.01), (0.1, 0.1, 0.1))
+
+# Will return a pair of tuples with limits you just set
+get_limits(lts)
+
+# Will return lower and upper limit for x stage
+lower_x, upper_x = get_limits_x(lts)
 
 # Will stay at 0.1 (upper limit)
 move_x_abs(lts, 0.2)
@@ -86,7 +95,8 @@ move_x_abs(lts, 0)
 # Clear limits
 clear_limits(lts)
 
-# Moving out of bounds with no limits set will throw an error, don't do this
+# Moving beyond your physical device with no limits will throw an error
+# Don't do this
 move_x_abs(lts, 5)
 ```
 
