@@ -110,13 +110,16 @@ Initializes a connection to the instrument at the given (input) IP address.
 # Arguments
 - `model`: They device type you are connecting to. Use `help>Instrument` to see available options.
 - `address::String`: The ip address of the device. Ex. "10.3.30.23"
+
+# Keywords
+- `GPIB_ID::Int`: The GPIB interface ID of your device. This is optional and doesn't need to be set unless you are using a prologix controller to control it remotely. 
 """
-function initialize(model, address; prologix_chan=-1)
+function initialize(model, address; GPIB_ID=-1)
     instr_h = CreateTcpInstr(model, address)
     connect!(instr_h)
     remote_mode(instr_h)
-    if prologix_chan >= 0
-        set_prologix_chan(instr_h, prologix_chan)
+    if GPIB_ID >= 0
+        set_prologix_chan(instr_h, GPIB_ID)
     end
     return instr_h
 end
@@ -154,12 +157,12 @@ function initialize(model)
     end
 
     address = get(data, "address", "")
-    prologix = get(data, "prologix", "")
+    gpib = get(data, "gpib", "")
 
-    if isempty(prologix)
+    if isempty(gpib)
         return initialize(model, address)
     end
-    return initialize(model, address, prologix_chan=prologix)
+    return initialize(model, address, GPIB_ID=gpib)
 end
 
 """

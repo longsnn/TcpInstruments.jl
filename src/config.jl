@@ -54,7 +54,7 @@ function load_config()
     TCP_FILE = file
     @info "CONFIG LOADED"
     for (device, data) in TCP_CONFIG
-        (device == "Prologix" || device == "python") && continue
+        device == "python" && continue
         device_type = nothing
         try
             device_type = eval(Symbol(device))
