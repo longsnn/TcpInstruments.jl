@@ -22,7 +22,7 @@ export
         get_limits_x,
         get_limits_y,
         get_limits_z,
-        clear_limits,
+        clear_limits
 
 """
 # Available Functions

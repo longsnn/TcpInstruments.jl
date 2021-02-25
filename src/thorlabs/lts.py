@@ -56,7 +56,7 @@ class Stage:
             if pos > self.high_limit:
                 pos = self.high_limit
 
-        self.force_move(pos)
+        self.force_move(pos * 1000)
 
     def force_move(self, pos):
         self.is_moving = True
@@ -72,6 +72,9 @@ class Stage:
         return Action[UInt64](isDoneHelper)
 
     def pos(self):
+        return self.pos_mm * 0.001
+
+    def pos_mm(self):
         return ParseDec(self.stage.Position)
     
     def get_limits(self):
