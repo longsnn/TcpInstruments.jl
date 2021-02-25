@@ -8,6 +8,7 @@ export
         move_x_rel,
         move_y_rel,
         move_z_rel,
+        move_xyz,
         pos_xyz,
         pos_x,
         pos_y,
@@ -15,7 +16,13 @@ export
         home,
         home_x,
         home_y,
-        home_z
+        home_z,
+        set_limits,
+        get_limits,
+        get_limits_x,
+        get_limits_y,
+        get_limits_z,
+        clear_limits,
 
 """
 # Available Functions
@@ -40,6 +47,8 @@ export
 - `set_limits(xyz, low, high)`
 - `get_limits(xyz)`
 - `get_limits_x(xyz)`
+- `get_limits_y(xyz)`
+- `get_limits_z(xyz)`
 - `clear_limits(xyz)`
 
 """
@@ -219,6 +228,26 @@ Returns
 function get_limits_x(xyz)
     low, high = xyz.lts.get_limits()
     return low[1], high[1]
+end
+
+"""
+Returns
+
+    (y_low_limit, y_high_limit)
+"""
+function get_limits_y(xyz)
+    low, high = xyz.lts.get_limits()
+    return low[2], high[2]
+end
+
+"""
+Returns
+
+    (z_low_limit, z_high_limit)
+"""
+function get_limits_z(xyz)
+    low, high = xyz.lts.get_limits()
+    return low[3], high[3]
 end
 
 function clear_limits(xyz)

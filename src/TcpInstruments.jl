@@ -160,6 +160,8 @@ export
         set_limits,
         get_limits,
         get_limits_x,
+        get_limits_y,
+        get_limits_z,
         clear_limits,
 
 
