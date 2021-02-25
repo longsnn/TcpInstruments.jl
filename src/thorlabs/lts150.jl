@@ -47,13 +47,15 @@ mutable struct ThorlabsLTS150
     lts
 end
 
+lts_lib = nothing
+
 using PyCall
 function __init__()
+global lts_lib
 PyCall.python != "python" && return
 scriptdir = @__DIR__
 pushfirst!(PyVector(pyimport("sys")."path"), scriptdir)
-pyimport("lts")
-py"test()"
+lts_lib = pyimport("lts")
 end
 
 """
@@ -65,7 +67,7 @@ Returns:
    - ThorlabsLTS150: Device Handle 
 """
 function initialize_lts() 
-    lts = py"LTS()"
+    lts = lts_lib.LTS()
     lts.init()
     ThorlabsLTS150(lts)
 end
