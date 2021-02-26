@@ -116,6 +116,14 @@ pushfirst!(PyVector(pyimport("sys")."path"), scriptdir)
 lts_lib = pyimport("lts")
 end
 
+
+function create_config(type::Type{ThorlabsLTS150})
+    xyz = initialize(type)
+   # xyz.
+
+    
+end
+
 """
     xyz = initialize_lts()
 
@@ -125,6 +133,7 @@ Returns:
    - ThorlabsLTS150: Device Handle 
 """
 function initialize_lts() 
+    @assert Sys.iswindows() "Windows is needed to connect to ThorlabsLTS150"
     @assert lts_lib != nothing "add python: python to top of config file then call load_python(). You must be on a windows computer to use this device"
     lts = lts_lib.LTS()
     lts.init()

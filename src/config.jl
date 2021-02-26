@@ -1,6 +1,6 @@
 using YAML
 
-EXAMPLE_FILE =  "https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp.yml"
+EXAMPLE_FILE = "https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp.yml"
 
 TCP_CONFIG = nothing
 TCP_FILE = nothing

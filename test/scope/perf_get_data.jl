@@ -3,31 +3,26 @@ using Test
 
 s = initialize(AgilentDSOX4034A)
 
+timeit(func_time, title) = println("$title: $(func_time)")
+
 for i in 1:2
-@info "Single Test $i"
+println("Single Channel $i")
 
-@info "Single Channel"
-@time get_data(s, 1)
+@show @elapsed get_data(s, 1)
 
-@info "Single Channel in Array; Forgo Inbounds False"
-@time get_data(s, [1])
+@show @elapsed get_data(s, [1])
 
-@info "Single Channel in Array; Forgo Inbounds True"
-@time get_data(s, [1]; inbounds=true)
+@show @elapsed get_data(s, [1]; inbounds=true)
 
 
 
-@info "Two Channel Test $i"
+println("Two Channel Test $i")
 
-@info "Two Channel Explicit; Inbounds False"
-@time get_data(s, [1, 2])
+@show @elapsed get_data(s, [1, 2])
 
-@info "Two Channel Autosearch; Inbounds False"
-@time get_data(s)
+@show @elapsed get_data(s)
 
-@info "Two Channel Explicit; Forgo Inbounds Checking: True"
-@time get_data(s, [1, 2]; inbounds=true)
+@show @elapsed get_data(s, [1, 2]; inbounds=true)
 
-@info "Two Channel Autosearch; Forgo Inbounds Checking: True"
-@time get_data(s; inbounds=true)
+@show @elapsed get_data(s; inbounds=true)
 end

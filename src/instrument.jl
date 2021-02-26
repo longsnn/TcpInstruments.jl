@@ -43,7 +43,7 @@ error will be thrown.
 - `message::AbstractString`: The message to be sent to the device before listening for a response
 - `timeout`: _Optional flag_ ~ How long to try and listen for a response before giving up and throwing an error. The default time is half a second. _Note_: if timeout is set to 0 then this will turn off the timeout functionality and `query` may listen/block indefinitely for a response
 """
-function query(instr::Instrument, message::AbstractString; timeout=1)
+function query(instr::Instrument, message::AbstractString; timeout=1.4)
     write(instr, message)
     if timeout == 0
         return read(instr)

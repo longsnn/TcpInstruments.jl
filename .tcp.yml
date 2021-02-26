@@ -30,8 +30,6 @@ Keysight33612A: "10.1.30.36"
 # Impedance Analyzer
 
 Agilent4294A:
-    prologix: 5
-    address: "10.1.30.38:1234"
+    address: "10.1.30.39:5025"
 Agilent4395A:
-    prologix: 5
     address: "10.1.30.38:1234"

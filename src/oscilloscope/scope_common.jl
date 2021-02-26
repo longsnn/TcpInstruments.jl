@@ -20,7 +20,7 @@ struct Waveform_info
 end
 
 struct Waveform_data
-    info::Waveform_info
+    info::Union{Waveform_info, Nothing}
     volt::Array{Float64,1}
     time::Array{Float64,1}
 end
@@ -163,7 +163,7 @@ function scope_parse_raw_waveform(wfm_data, wfm_info::Waveform_info)
     
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
     time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
-    @info "TIME", wfm_data[1:5]
+    # TODO @info "TIME", wfm_data[1:5]
     return Waveform_data(wfm_info, volt, time)
 end
 
@@ -183,9 +183,9 @@ function scope_speed_mode(instr::Instrument, speed::Int)
     end
 end
 
-function scope_waveform_info_get(instr::Instrument, ch::Int)
+function scope_waveform_info_get(instr::Instrument, ch::Int; skip_header=false)
     str = scope_waveform_preamble_get(instr)
-    @info "preamble", str
+    # TODO @info "preamble", str
     str_array = split(str, ",")
     format      = RESOLUTION_MODE[str_array[1]]
     type        = TYPE[str_array[2]]
@@ -197,9 +197,15 @@ function scope_waveform_info_get(instr::Instrument, ch::Int)
     y_increment = parse(Float64, str_array[8])
     y_origin    = parse(Float64, str_array[9])
     y_reference = parse(Float64, str_array[10])
-    imp = get_impedance(instr; chan=ch)
-    coupling = get_coupling(instr; chan=ch)
-    low_pass_filter = get_lpf_state(instr; chan=ch)
+    if skip_header
+        imp = ""
+        coupling = "" 
+        low_pass_filter = ""
+    else
+        imp = get_impedance(instr; chan=ch)
+        coupling =  get_coupling(instr; chan=ch)
+        low_pass_filter =  get_lpf_state(instr; chan=ch)
+    end
     return Waveform_info(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
 end 
 
@@ -225,30 +231,38 @@ function scope_read_raw_waveform(instr::Instrument)
 end
 
 
-function get_data(instr::Instrument, ch::Int)
+function get_data(instr::Instrument, ch::Int; skip_header=false)
     scope_waveform_source_set(instr, ch)
     #instrument_empty_buffer(instr)
-    wfm_info = scope_waveform_info_get(instr, ch)
-    @show wfm_info
+    wfm_info = scope_waveform_info_get(instr, ch; skip_header=skip_header)
     raw_data = scope_read_raw_waveform(instr);
     return scope_parse_raw_waveform(raw_data, wfm_info) 
 end
 
-# TODO: Make ch-vector only contain each channel maximum one time
 function get_data(
-    instr::Instrument, ch_vec::Vector{Int} = filter(x -> status(instr, x), 1:4);
-    inbounds=false
+    instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
+    inbounds=false, skip_header=false
 )
-    @info "Loading channels: $ch_vec"
-    if !inbounds
-        for ch in ch_vec
-            if !status(instr, ch)
-                error("Channel $ch is offline, data cannot be read")
+    if ch_vec == nothing || !inbounds
+        statuses = asyncmap(x->(x, status(instr, x)), 1:4)
+        filter!(x -> x[2], statuses)
+        valid_channels = map(x -> x[begin], statuses)
+    end
+    if ch_vec == nothing
+        ch_vec = valid_channels
+        # !inbounds && @info "Loading channels: $ch_vec"
+    else
+        unique!(ch_vec)
+        if !inbounds
+            for ch in ch_vec
+                if !(ch in valid_channels)
+                    error("Channel $ch is offline, data cannot be read")
+                end
             end
         end
     end
     stop(instr) # Makes sure the data from each channel is from the same trigger event
-    wfm_data = [get_data(instr, ch) for ch in ch_vec]
+    wfm_data = [get_data(instr, ch; skip_header=skip_header) for ch in ch_vec]
     run(instr)
     return wfm_data
 end
