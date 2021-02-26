@@ -122,6 +122,30 @@ class LTS:
 
         return self
 
+    # TODO
+    def init(self, serials):
+        DeviceManagerCLI.BuildDeviceList()
+
+        if len(serials) == 0:
+            print("No Thorlabs LTS Device connected!")
+            return
+        elif len(serials) == 3:
+            self.x_serial, self.y_serial, self.z_serial = serials
+            print("X: ", self.x_serial)
+            print("Y: ", self.y_serial)
+            print("Z: ", self.z_serial)
+
+            self.x_stage.init(self.x_serial)
+            self.y_stage.init(self.y_serial)
+            self.z_stage.init(self.z_serial)
+        else:
+            raise Exception(str(len(d_list)) + " stages were detected: " + str(d_list))
+
+        return self
+
+    def serial(self):
+        return self.x_stage.serial, self.y_stage.serial, self.z_stage.serial
+
     def move_x(self, pos):
         self.x_stage.move(pos)
         self.wait()
