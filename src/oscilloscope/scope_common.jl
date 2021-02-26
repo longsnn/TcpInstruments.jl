@@ -30,12 +30,9 @@ status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 function plot_helper(data::Waveform_data; label="", xguide="0", yguide="Volts")
     time_unit, scaled_time = autoscale_seconds(data)
     title = "Oscilloscope ~ Volts Vs. Time (" * time_unit * ")"
-    @info data.info.channel
     if isempty(label)
-        @info data.info.channel "empty"
         label = "Channel $(data.info.channel)"
     else
-        @info data.info.channel label
         label = label
     end
     if xguide == "0"
@@ -76,19 +73,14 @@ function autoscale_seconds(data::Waveform_data)
     unit = "seconds"
     time_array = data.time
     m = abs(min(data.time...))
-    @info "MIN", m
     if m >= 1
-        @info "SECONDS"
     elseif m < 1 && m >= 1e-3
-        @info "MILISECONDS"
         unit = "miliseconds"
         time_array = data.time * 1e3
     elseif m < 1e-3 && m >= 1e-6
-        @info "Microseconds"
         unit = "microseconds"
         time_array = data.time * 1e6
     elseif m < 1e-6 && m >= 1e-9
-        @info "Nanoseconds"
         unit = "nanoseconds"
         time_array = data.time * 1e9
     else
@@ -188,7 +180,6 @@ function scope_speed_mode(instr::Instrument, speed::Int)
     elseif speed == 6
         scope_waveform_mode_16bit(instr)
         scope_waveform_points_mode(instr, 0)
-
     end
 end
 
@@ -244,11 +235,16 @@ function get_data(instr::Instrument, ch::Int)
 end
 
 # TODO: Make ch-vector only contain each channel maximum one time
-function get_data(instr::Instrument, ch_vec::Vector{Int} = filter(x -> status(instr, x), 1:4))
+function get_data(
+    instr::Instrument, ch_vec::Vector{Int} = filter(x -> status(instr, x), 1:4);
+    inbounds=false
+)
     @info "Loading channels: $ch_vec"
-    for ch in ch_vec
-        if !status(instr, ch)
-            error("Channel $ch is offline, data cannot be read")
+    if !inbounds
+        for ch in ch_vec
+            if !status(instr, ch)
+                error("Channel $ch is offline, data cannot be read")
+            end
         end
     end
     stop(instr) # Makes sure the data from each channel is from the same trigger event

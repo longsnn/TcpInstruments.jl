@@ -238,7 +238,7 @@ data = get_data(scope, 1)
 multi_data = get_data(scope, [1,2, 4])
 
 
-using Plots; gr()
+using Plots
 
 plot(data)
 
@@ -251,6 +251,21 @@ plot(multi_data[2])
 # Plots channel 4
 plot(multi_data[3])
 ```
+
+Additionally you can grab data from all open channels
+(Let's say only channels 1 & 2 are activated for now)
+```
+scope = initialize(AgilentDSOX4034A)
+data = get_data(scope)    
+```
+Since the only activated channels are now only 1 & 2 this returns an array of waves (equivalent to `get_data(scope, [1,2]))
+
+You can also plot multiple waves at once:
+```
+plot(data)
+```
+
+![wave](examples/wave.png)
 
 # Multiple devices
 Lets say you want to use a waveform generator, power supply

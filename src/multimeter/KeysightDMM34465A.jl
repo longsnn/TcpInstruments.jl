@@ -13,18 +13,15 @@ struct KeysightDMM34465A <: MultiMeter end
 """
     get_tc_temperature(multimeter)
 
-Page. 288
-
 Perform take a measurement with the probe mode set to thermocouple
 """
 get_tc_temperature(obj::Instr{KeysightDMM34465A}) =
     f_query(obj, "MEASURE:TEMPERATURE? TC"; timeout=0)
 
-#TODO: Was default K?
 """
     set_tc_type(multimeter; type="K")
 
-# Arguments
+# Keywords
 - `type`: Can be E, J, K, N, R, T (Defaults to K)
 """
 function set_tc_type(obj::Instr{KeysightDMM34465A}; type="K")
@@ -35,8 +32,8 @@ end
 """
 Returns voltage
 
-# Arguments
-- `type`: "DC" | "AC"
+# Keywords
+- `type`: "DC" | "AC" (Default DC)
 
 """
 function get_voltage(obj::Instr{KeysightDMM34465A}; type="DC")
@@ -48,8 +45,8 @@ end
 """
 Returns current
 
-# Arguments
-- `type`: "DC" | "AC"
+# Keywords
+- `type`: "DC" | "AC" (Default DC)
 
 """
 function get_current(obj::Instr{KeysightDMM34465A}; type="DC")
@@ -58,10 +55,12 @@ function get_current(obj::Instr{KeysightDMM34465A}; type="DC")
 end
 
 """
+    get_resistance(multimeter; wire=2)
+    get_resistance(multimeter; wire=4)
 Returns resistance
 
-# Arguments
-- `type`: "DC" | "AC"
+# Keywords
+- `wire`: 2 | 4 (Required)
 
 """
 function get_resistance(obj::Instr{KeysightDMM34465A}; wire)
