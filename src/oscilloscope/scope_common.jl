@@ -250,7 +250,7 @@ function get_data(
     end
     if ch_vec == nothing
         ch_vec = valid_channels
-        # !inbounds && @info "Loading channels: $ch_vec"
+        !inbounds && @info "Loading channels: $ch_vec"
     else
         unique!(ch_vec)
         if !inbounds

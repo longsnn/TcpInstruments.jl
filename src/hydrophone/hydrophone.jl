@@ -94,6 +94,85 @@ function intensity_scan_x(
     )
 end
 
+"""
+ This function moves along the y axis and grabs data based on a fixed increment
+ passed by the user. There are three mantadory inputs and one optional input
+ that is used only when this function is called by other functions and the
+ printed messages should be supressed. The user usually doesn't have to use the
+ variable called.
+
+ Input: 
+     hydrophone: the structure for all controller connections.
+        axis_range: A 1x2 or 1x1 array that contains the start and end point
+                 of the desired range in the y-direction.
+          num_points: The number of points the user desires to record along the
+                 y-axis.
+         called: This variable is either one or zero and is used to turn
+                 off user notifications when another function calls this
+                 one. User usually won't have to use this variable.
+
+ Output:
+   wave_info_y: A structure that contains the data that traces num_points of
+                waveforms and the coordinates travelled. The waveforms are
+                stored under wave_info_y.wave_form and the coordinates 
+                travelled is stored under wave_info_x.coordinates. The
+                coordinates are the (x, y, z) coordinates along the path
+                that the function took.
+
+ Example:
+ scan_range = [0 1]; num_points = 5;
+ wave_info_x = ky_hydro_scan_y(settings, scan_range, num_points);
+"""
+function intensity_scan_y(
+    hydro, y_range, num_points;
+    verbose=true, filter=false
+)
+    intensity_scan_single_axis(
+        hydro, y_range, num_points, move_y_abs; verbose=verbose, filter=filter
+    )
+end
+
+"""
+ wave_info_x = ky_hydro_scan_x(settings, axis_range, num_points, called)
+
+ This function moves along the x axis and grabs data based on a fixed
+ increment passed by the user. This program uses the ky_scope_rs_ch_data
+ function that returns a structure with helpful information. There are
+ three mantadory inputs and one optional input that is used only when this
+ function is called by other functions and the printed messages should be
+ supressed. The user usually doesn't have to use the variable called.
+
+ Input: 
+     hydrophone: the structure for all controller connections.
+        axis_range: A 1x2 or 1x1 array that contains the start and end point
+                 of the desired range in the z-direction.
+          num_points: The number of points the user desires to record along the
+                 z-axis.
+         called: This variable is either one or zero and is used to turn
+                 off user notifications when another function calls this
+                 one. User usually won't have to use this variable.
+
+ Output:
+   wave_info_z: A structure that contains the data that traces num_points of
+                waveforms and the coordinates travelled. The waveforms are
+                stored under wave_info_x.wave_form and the coordinates 
+                travelled is stored under wave_info_x.coordinates. The
+                coordinates are the (x, y, z) coordinates along the path
+                that the function took.
+
+ Example:
+ scan_range = [0 1]; num_points = 5;
+ wave_info_z = ky_hydro_scan_z(settings, scan_range, num_points);
+"""
+function intensity_scan_z(
+    hydro, z_range, num_points;
+    verbose=true, filter=false
+)
+    intensity_scan_single_axis(
+        hydro, z_range, num_points, move_z_abs; verbose=verbose, filter=filter
+    )
+end
+
 function intensity_scan_single_axis(
     hydro, axis_range, num_points, move_func;
     verbose=true, filter=false
@@ -130,11 +209,12 @@ function intensity_scan_single_axis(
         wave_info.unfiltered_waveform = zeros(hydro.sample_size, num_points)
     end
 
+    axis = split(string(move_func), '_')[2]
+
     # Loop to scan positions
     for i in 1:num_points
         if verbose 
             loop_time = time()
-            axis = split(string(move_func), '_')[2]
             @info "Scanning $axis-direction: $i/$num_points iterations"
         end
 
