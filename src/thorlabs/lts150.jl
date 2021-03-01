@@ -115,6 +115,7 @@ using PyCall
 
 function __init__()
 global lts_lib
+@info xyz_config
 Configuration.load_config(xyz_config)
 PyCall.python != "python" && return
 scriptdir = @__DIR__
