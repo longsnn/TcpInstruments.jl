@@ -1,5 +1,6 @@
 using Base.Threads: @spawn
 using Sockets
+using Dates
 
 import Base.write, Base.read
 
@@ -43,13 +44,19 @@ error will be thrown.
 - `message::AbstractString`: The message to be sent to the device before listening for a response
 - `timeout`: _Optional flag_ ~ How long to try and listen for a response before giving up and throwing an error. The default time is half a second. _Note_: if timeout is set to 0 then this will turn off the timeout functionality and `query` may listen/block indefinitely for a response
 """
-function query(instr::Instrument, message::AbstractString; timeout=1.4)
+function query(instr::Instrument, message::AbstractString; timeout=1.8)
     write(instr, message)
     if timeout == 0
         return read(instr)
     end
     proc = @spawn read(instr)
-    sleep(timeout)
+    start_clock = time()
+    while (time() - start_clock) < timeout
+        if proc.state != :runnable
+            break
+        end
+        sleep(0.1)
+    end
     if proc.state == :runnable
         schedule(proc, ErrorException("Query timed out"), error=true)
         error("Query timed out")

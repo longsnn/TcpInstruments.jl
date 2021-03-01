@@ -1,5 +1,16 @@
 using Sockets
 using Base.Threads: @spawn
+using Dates
+
+function elapsed_time(start_time)
+            seconds = floor(time() - start_time)
+            return Time(0) + Second(seconds)
+end
+
+function elapsed_time(func, start_time)
+            seconds = floor(time() - start_time)
+            return Time(0) + Second(func(seconds))
+end
 
 function scan_network(; ip_network="10.1.30.", ip_range=1:255, v=false)
     @info "Scanning $ip_network$(ip_range[1])-$(ip_range[end])"
