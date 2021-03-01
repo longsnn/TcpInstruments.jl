@@ -216,6 +216,10 @@ function scope_read_binary_data(instr)
 end
 
 
+function scope_read_raw_waveform(instr::Instrument, ch; scope_stats=0)
+    scope_read_raw_waveform(instr)
+end
+
 function scope_read_raw_waveform(instr::Instrument)
     write(instr, "WAV:DATA?")
     num_header_bytes = 2

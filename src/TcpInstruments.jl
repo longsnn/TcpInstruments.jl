@@ -51,8 +51,10 @@ export
         WaveformGenerator,
         ImpedanceAnalyzer,
 
+        Configuration,
         create_config,
         edit_config,
+        get_config,
         load_config,
         load_python,
 

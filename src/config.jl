@@ -1,65 +1,128 @@
+module Configuration
 using YAML
 
-EXAMPLE_FILE = "https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp.yml"
+mutable struct Config
+   name::String
+   example::String
+   file_locations::Array
+   config::Union{Dict, Nothing}
+   loaded_file::String
 
-TCP_CONFIG = nothing
-TCP_FILE = nothing
-
-function get_config()
-    if TCP_CONFIG == nothing
-        load_config()
-        return TCP_CONFIG
-    end
-    return TCP_CONFIG
+   function Config(name; example = "")
+       dot = new()
+       dot.name = name
+       dot.example = example
+       dot.file_locations = [joinpath(i, name) for i in [pwd(), homedir()]]
+       dot.config = nothing
+       dot.loaded_file = ""
+       return dot
+   end
 end
 
-const FILE_LOCATIONS = [
-    joinpath(pwd(), ".tcp.yml"),
-    joinpath(homedir(), ".tcp.yml"),
-]
-
-function create_config(dir=homedir())
+function create_config(config; dir=homedir())
     if Sys.iswindows()
         error("create_config() is not supported on windows yet")
     end
-    Base.run(`wget -O $dir/.tcp.yml $EXAMPLE_FILE`)
-    load_config()
-end
-
-function edit_config()
-    @assert TCP_FILE != nothing "No tcp config found! Use `create_config()` to automatically load ours"
-    cmd = "$(ENV["EDITOR"]) $(TCP_FILE)"
-    if Sys.iswindows()
-       Base.run(`cmd /c "$(cmd)"`)
+    file_path = joinpath(dir, config.name)
+    if isempty(config.example)
+        @info """
+        No example config specified creating empty config file at:
+            $file_path
+        """
+        Base.run(`touch $file_path`)
     else
-        Base.run(`$(ENV["EDITOR"]) $(TCP_FILE)`)
+        Base.run(`wget -q --show-progress -O $file_path $(config.example)`)
     end
     load_config()
 end
 
-function load_config()
-    global TCP_CONFIG, TCP_FILE, FILE_LOCATIONS
-    file = ""
-    for f in FILE_LOCATIONS
+function edit_config(config)
+    @assert config.config != nothing """
+    No config loaded.
+    Cannot edit a config file that doesn't exists.
+
+    Create a new empty config from your shell by running:
+        touch $(config.name)
+
+    Or
+
+    To load the latest config use the create_config function
+    """
+    editor, file = ENV["EDITOR"], config.loaded_file
+    if Sys.iswindows()
+        Base.run(`powershell "$editor $file"`)
+    else
+        Base.run(`$editor $file`)
+    end
+    load_config(config)
+end
+
+function load_config(config)
+    for f in config.file_locations
         if isfile(f)
-            file = f
+            config.loaded_file = f
             break
         end
     end
-    if isempty(file)
-        @info "No configuration file found:\n$FILE_LOCATIONS"
+    if isempty(config.loaded_file)
+        config.config = nothing
+        @info "No configuration file found:\n$(config.file_locations)"
         return 
     end
-    TCP_CONFIG = YAML.load_file(file)
-    TCP_FILE = file
-    @info "CONFIG LOADED"
-    for (device, data) in TCP_CONFIG
+    config.config = YAML.load_file(config.loaded_file)
+    @info "$(config.loaded_file) ~ loaded"
+end
+
+function get_config(config)
+    if config.config == nothing
+        load_config(config)
+        return config.config
+    end
+    return config.config
+end
+
+end
+
+const EXAMPLE_FILE = "https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp_instruments.yml" 
+
+const tcp_config = Configuration.Config(
+    ".tcp_instruments.yml"; 
+    example = EXAMPLE_FILE
+)
+
+function get_config()
+    return Configuration.get_config(tcp_config)
+end
+
+function create_config(;dir=homedir())
+    Configuration.create_config(tcp_config; dir=dir)
+end
+
+function edit_config()
+    Configuration.edit_config(tcp_config)
+end
+
+function load_config()
+    Configuration.load_config(tcp_config)
+    isempty(tcp_config.loaded_file) && return
+    create_aliases(tcp_config)
+end
+
+function create_aliases(config)
+    for (device, data) in config.config
         device == "python" && continue
         device_type = nothing
         try
             device_type = eval(Symbol(device))
         catch e
-            error("Device of name: $device inside .tcp.yaml does not exist! For a list of available devices use `help> Instrument`")
+            error("""
+            $(config.loaded_file) contains device of name:
+                $device
+            
+            This is not a valid device.
+
+            For a list of available devices use `help> Instrument`
+            """)
         end
         !(data isa Dict) && continue
         alias = get(data, "alias", "")
@@ -69,5 +132,3 @@ function load_config()
         alias_print("$alias = $device")
     end
 end
-
-

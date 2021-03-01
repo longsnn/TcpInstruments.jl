@@ -55,7 +55,7 @@ function query(instr::Instrument, message::AbstractString; timeout=1.8)
         if proc.state != :runnable
             break
         end
-        sleep(0.1)
+        sleep(0.05)
     end
     if proc.state == :runnable
         schedule(proc, ErrorException("Query timed out"), error=true)
