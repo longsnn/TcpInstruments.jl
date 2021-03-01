@@ -6,7 +6,7 @@ s = initialize(AgilentDSOX4034A)
 timeit(func_time, title) = println("$title: $(func_time)")
 
 for i in 1:2
-println("Single Channel $i")
+println("Single Channe: Iteration $i")
 
 @show @elapsed get_data(s, 1)
 
@@ -15,8 +15,7 @@ println("Single Channel $i")
 @show @elapsed get_data(s, [1]; inbounds=true)
 
 
-
-println("Two Channel Test $i")
+println("Two Channel Test: Iteration $i")
 
 @show @elapsed get_data(s, [1, 2])
 

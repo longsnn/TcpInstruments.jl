@@ -1,4 +1,5 @@
 module LTS
+import TcpInstruments.Configuration
 export 
         initialize_lts,
         ThorlabsLTS150,
@@ -107,21 +108,35 @@ end
 
 lts_lib = nothing
 
+const xyz_config = Configuration.Config(".xyz_stage.yml")
+
 using PyCall
+
+
 function __init__()
 global lts_lib
+Configuration.load_config(xyz_config)
 PyCall.python != "python" && return
 scriptdir = @__DIR__
 pushfirst!(PyVector(pyimport("sys")."path"), scriptdir)
 lts_lib = pyimport("lts")
 end
 
+function get_config()
+    return Configuration.get_config(xyz_config)
+end
 
-function create_config(type::Type{ThorlabsLTS150})
-    xyz = initialize(type)
-   # xyz.
+function create_config(;dir=homedir())
+    Configuration.create_config(xyz_config; dir=dir)
+end
 
-    
+function edit_config()
+    Configuration.edit_config(xyz_config)
+end
+
+function load_config()
+    isempty(xyz_config.loaded_file) && return
+    #create_aliases(xyz_config)
 end
 
 """
