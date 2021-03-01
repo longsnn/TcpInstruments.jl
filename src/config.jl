@@ -67,13 +67,15 @@ function load_config(config)
     if isempty(config.loaded_file)
         config.config = nothing
         @info "No configuration file found:\n$(config.file_locations)"
-        return 
+        return
     end
-    if isnothing(config.config)
-        error("$(config.loaded_file) is empty")
+    try
+        config.config = YAML.load_file(config.loaded_file)
+        @info "$(config.loaded_file) ~ loaded"
+    catch
+        @info "$(config.loaded_file) is empty"
+        config.config = Dict()
     end
-    config.config = YAML.load_file(config.loaded_file)
-    @info "$(config.loaded_file) ~ loaded"
 end
 
 function get_config(config)
