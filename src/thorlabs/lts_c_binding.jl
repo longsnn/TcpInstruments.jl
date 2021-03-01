@@ -7,16 +7,22 @@ const shared_lib = dlopen(joinpath(path, ISM_LIB))
 lib(x) = dlsym(shared_lib, x)
 
 """
-Returns the number of device units "microsteps" in one milimeter for Thorlabs LTS150
+Returns the number of microsteps in one milimeter for Thorlabs LTS150
 
 """
-ms_per_mm() = 49152
+microsteps_per_mm() = 49152
 
 """
-Returns the number of device units "microsteps" in one meter for Thorlabs LTS150
+Returns the number of microsteps in one meter for Thorlabs LTS150
 
 """
-ms_per_m() = ms_per_mm() * 1000
+microsteps_per_m() = microsteps_per_mm() * 1000
+
+"""
+Returns the number of microsteps in x meters for Thorlabs LTS150
+
+"""
+microsteps_per_m(x)::Int = x * microsteps_per_m()
 
 BuildDeviceList() = ccall(lib("TLI_BuildDeviceList"), Int, ())
 
@@ -46,7 +52,6 @@ MoveAbs(serial::String) = ccall(lib(:ISC_MoveAbsolute), Int, (Cstring,), serial)
 
 GetPos(serial) = ccall(lib(:ISC_GetPosition), Int, (Cstring,), serial)
 
-r2d(x)::Int = x * ms_per_m()
 
 function Real2Device(serial::String, real::Float64)
     device_unit = Ref{Int}(0)
@@ -77,11 +82,11 @@ for serial in serials
 end
 function move_to(serial, pos)
     @info ClearQueue(serial)
-    @info MoveTo(serial, r2d(pos))
+    @info MoveTo(serial, microsteps_per_m(pos))
 end
 function move_abs(serial, pos)
     @info ClearQueue(serial)
     @info "Moving $serial"
-    @info SetMoveAbs(serial, r2d(pos))
+    @info SetMoveAbs(serial, microsteps_per_m(pos))
     @info MoveAbs(serial)
 end

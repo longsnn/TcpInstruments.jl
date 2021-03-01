@@ -183,7 +183,7 @@ function scope_speed_mode(instr::Instrument, speed::Int)
     end
 end
 
-function scope_waveform_info_get(instr::Instrument, ch::Int; skip_header=false)
+function scope_waveform_info_get(instr::Instrument, ch::Int; scope_stats=false)
     str = scope_waveform_preamble_get(instr)
     # TODO @info "preamble", str
     str_array = split(str, ",")
@@ -197,14 +197,14 @@ function scope_waveform_info_get(instr::Instrument, ch::Int; skip_header=false)
     y_increment = parse(Float64, str_array[8])
     y_origin    = parse(Float64, str_array[9])
     y_reference = parse(Float64, str_array[10])
-    if skip_header
-        imp = ""
-        coupling = "" 
-        low_pass_filter = ""
-    else
+    if scope_stats
         imp = get_impedance(instr; chan=ch)
         coupling =  get_coupling(instr; chan=ch)
         low_pass_filter =  get_lpf_state(instr; chan=ch)
+    else
+        imp = ""
+        coupling = "" 
+        low_pass_filter = ""
     end
     return Waveform_info(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
 end 
@@ -231,17 +231,17 @@ function scope_read_raw_waveform(instr::Instrument)
 end
 
 
-function get_data(instr::Instrument, ch::Int; skip_header=false)
+function get_data(instr::Instrument, ch::Int; scope_stats=false)
     scope_waveform_source_set(instr, ch)
     #instrument_empty_buffer(instr)
-    wfm_info = scope_waveform_info_get(instr, ch; skip_header=skip_header)
+    wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
     raw_data = scope_read_raw_waveform(instr);
     return scope_parse_raw_waveform(raw_data, wfm_info) 
 end
 
 function get_data(
     instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
-    inbounds=false, skip_header=false
+    inbounds=false, scope_stats=false
 )
     if ch_vec == nothing || !inbounds
         statuses = asyncmap(x->(x, status(instr, x)), 1:4)
@@ -262,7 +262,7 @@ function get_data(
         end
     end
     stop(instr) # Makes sure the data from each channel is from the same trigger event
-    wfm_data = [get_data(instr, ch; skip_header=skip_header) for ch in ch_vec]
+    wfm_data = [get_data(instr, ch; scope_stats=scope_stats) for ch in ch_vec]
     run(instr)
     return wfm_data
 end

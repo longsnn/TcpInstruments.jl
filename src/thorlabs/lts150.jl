@@ -136,7 +136,16 @@ function initialize_lts()
     @assert Sys.iswindows() "Windows is needed to connect to ThorlabsLTS150"
     @assert lts_lib != nothing "add python: python to top of config file then call load_python(). You must be on a windows computer to use this device"
     lts = lts_lib.LTS()
-    lts.init()
+
+    stages = get(get_config(), "ThorlabsLTS150", "")
+    @info stages
+    return
+
+    if isempty(stages)
+        lts.init()
+    else
+        lts.init([stages["X"], stages["Y"], stages["Z"]])
+    end
     ThorlabsLTS150(lts)
 end
 
