@@ -81,7 +81,6 @@ end
 function get_config(config)
     if config.config == nothing
         load_config(config)
-        return config.config
     end
     return config.config
 end
@@ -109,13 +108,14 @@ end
 
 function load_config()
     Configuration.load_config(tcp_config)
-    isempty(tcp_config.loaded_file) && return
     create_aliases(tcp_config)
 end
 
-function create_aliases(config)
+function create_aliases(config; ignore=[])
     for (device, data) in config.config
-        device == "python" && continue
+        if device in ignore
+            continue
+        end
         device_type = nothing
         try
             device_type = eval(Symbol(device))
