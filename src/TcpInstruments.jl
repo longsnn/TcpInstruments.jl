@@ -166,6 +166,7 @@ include("impedance_analyzer/ia.jl")
 include("multimeter/dmm.jl")
 
 function __init__()
+    @info "init"
     load_config()
 end
 

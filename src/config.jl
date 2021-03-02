@@ -33,7 +33,7 @@ function create_config(config; dir=homedir())
     else
         Base.run(`wget -q --show-progress -O $file_path $(config.example)`)
     end
-    load_config()
+    load_config(config)
 end
 
 function edit_config(config)
