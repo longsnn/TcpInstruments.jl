@@ -65,7 +65,7 @@ function load_config(config)
         end
     end
     if isempty(config.loaded_file)
-        config.config = nothing
+        config.config = Dict()
         @info "No configuration file found:\n$(config.file_locations)"
         return
     end
@@ -86,7 +86,7 @@ function get_config(config)
     return config.config
 end
 
-end
+end # Configuration
 
 const EXAMPLE_FILE = "https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp_instruments.yml" 
 

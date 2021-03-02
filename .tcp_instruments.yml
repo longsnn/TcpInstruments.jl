@@ -33,8 +33,3 @@ Agilent4294A:
     address: "10.1.30.39:5025"
 Agilent4395A:
     address: "10.1.30.38:1234"
-
-ThorlabsLTS150:
-  X:  45140764
-  Y:  45141924
-  Z:  45146974
