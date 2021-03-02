@@ -52,6 +52,7 @@ export
         ImpedanceAnalyzer,
 
         Configuration,
+        create_aliases,
         create_config,
         edit_config,
         get_config,
