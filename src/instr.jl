@@ -71,6 +71,7 @@ abstract type WaveformGenerator <: Instrument end
 
 """
 # Supported Instruments:
+- `Agilent4294A`
 - `Agilent4395A`
 
 """
@@ -125,21 +126,9 @@ function initialize(model, address; GPIB_ID=-1)
 end
 
 function initialize(model)
-    if model == ThorlabsLTS150
-        return initialize_lts()
-    end
-    @assert TCP_CONFIG != nothing """
-    No .tcp.yml file found! To use ours:
-    `create_config()`
-
-    If you want to initialize this device without a config file 
-    please specify an ip address:
-    `initialize($(string(model)), "10.1.30.XX")`
-    """
-
     data = nothing
     try
-        data = TCP_CONFIG[string(model)]
+        data = get_config()[string(model)]
     catch e
         @assert false """
         $(string(model)) was not found in your .tcp.yml file.
