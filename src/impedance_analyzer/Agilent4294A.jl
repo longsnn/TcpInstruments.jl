@@ -50,7 +50,7 @@ Range For voltage setting: 5E-3 to 1
 """
 set_volt_ac(i::Instr{Agilent4294A}, n) = write(i, "POWE $n"*"V")
 
-function get_impedance(obj::Instr{Agilent4294A}; complex=true) 
+function get_impedance(obj::Instr{Agilent4294A}; complex=false) 
     data = query(obj, "OUTPDTRC?"; timeout=3)
     data = split(data, ',')
     arr = []
@@ -58,11 +58,7 @@ function get_impedance(obj::Instr{Agilent4294A}; complex=true)
     for i in 1:Int(length(data) / 2)
         real_i = i * 2 - 1
         img_i = i * 2
-        if complex
-            push!(arr, (get_f(real_i) + get_f(img_i)im))
-        else
-            push!(arr, (get_f(real_i), get_f(img_i)))
-        end
+        push!(arr, (get_f(real_i), get_f(img_i)))
     end
     return arr
 end

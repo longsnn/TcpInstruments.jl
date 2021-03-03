@@ -52,12 +52,6 @@ export
     ImpedanceAnalyzer,
 
     Configuration,
-    create_aliases,
-    create_config,
-    edit_config,
-    get_config,
-    load_config,
-    load_python,
 
     initialize,
     terminate,
@@ -165,10 +159,5 @@ include("power_supply/psu.jl")
 include("signal_generator/awg.jl")
 include("impedance_analyzer/ia.jl")
 include("multimeter/dmm.jl")
-
-function __init__()
-    @info "init"
-    load_config()
-end
 
 end #endmodule
