@@ -45,20 +45,26 @@ Returns oscillator (ac) voltage
 """
 get_volt_ac(i::Instr{Agilent4294A}) = query(i, "POWE?")
 
-#TODO: Test V
 """
 Range For voltage setting: 5E-3 to 1
 """
 set_volt_ac(i::Instr{Agilent4294A}, n) = write(i, "POWE $n"*"V")
 
-"""
-P. 188
-Must be in ZA mode
-IMPH
-COMP
-"""
-function get_impedance(obj::Instr{Agilent4294A}) 
-    write(obj, "MEAS IMAG")
+function get_impedance(obj::Instr{Agilent4294A}; complex=true) 
+    data = query(obj, "OUTPDTRC?"; timeout=3)
+    data = split(data, ',')
+    arr = []
+    get_f(i) = parse(Float64, data[i])
+    for i in 1:Int(length(data) / 2)
+        real_i = i * 2 - 1
+        img_i = i * 2
+        if complex
+            push!(arr, (get_f(real_i) + get_f(img_i)im))
+        else
+            push!(arr, (get_f(real_i), get_f(img_i)))
+        end
+    end
+    return arr
 end
 
 get_channel(i::Instr{Agilent4294A}) = query(i, "TRAC?") == "A" ? 1 : 2
