@@ -63,6 +63,10 @@ function get_impedance(obj::Instr{Agilent4294A}; complex=false)
     return arr
 end
 
+@recipe function f(impedance::Array{Tuple{Float64, Float64}})
+    map(x->x[1], impedance), map(x->x[2], impedance)
+end
+
 get_channel(i::Instr{Agilent4294A}) = query(i, "TRAC?") == "A" ? 1 : 2
 
 function set_channel(i::Instr{Agilent4294A}, n::Int)
