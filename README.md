@@ -117,11 +117,11 @@ enable_output(p)
 ```
 
 ## Autoinitialize
-Additionally you can create a `.tcp.yml` file. You 
+Additionally you can create a `.tcp_instruments.yml` file. You 
 can save the ip address of all your devices 
 in one easy-to-find place so they don't have to be hardcoded in scripts.
 
-Format of .tcp.yml file:
+Format of `.tcp_instruments.yml` file:
 ```julia
 {name-of-device}:
     address: "{ip-address}"
@@ -149,8 +149,8 @@ julia --project=.
 julia>using TcpInstruments
 ```
 
-The .tcp.yml file must be in the current directory of our project. If you have multiple scripts in different directories you can
-can also place the config file in your home directory: `~/.tcp.yml`.
+The `.tcp_instruments.yml` file must be in the current directory of our project. If you have multiple scripts in different directories you can
+can also place the config file in your home directory: `~/.tcp_instruments.yml`.
 
 Each project will first look for a config in the current directory and if none is found it will look in the home directory.
 

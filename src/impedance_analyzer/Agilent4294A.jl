@@ -63,9 +63,31 @@ function get_impedance(obj::Instr{Agilent4294A}; complex=false)
     return arr
 end
 
-@recipe function f(impedance::Array{Tuple{Float64, Float64}})
-    map(x->x[1], impedance), map(x->x[2], impedance)
+@recipe function f(impedance::Array{Tuple{Float64, Float64}, 1}; complex=false)
+    title := "Impedance"
+    layout := (2, 1)
+    real_label, imag_label = if complex 
+        "Real", "Imaginary" 
+    else
+        "Amplitude", "Phase"
+    end
+    label := [real_label, imag_label]
+    @series begin 
+        subplot := 1
+        label := real_label
+        legend := :outertopright
+        map(x->x[1], impedance)
+    end
+    @series begin 
+        title := ""
+        subplot := 2
+        label := imag_label
+        legend := :outertopright
+        linecolor := :red
+        map(x->x[2], impedance)
+    end
 end
+
 
 get_channel(i::Instr{Agilent4294A}) = query(i, "TRAC?") == "A" ? 1 : 2
 
