@@ -13,17 +13,14 @@ which was again based on [Instruments.jl](https://github.com/BBN-Q/Instruments.j
 
 SCPI is supported on almost all modern pieces of lab equipment but this code has been tested on the following devices:
 - [X] Oscilloscope Keysight DSOX4034A
-- [ ] Oscilloscope Keysight DSOX4024A
+- [X] Oscilloscope Keysight DSOX4024A
 - [X] Multimeter Keysight DMM34465A
 - [X] Signal generator Keysight 33612A
 - [X] Power supply Agilent E36312A
 - [X] HV power supply SRS PS310 via Prologix GPIB to Ethernet adaptor
 - [X] Power supply Versatile Power 100-10 XR
+- [X] Impedance analyser Agilent 4294A
 - [ ] Impedance analyser Agilent 4395A (with 43961A imp. probe)
-- [ ] Thorlabs LTS150
-
-
-This package is under active development so expect breaking changes. 
 
 For more information on every type of instrument as well as
 their available functions and how they work:
@@ -132,9 +129,9 @@ Format of `.tcp_instruments.yml` file:
     address: "{ip-address}"
 ```
 
-Let's create a new .tcp.yml file or ensure the two previous
-devices are found in our .tcp.yml file
-```julia
+Let's create a new `.tcp_instruments.yml` file or ensure the two previous
+devices are found in our `.tcp_instruments.yml` file
+```yaml
 Keysight33612A:
     address: "10.1.30.36"
     alias: "OleBigWave"
@@ -155,7 +152,7 @@ can also place the config file in your home directory: `~/.tcp_instruments.yml`.
 Each project will first look for a config in the current directory and if none is found it will look in the home directory.
 
 The two devices from above can now be initialized as follows:
-```
+```julia
 wave = initialize(Keysight33612A)
 p = initialize(SRSPS310)
 ```
