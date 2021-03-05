@@ -3,12 +3,12 @@ This device only has one channel so channel specific functions
 and optional arguments are not available.
 
 # Available functions
-- enable_output()
-- disable_output()
-- set_voltage(volts)
-- get_voltage()
-- set_current_limit(current)
-- get_current_limit()
+- [`enable_output(obj::Instr{VersatilePower})`](@ref)
+- [`disable_output(obj::Instr{VersatilePower})`](@ref)
+- [`set_voltage(obj::Instr{VersatilePower})`](@ref)
+- [`get_voltage(obj::Instr{VersatilePower})`](@ref)
+- [`set_current_limit(obj::Instr{VersatilePower}, current)`](@ref)
+- [`get_current_limit(obj::Instr{VersatilePower})`](@ref)
 
 # Helpers
 - `remote_mode()`: sets the device to remote mode. Automatically called on initialize

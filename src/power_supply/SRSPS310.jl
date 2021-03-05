@@ -19,24 +19,24 @@ struct SRSPS310 <: PowerSupply end
 
 
 """
-    This will enable an output on a device.
+This will enable an output on a device.
 
-    Arguments:
-      - obj
-        - must be a Power Supply Instrument
-    Supported Instruments:
-       - Power supply
+Arguments:
+  - obj
+    - must be a Power Supply Instrument
+Supported Instruments:
+   - Power supply
 """
 enable_output(obj::Instr{SRSPS310}) = write(obj, "HVON")
 
 """
-    This will disable an output on a device.
+This will disable an output on a device.
 
-    Arguments:
-      - obj
-        - must be a Power Supply Instrument
-    Supported Instruments:
-       - Power supply
+Arguments:
+  - obj
+    - must be a Power Supply Instrument
+Supported Instruments:
+   - Power supply
 """
 disable_output(obj::Instr{SRSPS310}) = write(obj, "HVOF")
 
@@ -69,15 +69,15 @@ Returns:
 set_voltage(obj::Instr{SRSPS310}, num) = write(obj, "VSET$num")
 
 """
-    This will return the voltage of a device
+This will return the voltage of a device
 
-    Voltage Limit: 1250V
+Voltage Limit: 1250V
 
-    Supported Instruments:
-       - Power supply
+Supported Instruments:
+   - Power supply
 
-    Returns:
-      Voltage
+Returns:
+  Voltage
 """
 get_voltage(obj::Instr{SRSPS310}) = f_query(obj, "VSET?") # VLIM?
 
@@ -97,41 +97,41 @@ Returns:
 set_voltage_limit(obj::Instr{SRSPS310}, num) = write(obj, "VLIM$num")
 
 """
-    This will return the voltage limit of a device
+This will return the voltage limit of a device
 
-    Voltage Limit: 1250V
+Voltage Limit: 1250V
 
-    Supported Instruments:
-       - Power supply
+Supported Instruments:
+   - Power supply
 
-    Returns:
-      Voltage
+Returns:
+  Voltage
 """
 get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") # VLIM?
 
 """
-    This will change the current limit of a device 
+This will change the current limit of a device 
 
-    MIN Value: 0
-    Max Value: { 2.1e-3 | 0.021 } (21mA)
+MIN Value: 0
+Max Value: { 2.1e-3 | 0.021 } (21mA)
 
-    Supported Instruments:
-       - Power supply
+Supported Instruments:
+   - Power supply
 
-    Returns:
-      Nothing
+Returns:
+  Nothing
 """
 set_current_limit(obj::Instr{SRSPS310}, num) = write(obj, "ILIM$num")
 
 """
-    This will return the current limit of a device.
+This will return the current limit of a device.
 
 
-    Supported Instruments:
-       - Power supply
+Supported Instruments:
+   - Power supply
 
-    Returns:
-      Current Limit
+Returns:
+  Current Limit
 """
 get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?")
 
