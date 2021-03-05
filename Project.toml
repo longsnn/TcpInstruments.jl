@@ -14,7 +14,7 @@ TestSetExtensions = "98d24dd4-01ad-11ea-1b02-c9a08f80db04"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [compat]
-InstrumentConfig = "0.1.0"
+InstrumentConfig = "0.2.0"
 PyCall = "1.92"
 RecipesBase = "1.1"
 TestSetExtensions = "2.0"
