@@ -12,6 +12,15 @@ function elapsed_time(func, start_time)
             return Time(0) + Second(func(seconds))
 end
 
+"""
+    scan_network(; ip_network="10.1.30.", ip_range=1:255, v=false)
+Will scan your network and report all found devices.
+
+By default it only searches for devices connected on port: 5025
+
+If you would like to search for devices on a different port set the
+v flag to true.
+"""
 function scan_network(; ip_network="10.1.30.", ip_range=1:255, v=false)
     @info "Scanning $ip_network$(ip_range[1])-$(ip_range[end])"
     ips = asyncmap(

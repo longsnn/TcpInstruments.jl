@@ -1,3 +1,7 @@
+```@meta
+CurrentModule = TcpInstruments
+```
+
 # Supported Instruments
 
 A list of all current supported instruments
@@ -5,28 +9,32 @@ A list of all current supported instruments
 - link to [`initialize`](@ref)
 - link to [`AgilentDSOX4034A`](@ref)
 ## ImpedanceAnalyzer
-```@docs
-Agilent4395A
-```
 
 ## Oscilloscope
 ```@docs
-AgilentDSOX4034A
+Oscilloscope
+```
+```@autodocs
+Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: Oscilloscope && typeof(t) != Oscilloscope
 ```
 
 ## MultiMeter
 ```@docs
-KeysightDMM34465A
+MultiMeter
+```
+```@autodocs
+Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: MultiMeter && typeof(t) != MultiMeter
 ```
 
 ## PowerSupply
+```@docs
+PowerSupply
+```
 ```@autodocs
-TcpInstruments.AgilentE36312A
-VersatilePowerBench100_10XR
-PS310
+Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: PowerSupply && typeof(t) != PowerSupply
 ```
 
 ## WaveformGenerator
-```@docs
-Keysight33612A
-```

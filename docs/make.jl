@@ -7,6 +7,11 @@ makedocs(
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true"
     ),
+    pages = [
+             "Home" => "index.md",
+             "General" => "general.md",
+             "Supported Instruments" => "instruments.md",
+            ],
     modules = [TcpInstruments]
 )
 

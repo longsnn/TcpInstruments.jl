@@ -42,7 +42,7 @@ help>AgilentDSOX4034A
 abstract type Instrument end
 """
 # Supported Instruments
-- `AgilentDSOX4024A`
+- [`AgilentDSOX4024A`](@ref)
 - `AgilentDSOX4034A`
 """
 abstract type Oscilloscope <: Instrument end
@@ -76,13 +76,6 @@ abstract type WaveformGenerator <: Instrument end
 
 """
 abstract type ImpedanceAnalyzer <: Instrument end
-
-"""
-# Supported Instruments:
-- `ThorlabsLTS150`
-
-"""
-abstract type XYZStage <: Instrument end
 
 mutable struct Instr{ T <: Instrument } <: Instrument
     model::Type
@@ -170,5 +163,9 @@ remote_mode(obj)   = nothing
 local_mode(obj) = nothing
 set_prologix_chan(obj, chan) = write(obj, "++addr $chan")
 get_prologix_chan(obj) = query(obj, "++addr")
+"""
+    info(instr_h)
+Asks an instrument to print model number and other device info.
+"""
 info(obj) = query(obj, "*IDN?")
 
