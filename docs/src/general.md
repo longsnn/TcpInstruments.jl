@@ -11,6 +11,8 @@ IP address:
 using TcpInstruments
 instrument_handle = initialize(AgilentDSOX4034A, "10.1.30.32")
 info(instrument_handle)
+data = get_data(instrument_handle)
+save(data)
 ```
 When you are done you can close your connection:
 ```julia
@@ -35,6 +37,8 @@ initialize
 terminate
 info
 scan_network
+save
+load
 ```
 
 ## Power Supply
