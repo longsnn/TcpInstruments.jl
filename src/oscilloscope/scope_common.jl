@@ -3,7 +3,7 @@ using RecipesBase
 const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
-struct Waveform_info
+struct ScopeInfo
     format::String
     type::String
     num_points::Int64
@@ -19,15 +19,15 @@ struct Waveform_info
     channel::Int64
 end
 
-struct Waveform_data
-    info::Union{Waveform_info, Nothing}
+struct ScopeData
+    info::Union{ScopeInfo, Nothing}
     volt::Array{Float64,1}
     time::Array{Float64,1}
 end
 
 status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 
-function plot_helper(data::Waveform_data; label="", xguide="0", yguide="Voltage / V")
+function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
     time_unit, scaled_time = autoscale_seconds(data)
     title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
     if isempty(label)
@@ -43,7 +43,7 @@ function plot_helper(data::Waveform_data; label="", xguide="0", yguide="Voltage 
     return scaled_time, data.volt, title, label, xguide, yguide
 end
 
-@recipe function plot(data::Waveform_data; label="", xguide="0", yguide="Voltage / V")
+@recipe function plot(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
     scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
     title := t
     label := l
@@ -52,7 +52,7 @@ end
     return scaled_time, volts
 end
 
-@recipe function plot(data_array::Array{Waveform_data, 1}; label="", xguide="0", yguide="Voltage / V")
+@recipe function plot(data_array::Array{ScopeData, 1}; label="", xguide="0", yguide="Voltage / V")
     for data in data_array
         @series begin
             scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
@@ -65,7 +65,7 @@ end
     end
 end
 
-function autoscale_seconds(data::Waveform_data)
+function autoscale_seconds(data::ScopeData)
     # temp = filter(x->x != 0, abs.(data.time))
     # @info "test", temp == data.time
     # m = min(temp...)
@@ -157,13 +157,13 @@ scope_waveform_points_mode(instr::Instrument, mode_idx::Int) = write(instr, "WAV
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
-function scope_parse_raw_waveform(wfm_data, wfm_info::Waveform_info) 
+function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo) 
     # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
     
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
     time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
     # TODO @info "TIME", wfm_data[1:5]
-    return Waveform_data(wfm_info, volt, time)
+    return ScopeData(wfm_info, volt, time)
 end
 
 function scope_speed_mode(instr::Instrument, speed::Int)
@@ -205,7 +205,7 @@ function scope_waveform_info_get(instr::Instrument, ch::Int; scope_stats=false)
         coupling = "" 
         low_pass_filter = ""
     end
-    return Waveform_info(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
+    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
 end 
 
 
