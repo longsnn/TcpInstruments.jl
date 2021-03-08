@@ -1,6 +1,8 @@
 using Base.Threads: @spawn
 using Sockets
 using Dates
+using MAT
+using JLD2
 
 import Base.write, Base.read
 
@@ -80,3 +82,41 @@ error will be thrown.
 Differs from query in that it will return a Float64 and not a String
 """
 f_query(obj, ins; timeout=0.5) = parse(Float64, query(obj, ins; timeout=timeout))
+
+"""
+    save(data)
+    save(data; format=:matlab)
+    save(data; filename="custom_file_name.ext")
+
+Save data to a file
+
+By default saves to julia format (.jld2) but can also export
+data to matlab by using the format=:matlab keyword argument
+"""
+function save(data; filename="", format=:julia)
+    if isempty(filename)
+        t = Dates.format(Dates.now(), "yy-mm-dd_HH:MM:SS")
+        filename = "scan_" * t
+    end
+    if format == :julia
+        @save (filename * ".jld2") data
+    elseif format == :matlab
+        file = matopen(filename * ".mat", "w")
+        write(file, "data", data)
+        close(file)
+    end
+end
+
+"""
+    data = load("file.jld2")
+
+Loads saved data from a file
+"""
+function load(filename)
+    ext = split(filename, '.')[end]
+    if ext == "jld2"
+        jldopen(filename)["data"]
+    else
+        error("unsupported file type: $ext")
+    end
+end

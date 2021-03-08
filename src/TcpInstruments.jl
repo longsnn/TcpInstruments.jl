@@ -55,6 +55,8 @@ export
 
     initialize,
     terminate,
+    save,
+    load,
     reset,
     connect!,
     close!,

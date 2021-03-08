@@ -247,6 +247,9 @@ plot(multi_data[2])
 
 # Plots channel 4
 plot(multi_data[3])
+
+# Saves data to a file
+save(multi_data)
 ```
 
 Additionally you can grab data from all open channels
