@@ -27,9 +27,9 @@ end
 
 status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 
-function plot_helper(data::Waveform_data; label="", xguide="0", yguide="Volts")
+function plot_helper(data::Waveform_data; label="", xguide="0", yguide="Voltage / V")
     time_unit, scaled_time = autoscale_seconds(data)
-    title = "Oscilloscope ~ Volts Vs. Time (" * time_unit * ")"
+    title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
     if isempty(label)
         label = "Channel $(data.info.channel)"
     else
@@ -40,11 +40,10 @@ function plot_helper(data::Waveform_data; label="", xguide="0", yguide="Volts")
     else
         xguide = xguide
     end
-    yguide = yguide * " / " * data.info.coupling
     return scaled_time, data.volt, title, label, xguide, yguide
-
 end
-@recipe function plot(data::Waveform_data; label="", xguide="0", yguide="Volts")
+
+@recipe function plot(data::Waveform_data; label="", xguide="0", yguide="Voltage / V")
     scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
     title := t
     label := l
@@ -53,7 +52,7 @@ end
     return scaled_time, volts
 end
 
-@recipe function plot(data_array::Array{Waveform_data, 1}; label="", xguide="0", yguide="Volts")
+@recipe function plot(data_array::Array{Waveform_data, 1}; label="", xguide="0", yguide="Voltage / V")
     for data in data_array
         @series begin
             scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
@@ -75,13 +74,13 @@ function autoscale_seconds(data::Waveform_data)
     m = abs(min(data.time...))
     if m >= 1
     elseif m < 1 && m >= 1e-3
-        unit = "miliseconds"
+        unit = "ms" # miliseconds
         time_array = data.time * 1e3
     elseif m < 1e-3 && m >= 1e-6
-        unit = "microseconds"
+        unit = "μs" # microseconds
         time_array = data.time * 1e6
     elseif m < 1e-6 && m >= 1e-9
-        unit = "nanoseconds"
+        unit = "ns" # nanoseconds
         time_array = data.time * 1e9
     else
         @info "Seconds unit not found"
