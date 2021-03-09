@@ -121,6 +121,39 @@ export
     set_temp_unit_kelvin,
     get_temp_unit,
 
+    # Impedance
+    get_bandwidth,
+    set_bandwidth,
+    get_frequency_limits,
+    set_frequency_limits,
+    get_num_data_points,
+    set_num_data_points,
+    get_volt_dc,
+    set_volt_dc,
+    get_volt_ac,
+    set_volt_ac,
+    get_volt_limit_dc,
+    set_volt_limit_dc,
+
+    # Signal Generator
+    get_frequency,
+    set_frequency,
+    get_amplitude,
+    set_amplitude,
+    get_burst_num_cycles,
+    set_burst_num_cycles,
+    get_time_offset,
+    set_time_offset,
+    get_voltage_offset,
+    set_voltage_offset,
+    get_burst_period,
+    set_burst_period,
+    get_mode,
+    set_mode_burst,
+    set_mode_cw,
+
+
+
     # Devices
     ## Impedance Analyzer
     Agilent4294A,
