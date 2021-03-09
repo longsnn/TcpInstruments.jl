@@ -128,11 +128,27 @@ Set impedance to 1MΩ
 set_impedance_1Mohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE ONEMEG")
 
 """
-    set_impedance_50ohm(scope, chan=1)
+    set_impedance_50ohm(scope)
+    set_impedance_50ohm(scope, chan=2)
+
+# Keywords
+- `chan`: Specify channel: Default is 1
 
 Set impedance to 50Ω
 """
 set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE FIFTY")
+
+"""
+    get_impedance(scope)
+    set_impedance(scope, chan=2)
+
+# Keywords
+- `chan`: Specify channel: Default is 1
+
+# Returns
+- `"FIFT"`: 50Ω
+- `"ONEM"`: 1MΩ
+"""
 get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
  
 """
