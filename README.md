@@ -40,12 +40,12 @@ You can write your own or ask your lab advisor for the lab's config file.
 
 To get Orchard's config or update your config to Orchard's current latest version use:
 ```julia
-julia>create_config()
+julia>TcpInstruments.create_config()
 ```
 
 Should you ever need to change anything in your config you can always use:
 ```julia
-julia>edit_config()
+julia>TcpInstruments.edit_config()
 ```
 
 # Using this library
