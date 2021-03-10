@@ -1,3 +1,4 @@
+import InstrumentConfig: initialize, terminate
 """
 An instrument is a generic device with which you can take and read measurements
 
@@ -102,13 +103,13 @@ end
 Initializes a connection to the instrument at the given (input) IP address.
 
 # Arguments
-- `model`: They device type you are connecting to. Use `help>Instrument` to see available options.
+- `model`: They device type you are connecting to. Use `help> -->Instrument` to see available options.
 - `address::String`: The ip address of the device. Ex. "10.3.30.23"
 
 # Keywords
 - `GPIB_ID::Int`: The GPIB interface ID of your device. This is optional and doesn't need to be set unless you are using a prologix controller to control it remotely. 
 """
-function initialize(model, address; GPIB_ID=-1)
+function initialize(model::Type{T}, address; GPIB_ID=-1) where T <: Instrument
     instr_h = CreateTcpInstr(model, address)
     connect!(instr_h)
     remote_mode(instr_h)
@@ -118,7 +119,7 @@ function initialize(model, address; GPIB_ID=-1)
     return instr_h
 end
 
-function initialize(model)
+function initialize(model::Type{T}) where T <: Instrument
     data = nothing
     try
         data = get_config()[string(model)]
