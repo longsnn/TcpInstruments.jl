@@ -15,7 +15,7 @@ To use Orchard Ultrasound's latest lab config use:
 ```
 create_config()
 ```
-This will create a yaml file in your home directory: ~/.tcp.yml
+This will create a yaml file in your home directory: ~/.tcp_instruments.yml
 
 This yaml file will be loaded everytime you use this package.
 

@@ -125,11 +125,11 @@ function initialize(model::Type{T}) where T <: Instrument
         data = get_config()[string(model)]
     catch e
         @assert false """
-        $(string(model)) was not found in your .tcp.yml file.
+        $(string(model)) was not found in your .tcp_instruments.yml file.
         To update to the latest version:
         `create_config()`
 
-        Otherwise please add it to your .tcp.yml config file or
+        Otherwise please add it to your config file or
         specify an ip address:
         `initialize($(string(model)), "10.1.30.XX")`
         
