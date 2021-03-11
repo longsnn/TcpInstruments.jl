@@ -34,7 +34,7 @@ Returns bandwidth level (1-5)
 5. Specifies bandwidth 5 (longest measurement time, accurate
 measurement).
 """
-get_bandwidth(i::Instr{Agilent4294A}) = write(i, "BWFACT?")
+get_bandwidth(i::Instr{Agilent4294A}) = i_query(i, "BWFACT?")
 
 """
     set_bandwith(instr, n)

@@ -67,21 +67,14 @@ function query(instr::Instrument, message::AbstractString; timeout=1.8)
 end
 
 """
-Writes a message to a device then listens for and returns any output from
-the device.
-
-This is a blocking procedure and will block until a response is received from the device or
-till it has been blocking for longer than the designated `timeout` time after which an
-error will be thrown.
-
-# Arguments
-- `instr::Instrument`: Any instrument that supports being written to and read from
-- `message::AbstractString`: The message to be sent to the device before listening for a response
-- `timeout`: _Optional flag_ ~ How long to try and listen for a response before giving up and throwing an error. The default time is half a second. _Note_: if timeout is set to 0 then this will turn off the timeout functionality and `query` may listen/block indefinitely for a response
-
-Differs from query in that it will return a Float64 and not a String
+Differs from [query](@ref) in that it will return a Float64 and not a String
 """
 f_query(obj, ins; timeout=0.5) = parse(Float64, query(obj, ins; timeout=timeout))
+
+"""
+Differs from [query](@ref) in that it will return an Int64 and not a String
+"""
+i_query(obj, ins; timeout=0.5) = parse(Int64, query(obj, ins; timeout=timeout))
 
 """
     save(data)

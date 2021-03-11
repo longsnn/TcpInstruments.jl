@@ -29,7 +29,7 @@ set_num_data_points(obj::Instr{T}, n) where (T <: ImpedanceAnalyzer) =
 
 """
 get_num_data_points(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
-    f_query(obj, "POIN?")
+    i_query(obj, "POIN?")
 
 """
     get_volt_dc(instr)
