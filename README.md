@@ -25,10 +25,11 @@ SCPI is supported on almost all modern pieces of lab equipment but this code has
 For more information on every type of instrument as well as
 their available functions and how they work:
 
-Now install the package
+## Installation
+TcpInstruments can be installed using the Julia package manager. From the Julia REPL, type ] to enter the Pkg REPL mode and run
+
 ```julia
-julia 
-julia>] add https://github.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl
+pkg> add TcpInstruments
 julia>using TcpInstruments
 julia>?
 help>Instrument
