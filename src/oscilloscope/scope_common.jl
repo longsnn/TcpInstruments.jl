@@ -21,7 +21,7 @@ end
 
 struct ScopeData
     info::Union{ScopeInfo, Nothing}
-    volt::Array{Float64,1}
+    volt
     time::Array{Float64,1}
 end
 
@@ -40,7 +40,7 @@ function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V"
     else
         xguide = xguide
     end
-    return scaled_time, data.volt, title, label, xguide, yguide
+    return scaled_time, ustrip(data.volt), title, label, xguide, yguide
 end
 
 @recipe function plot(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
@@ -179,7 +179,7 @@ function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
     time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
     # TODO @info "TIME", wfm_data[1:5]
-    return ScopeData(wfm_info, volt, time)
+    return ScopeData(wfm_info, u"V" .* volt, time)
 end
 
 function scope_speed_mode(instr::Instrument, speed::Int)
