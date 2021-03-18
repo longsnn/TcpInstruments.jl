@@ -42,6 +42,7 @@ use `help>Instrument`.
 module TcpInstruments
 
 using Sockets
+using Unitful
 
 export 
     Instrument,
