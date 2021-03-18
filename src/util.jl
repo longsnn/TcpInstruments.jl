@@ -22,7 +22,7 @@ If you would like to search for devices on a different port set the
 v flag to true.
 """
 function scan_network(; network="10.1.30.0", host_range=1:255, v=false)
-    @info "Scanning $network$(host_range[1])-$(host_range[end])"
+    @info "Scanning $(network[1:end-1])$(host_range[1])-$(host_range[end])"
     ips = asyncmap(
         x->connect_to_scpy(x; v=v),
         [network[1:end-1]*"$host" for host in host_range]
