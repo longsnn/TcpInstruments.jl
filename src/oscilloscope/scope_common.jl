@@ -190,10 +190,10 @@ function scope_speed_mode(instr::Instrument, speed::Int)
         scope_waveform_mode_16bit(instr)
         scope_waveform_points_mode(instr, 0)
     elseif speed == 5
-        scope_waveform_mode_16bit(instr)
+        scope_waveform_mode_8bit(instr)
         scope_waveform_points_mode(instr, 1)
     elseif speed == 6
-        scope_waveform_mode_16bit(instr)
+        scope_waveform_mode_8bit(instr)
         scope_waveform_points_mode(instr, 0)
     end
 end
