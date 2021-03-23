@@ -45,7 +45,7 @@ Sets bandwidth level (1-5)
 - `n::Int`: Desired bandwidth level (between 1 and 5)
 """
 function set_bandwidth(i::Instr{Agilent4294A}, n) 
-    @assert n in 1:5 "$n must be an int between 1 and 5"
+    !(n in 1:5) && error("$n must be an int between 1 and 5")
     write(i, "BWFACT $n")
 end
 
@@ -106,6 +106,6 @@ end
 get_channel(i::Instr{Agilent4294A}) = query(i, "TRAC?") == "A" ? 1 : 2
 
 function set_channel(i::Instr{Agilent4294A}, n::Int)
-    @assert n in [1,2] "Channel cannot be: $n (must be 1 or 2)"
+    !(n in [1,2]) && error("Channel cannot be: $n (must be 1 or 2)")
     n == 1 ? write(i, "TRAC A") :  write(i, "TRAC B")
 end

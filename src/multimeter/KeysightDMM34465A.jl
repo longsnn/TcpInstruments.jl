@@ -25,7 +25,9 @@ get_tc_temperature(obj::Instr{KeysightDMM34465A}) =
 - `type`: Can be E, J, K, N, R, T (Defaults to K)
 """
 function set_tc_type(obj::Instr{KeysightDMM34465A}; type="K")
-    @assert string(type) in ["E", "J", "K", "N", "R", "T"]
+    if !(string(type) in ["E", "J", "K", "N", "R", "T"])
+        error(`$type must be one of [E, J, K, N, R, T]`)
+    end
     write(obj, "CONFIGURE:TEMPERATURE TC,$type")
 end
 
@@ -37,7 +39,7 @@ Returns voltage
 
 """
 function get_voltage(obj::Instr{KeysightDMM34465A}; type="DC")
-    @assert type in ["AC","DC"] "$type not valid!\nMust be AC or DC"
+    !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
     f_query(obj, "MEASURE:VOLTAGE:$type?"; timeout=0)
 end
 
@@ -50,7 +52,7 @@ Returns current
 
 """
 function get_current(obj::Instr{KeysightDMM34465A}; type="DC")
-    @assert type in ["AC","DC"] "$type not valid!\nMust be AC or DC"
+    !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
     f_query(obj, "MEASURE:CURRENT:$type?"; timeout=0)
 end
 

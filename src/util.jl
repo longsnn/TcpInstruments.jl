@@ -78,7 +78,7 @@ Splits a string like "192.168.1.1:5056" into ("192.168.1.1", 5056)
 """
 function split_str_into_host_and_port(str::AbstractString)::Tuple{String, Int}
 	spl_str = split(str, ":")
-	@assert !isempty(spl_str) "IP address string is empty!"
+    isempty(spl_str) && error("IP address string is empty!")
 	host = spl_str[1]
 	if length(spl_str) == 1
 		port = 0

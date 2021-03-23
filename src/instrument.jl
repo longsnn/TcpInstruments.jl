@@ -8,7 +8,7 @@ import Base.write, Base.read
 
 
 function connect!(instr::Instrument)
-	@assert !instr.connected "Cannot connect. Instrument is already connected!"
+    instr.connected && error("Cannot connect. Instrument is already connected!")
 	SCPI_port = 5025
 	host,port = split_str_into_host_and_port(instr.address)
 	port == 0 && (port = SCPI_port)
@@ -17,19 +17,18 @@ function connect!(instr::Instrument)
 end
 
 function close!(instr::Instrument)::Bool
-	@assert instr.connected "Cannot disconnect. Instrument is not connected!"
+    !instr.connected && error("Cannot disconnect. Instrument is not connected!")
 	close(instr.sock)
 	instr.connected = false
 end
 
 function write(instr::Instrument, message::AbstractString)
-	@assert instr.connected "Instrument is not connected, cannot write to it!"
+    !instr.connected && error("Instrument is not connected, cannot write to it!")
 	println(instr.sock, message)
 end
 
-# TODO: Have a timeout parameter
-function read(instr::Instrument; timeout=5)
-	@assert instr.connected "Instrument is not connected, cannot read from it!"
+function read(instr::Instrument)
+    !instr.connected && error("Instrument is not connected, cannot read from it!")
 	return rstrip(readline(instr.sock), ['\r', '\n'])
 end
 

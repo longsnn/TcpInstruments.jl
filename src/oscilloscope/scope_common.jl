@@ -240,7 +240,9 @@ function scope_read_raw_waveform(instr::Instrument)
     num_header_bytes = 2
     #@show header_a_str = read_n_bytes(instr, num_header_bytes)
     header_a_uint8 = read(instr.sock, 2)
-    @assert (header_a_uint8[1] == UInt8('#'))  "The waveform data format is not formated as expected."
+    if !(header_a_uint8[1] == UInt8('#')) 
+        error("The waveform data format is not formated as expected.")
+    end
     header_b_length = parse(Int,convert(Char, header_a_uint8[2]))
     header_b_uint8 = read(instr.sock, header_b_length)
     num_waveform_samples = parse(Int,String(convert.(Char,header_b_uint8)))
