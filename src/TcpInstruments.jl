@@ -44,142 +44,78 @@ module TcpInstruments
 using Sockets
 using Unitful
 
-export 
-    Instrument,
-    Oscilloscope, 
-    MultiMeter,
-    PowerSupply,
-    WaveformGenerator,
-    ImpedanceAnalyzer,
+export Instrument
+export Oscilloscope, MultiMeter, PowerSupply, WaveformGenerator, ImpedanceAnalyzer
 
-    Configuration,
+export save, load
 
-    initialize,
-    terminate,
-    save,
-    load,
-    reset,
-    connect!,
-    close!,
-    remote_mode,
-    local_mode,
-    query,
-    write,
-    info,
+export initialize, terminate, reset,
+export remote_mode, local_mode,
+export query, write, info, connect!, close!
 
-
-    # Power Supply
-    enable_output,
-    disable_output,
-    get_output,
-    set_current_limit,
-    get_current_limit,
-    set_voltage,
-    get_voltage,
-    set_voltage_limit,
-    get_voltage_limit,
-    set_channel,
-    get_channel,
+# Power Supply
+export enable_output, disable_output, get_output
+export set_current_limit, get_current_limit
+export set_voltage, get_voltage
+export set_voltage_limit, get_voltage_limit
+export set_channel, get_channel
 
     # Scope
-    get_data,
-    lpf_on,
-    lpf_off,
-    get_lpf_state,
-    set_impedance_1Mohm,
-    set_impedance_50ohm,
-    get_impedance,
-    get_coupling,
-    get_function,
-    set_function,
-    get_frequency,
-    set_frequency,
-    get_amplitude,
-    set_amplitude,
-    get_voltage_offset,
-    set_voltage_offset,
-    get_burst_mode,
-    get_mode,
-    set_mode_burst,
-    set_mode_cw,
-    set_burst_mode_gated,
-    set_burst_mode_triggered,
+export get_data,
+export lpf_on, lpf_off, get_lpf_state,
+export set_impedance_1Mohm, set_impedance_50ohm, get_impedance
+export get_coupling
+export get_function, set_function
+export get_frequency, set_frequency,
+export get_amplitude, set_amplitude,
+export get_voltage_offset, set_voltage_offset,
+export set_burst_mode_gated, set_burst_mode_triggered, get_burst_mode
+export get_mode, set_mode_burst, set_mode_cw,
 
 
-    # Prologix
-    set_prologix_chan,
-    get_prologix_chan,
-    scan_prologix,
+# Prologix
+export set_prologix_chan, get_prologix_chan, scan_prologix
 
 
-    # DMM
-    get_tc_temperature,
-    set_tc_type,
-    get_current,
-    get_resistance,
-    set_temp_unit_celsius,
-    set_temp_unit_farenheit,
-    set_temp_unit_kelvin,
-    get_temp_unit,
+# DMM
+export get_tc_temperature, set_tc_type
+export get_current,
+export get_resistance,
+export set_temp_unit_celsius, set_temp_unit_farenheit, set_temp_unit_kelvin,
+export get_temp_unit,
 
-    # Impedance
-    get_bandwidth,
-    set_bandwidth,
-    get_frequency_limits,
-    set_frequency_limits,
-    get_num_data_points,
-    set_num_data_points,
-    get_volt_dc,
-    set_volt_dc,
-    get_volt_ac,
-    set_volt_ac,
-    get_volt_limit_dc,
-    set_volt_limit_dc,
+# Impedance
+export get_bandwidth, set_bandwidth,
+export get_frequency_limits, set_frequency_limits,
+export get_num_data_points, set_num_data_points,
+export get_volt_dc, set_volt_dc,
+export get_volt_ac, set_volt_ac,
+export get_volt_limit_dc, set_volt_limit_dc,
 
-    # Signal Generator
-    get_frequency,
-    set_frequency,
-    get_amplitude,
-    set_amplitude,
-    get_burst_num_cycles,
-    set_burst_num_cycles,
-    get_time_offset,
-    set_time_offset,
-    get_voltage_offset,
-    set_voltage_offset,
-    get_burst_period,
-    set_burst_period,
-    get_mode,
-    set_mode_burst,
-    set_mode_cw,
+# Signal Generator
+export get_frequency, set_frequency,
+export get_amplitude, set_amplitude,
+export get_burst_num_cycles, set_burst_num_cycles,
+export get_time_offset, set_time_offset,
+export get_voltage_offset, set_voltage_offset,
+export get_burst_period, set_burst_period,
+export get_mode, set_mode_burst, set_mode_cw,
 
 
 
-    # Devices
-    ## Impedance Analyzer
-    Agilent4294A,
-    Agilent4395A,
-    ## Multimeter
-    KeysightDMM34465A,
-    ## Scope
-    AgilentDSOX4024A,
-    AgilentDSOX4034A,
-    ## Power Supply
-    AgilentE36312A,
-    VersatilePower,
-    SRSPS310,
-    ## Waveform Generator
-    Keysight33612A,
+# Devices
+## Impedance Analyzer
+export Agilent4294A, Agilent4395A,
+## Multimeter
+export KeysightDMM34465A,
+## Scope
+export AgilentDSOX4024A, AgilentDSOX4034A,
+## Power Supply
+export AgilentE36312A, SRSPS310, VersatilePower
+## Waveform Generator
+export Keysight33612A
 
-    scan_network,
-
-    instrument_reset,
-    instrument_clear,
-    instrument_get_id,
-    instrument_beep_on,
-    instrument_beep_off,
-    instrument_set_hilevel
-
+export scan_network
 
 include("util.jl")
 include("config.jl")
