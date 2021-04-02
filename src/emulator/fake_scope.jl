@@ -1,6 +1,6 @@
 import InstrumentConfig: initialize, terminate
 
-Base.@kwdef struct FakeDSOX4034A
+Base.@kwdef struct FakeDSOX4034A <: Oscilloscope
     num_samples = 65104
 end
 
