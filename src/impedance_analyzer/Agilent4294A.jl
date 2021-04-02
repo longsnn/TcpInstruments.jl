@@ -54,7 +54,7 @@ end
 
 Returns oscillator (ac) voltage
 """
-get_volt_ac(i::Instr{Agilent4294A}) = query(i, "POWE?")
+get_volt_ac(i::Instr{Agilent4294A}) = query(i, "POWE?") * V
 
 """
     set_volt_ac(instr, voltage)
@@ -62,7 +62,7 @@ get_volt_ac(i::Instr{Agilent4294A}) = query(i, "POWE?")
 # Arguments
 - `voltage`: Desired voltage, range for voltage setting: 5E-3 to 1
 """
-set_volt_ac(i::Instr{Agilent4294A}, n) = write(i, "POWE $n"*"V")
+set_volt_ac(i::Instr{Agilent4294A}, n::Voltage) = write(i, "POWE $(raw(n))"*"V")
 
 function get_impedance(obj::Instr{Agilent4294A}) 
     data = query(obj, "OUTPDTRC?"; timeout=3)
@@ -74,10 +74,11 @@ function get_impedance(obj::Instr{Agilent4294A})
         img_i = i * 2
         push!(arr, get_f(real_i) + get_f(img_i)im)
     end
-    return arr
+    return arr * R
 end
 
-@recipe function f(impedance::Array{Complex, 1}; complex=false)
+
+@recipe function f(impedance::Array{typeof((1.0 + 0im)R), 1}; complex=false)
     title := "Impedance"
     layout := (2, 1)
     real_label, imag_label = if complex 
@@ -90,7 +91,7 @@ end
         subplot := 1
         label := real_label
         legend := :outertopright
-        real(impedance)
+        return complex ?  real(impedance) : abs.(impedance)
     end
     @series begin 
         title := ""
@@ -98,7 +99,7 @@ end
         label := imag_label
         legend := :outertopright
         linecolor := :red
-        imag(impedance)
+        return complex ?  imag(impedance) : rad2deg.(angle.(impedance))
     end
 end
 

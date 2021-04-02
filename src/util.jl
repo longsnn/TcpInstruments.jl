@@ -2,14 +2,27 @@ using Sockets
 using Base.Threads: @spawn
 using Dates
 
+const R = u"Ω"
+const V = u"V"
+const A = u"A"
+const Hz = u"Hz"
+
+using Unitful: Current, Voltage, Frequency
+
+-->(a::Unitful.AbstractQuantity, b::Unitful.Units) = Float64(uconvert(b, a))
+
+raw(a::Current) = ustrip(a --> A)
+raw(a::Voltage) = ustrip(a --> V)
+raw(a::Frequency) = ustrip(a --> Hz)
+
 function elapsed_time(start_time)
-            seconds = floor(time() - start_time)
-            return Time(0) + Second(seconds)
+    seconds = floor(time() - start_time)
+    return Time(0) + Second(seconds)
 end
 
 function elapsed_time(func, start_time)
-            seconds = floor(time() - start_time)
-            return Time(0) + Second(func(seconds))
+    seconds = floor(time() - start_time)
+    return Time(0) + Second(func(seconds))
 end
 
 """

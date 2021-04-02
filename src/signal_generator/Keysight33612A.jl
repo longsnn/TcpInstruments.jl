@@ -48,15 +48,15 @@ set_voltage_offset(obj::Instr{Keysight33612A}, num; chan=1) =
     write(obj, "SOURCE$chan:VOLTAGE:OFFSET $num")
 
 get_amplitude(obj::Instr{Keysight33612A}; chan=1) =
-    f_query(obj, "SOURCE$chan:VOLTAGE?")
-set_amplitude(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOURCE$chan:VOLTAGE $num")
+    f_query(obj, "SOURCE$chan:VOLTAGE?") * V
+set_amplitude(obj::Instr{Keysight33612A}, num::Voltage; chan=1) =
+write(obj, "SOURCE$chan:VOLTAGE $(raw(num))")
 
 
 get_frequency(obj::Instr{Keysight33612A}; chan=1) =
     f_query(obj, "SOURCE$chan:FREQUENCY?") # +4.0E+05
-set_frequency(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOURCE$chan:FREQUENCY $num") # +4.0E+05
+set_frequency(obj::Instr{Keysight33612A}, num::Frequency; chan=1) =
+    write(obj, "SOURCE$chan:FREQUENCY $(raw(num)))") # +4.0E+05
 
 """
     get_function(instr)

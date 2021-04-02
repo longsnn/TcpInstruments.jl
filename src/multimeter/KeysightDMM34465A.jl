@@ -26,7 +26,7 @@ get_tc_temperature(obj::Instr{KeysightDMM34465A}) =
 """
 function set_tc_type(obj::Instr{KeysightDMM34465A}; type="K")
     if !(string(type) in ["E", "J", "K", "N", "R", "T"])
-        error(`$type must be one of [E, J, K, N, R, T]`)
+        error("$type must be one of [E, J, K, N, R, T]")
     end
     write(obj, "CONFIGURE:TEMPERATURE TC,$type")
 end

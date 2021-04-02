@@ -53,9 +53,9 @@ end
     handle = test_initialize(SRSPS310)
     enable_output(handle)
     disable_output(handle)
-    set_current_limit(handle, 1)
-    set_current_limit(handle, 2)
-    set_current_limit(handle, 5)
+    set_current_limit(handle, 1A)
+    set_current_limit(handle, 2A)
+    set_current_limit(handle, 5A)
     terminate(handle)
     @info "Successfully disconnected"
 end
