@@ -7,7 +7,7 @@ const A = u"A"
 
 
 @testset "Fake Scope" begin
-    f = TcpInstruments.FakeDSOX4034A()
+    f = initialize(TcpInstruments.FakeDSOX4034A)
 
     data = get_data(f, 1)
     @test data isa TcpInstruments.ScopeData 

@@ -4,11 +4,14 @@ Base.@kwdef struct FakeDSOX4034A <: Oscilloscope
     num_samples = 65104
 end
 
-function initialize(::Type(FakeDSOX4034A))
-    return FakeDSOX4034A()
+function initialize(model::Type{FakeDSOX4034A})
+    return Instr{model}(model(), "", TCPSocket(), true)
+end
+function initialize(model::FakeDSOX4034A)
+    return Instr{typeof(model)}(model, "", TCPSocket(), true)
 end
 
-function get_data(instr::FakeDSOX4034A, ch::Vector{Int}) 
+function get_data(instr::Instr{FakeDSOX4034A}, ch::Vector{Int}) 
     for num in ch
         if num < 1 || num > 4
             error("$num is not a valid channel")
@@ -17,15 +20,18 @@ function get_data(instr::FakeDSOX4034A, ch::Vector{Int})
     map(c->get_data(instr, c), ch)
 end
 
+num_samples(i::Instr{FakeDSOX4034A}) = i.model.num_samples
 
-function get_data(instr::FakeDSOX4034A, ch::Int; scope_stats=false)
+
+function get_data(instr::Instr{FakeDSOX4034A}, ch::Int; scope_stats=false)
     # TODO: Replace with actual fake raw data. raw_data = scope_read_raw_waveform(instr);
     # return scope_parse_raw_waveform(raw_data, wfm_info) 
 
+    samples = num_samples(instr)
     info = ScopeInfo(
         "8bit", 
         "Normal", 
-        instr.num_samples,
+        samples,
         7.68e-8, 
         -0.0025, 
         0.0, 
@@ -39,15 +45,15 @@ function get_data(instr::FakeDSOX4034A, ch::Int; scope_stats=false)
     )
 
     volt = if ch == 1
-            map(sin, collect(range(0, stop=6pi, length=instr.num_samples))) .* V
+            map(sin, collect(range(0, stop=6pi, length=samples))) .* V
         elseif ch == 2
-            map(cos, collect(range(0, stop=6pi, length=instr.num_samples))) .* V
+            map(cos, collect(range(0, stop=6pi, length=samples))) .* V
         elseif ch == 3
-            map(x->abs(sin(x)) / -3, collect(range(0, stop=16pi, length=instr.num_samples))) .* V
+            map(x->abs(sin(x)) / -3, collect(range(0, stop=16pi, length=samples))) .* V
         else
-            map(x->abs(sin(x)) / 3, collect(range(0, stop=16pi, length=instr.num_samples))) .* V
+            map(x->abs(sin(x)) / 3, collect(range(0, stop=16pi, length=samples))) .* V
     end
-    time = collect(range(-0.0025, stop=0.0025, length=instr.num_samples))
+    time = collect(range(-0.0025, stop=0.0025, length=samples))
     return ScopeData(info, volt, time)
 end
 
