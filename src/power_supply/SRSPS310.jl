@@ -66,7 +66,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage(obj::Instr{SRSPS310}, num) = write(obj, "VSET$num")
+set_voltage(obj::Instr{SRSPS310}, num::Voltage) = write(obj, "VSET$(raw(num))")
 
 """
 This will return the voltage of a device
@@ -79,7 +79,7 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage(obj::Instr{SRSPS310}) = f_query(obj, "VSET?") # VLIM?
+get_voltage(obj::Instr{SRSPS310}) = f_query(obj, "VSET?") * V
 
 """
     set_voltage_limit(::SRSPS310, voltage_limit)
@@ -94,7 +94,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage_limit(obj::Instr{SRSPS310}, num) = write(obj, "VLIM$num")
+set_voltage_limit(obj::Instr{SRSPS310}, num::Voltage) = write(obj, "VLIM$(raw(num))")
 
 """
 This will return the voltage limit of a device
@@ -107,7 +107,7 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") # VLIM?
+get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") * V
 
 """
 This will change the current limit of a device 
@@ -121,7 +121,9 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{SRSPS310}, num) = write(obj, "ILIM$num")
+function set_current_limit(obj::Instr{SRSPS310}, num::Current) 
+    write(obj, "ILIM$(raw(num))")
+end
 
 """
 This will return the current limit of a device.
@@ -133,7 +135,7 @@ Supported Instruments:
 Returns:
   Current Limit
 """
-get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?")
+get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?") * A
 
 function scan_prologix(obj::Instr{SRSPS310}) 
     devices = Dict()

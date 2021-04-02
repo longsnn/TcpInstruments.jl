@@ -132,4 +132,5 @@ include("signal_generator/awg.jl")
 include("impedance_analyzer/ia.jl")
 include("multimeter/dmm.jl")
 
+include("emulator/emulator.jl")
 end #endmodule

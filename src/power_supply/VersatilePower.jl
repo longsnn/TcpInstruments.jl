@@ -75,7 +75,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage(obj::Instr{VersatilePower}, num) = write(obj, "VOLTAGE $num")
+set_voltage(obj::Instr{VersatilePower}, num::Voltage) = write(obj, "VOLTAGE $(raw(num))")
 
 """
 This will return the voltage of a device
@@ -86,7 +86,7 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage(obj::Instr{VersatilePower}) = query(obj, "VOLTAGE?")
+get_voltage(obj::Instr{VersatilePower}) = f_query(obj, "VOLTAGE?") * V
 
 """
 This will change the current limit of a device 
@@ -97,7 +97,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{VersatilePower}, num) = write(obj, "CURRENT $num")
+set_current_limit(obj::Instr{VersatilePower}, num::Current) = write(obj, "CURRENT $(raw(num))")
 
 """
 This will return the current limit of a device.
