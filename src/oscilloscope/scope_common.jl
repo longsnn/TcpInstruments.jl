@@ -3,7 +3,7 @@ using RecipesBase
 const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
-Base.@kwdef struct FakeDSOX4034A 
+Base.@kwdef struct FakeDSOX4034A <: Oscilloscope
     num_samples = 65104
 end
 
