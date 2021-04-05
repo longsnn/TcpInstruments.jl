@@ -1,4 +1,3 @@
-import InstrumentConfig: initialize, terminate
 """
 An instrument is a generic device with which you can take and read measurements
 
@@ -90,9 +89,10 @@ function CreateTcpInstr(model, address)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", i::TcpInstruments.Instr)
+    model = i.model isa DataType ? i.model : typeof(i.model)
     println("TcpInstruments.Instr{$(i.model)}")
-    println("    Group: $(supertype(i.model))")
-    println("    Model: $(i.model)")
+    println("    Group: $(supertype(model))")
+    println("    Model: $(model)")
     println("    Address: $(i.address)")
     println("    Connected: $(i.connected)")
 end

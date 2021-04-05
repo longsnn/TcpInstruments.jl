@@ -1,5 +1,3 @@
-import InstrumentConfig: initialize, terminate
-
 Base.@kwdef struct FakeDSOX4034A <: Oscilloscope
     num_samples = 65104
 end
@@ -7,6 +5,7 @@ end
 function initialize(model::Type{FakeDSOX4034A})
     return Instr{model}(model(), "", TCPSocket(), true)
 end
+
 function initialize(model::FakeDSOX4034A)
     return Instr{typeof(model)}(model, "", TCPSocket(), true)
 end

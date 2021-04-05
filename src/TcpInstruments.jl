@@ -44,6 +44,8 @@ module TcpInstruments
 using Sockets
 using Unitful
 
+import InstrumentConfig: initialize, terminate
+
 export Instrument
 export Oscilloscope, MultiMeter, PowerSupply, WaveformGenerator, ImpedanceAnalyzer
 
