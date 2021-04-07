@@ -60,7 +60,8 @@ end
 Loads saved data from a file
 """
 function load(filename)
-    ext = split(filename, )[end]
+    ext = split(filename, '.')[end]
+    @info ext
     if ext == "jld2"
         jldopen(filename)["data"]
     else
