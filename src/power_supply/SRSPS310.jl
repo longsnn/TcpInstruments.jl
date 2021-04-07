@@ -58,7 +58,7 @@ get_output(obj::Instr{SRSPS310}) = query(obj, "*STB? 7") == "1" ? true : false
 """
 This will change the voltage output of a device.
 
-Voltage Limit: The value of get_voltage_limit()
+Voltage Limit: The value of get\_voltage\_limit()
 
 Supported Instruments:
    - Power supply
@@ -110,7 +110,7 @@ Returns:
 get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") * V
 
 """
-This will change the current limit of a device 
+This will change the current limit of a device
 
 MIN Value: 0
 Max Value: { 2.1e-3 | 0.021 } (21mA)
@@ -121,7 +121,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-function set_current_limit(obj::Instr{SRSPS310}, num::Current) 
+function set_current_limit(obj::Instr{SRSPS310}, num::Current)
     write(obj, "ILIM$(raw(num))")
 end
 
@@ -137,7 +137,7 @@ Returns:
 """
 get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?") * A
 
-function scan_prologix(obj::Instr{SRSPS310}) 
+function scan_prologix(obj::Instr{SRSPS310})
     devices = Dict()
     for i in 0:15
         write(obj, "++addr $i")
