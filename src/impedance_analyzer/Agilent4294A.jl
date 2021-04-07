@@ -54,7 +54,7 @@ end
 
 Returns oscillator (ac) voltage
 """
-get_volt_ac(i::Instr{Agilent4294A}) = query(i, "POWE?") * V
+get_volt_ac(i::Instr{Agilent4294A}) = f_query(i, "POWE?") * V
 
 """
     set_volt_ac(instr, voltage)
