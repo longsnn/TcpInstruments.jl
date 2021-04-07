@@ -73,6 +73,23 @@ julia> scan_network()
  "10.1.30.38:5025" => "Keysight Technologies,34465A,MY59008389,A.03.01-03.15-03.01-00.52-03-02"
 ```
 
+## Units
+This package uses Unitful. In order to control certain devices
+it is required to run:
+```julia
+using Unitful
+```
+
+Commands such as:
+```julia
+set_voltage_offset(instr, 0)
+```
+will not work you must specify the units:
+```julia
+set_voltage_offset(instr, 0u"V")
+```
+
+
 # Examples
 ## Waveform Generator
 ###  Creating a Sin Wave Example:
@@ -80,9 +97,9 @@ julia> scan_network()
 wave = initialize(Keysight33612A, "10.1.30.36")
 set_mode_cw(wave) # Set to continuous waveform mode
 set_function(wave, "SIN")
-set_frequency(wave, 1000)
-set_amplitude(wave, 0.1)
-set_voltage_offset(wave, 0)
+set_frequency(wave, 1000u"Hz")
+set_amplitude(wave, 0.1u"V")
+set_voltage_offset(wave, 0u"V")
 enable_output(wave) # Starts wave
 
 ```
@@ -109,9 +126,9 @@ julia> get_prologix(p)
 ### Using SRSPS310 Power Supply
 ```julia
 p = initialize(SRSPS310, "10.1.30.37:1234"; GPIB_ID=2)
-set_voltage_limit(p, 1250)
-set_voltage(p, 1250)
-set_current_limit(p, 0.021) # 21mA
+set_voltage_limit(p, 1250u"V")
+set_voltage(p, 1250u"V")
+set_current_limit(p, 0.021u"A") # equivalent to set_current_limit(p, 21u"mA")
 enable_output(p)
 ```
 
@@ -170,8 +187,8 @@ wave = initialize(OleBigWave)
 # Initialize automatically puts this power supply in remote mode
 pwr = initialize(VersatilePower)
 
-set_voltage(pwr, 20)
-set_current_limit(pwr, 4)
+set_voltage(pwr, 20u"V")
+set_current_limit(pwr, 4u"A")
 enable_output(pwr)
 
 # Closes connection as with other devices but also puts this
@@ -186,17 +203,17 @@ pwr = initialize(AgilentE36312A)
 
 set_channel(pwr, 1)
 set_current_limit(pwr, 1)
-set_voltage(pwr, 2)
+set_voltage(pwr, 2u"V")
 enable_output(pwr) # Enables output on channel 1
 
 set_channel(pwr, 2)
-set_voltage(pwr, "10")
+set_voltage(pwr, 10u"V")
 enable_output(pwr) # Enables output on channel 2
 
 set_channel(pwr, 3)
-set_voltage(pwr, "MAX")
+set_voltage(pwr, 10u"V")
 
-set_voltage(pwr, "MIN"; chan=1) # Changes voltage of channel 1
+set_voltage(pwr, 0u"V"; chan=1) # Changes voltage of channel 1
 
 get_voltage(pwr) # Get voltage channel 3
 get_voltage(pwr; chan=2)
@@ -282,13 +299,13 @@ wave = initialize(Keysight33612A)
 
 set_mode_cw(wave)
 set_function(wave, "SIN")
-set_frequency(wave, 1000)
-set_amplitude(wave, 0.1)
-set_voltage_offset(wave, 0)
+set_frequency(wave, 1000u"Hz")
+set_amplitude(wave, 0.1u"A")
+set_voltage_offset(wave, 0u"V")
 enable_output(wave)
 
-set_voltage(pwr, 20)
-set_current_limit(pwr, 4)
+set_voltage(pwr, 20u"V")
+set_current_limit(pwr, 4u"A")
 enable_output(pwr)
 
 chan1, chan2 = get_data(scope, [1,2])

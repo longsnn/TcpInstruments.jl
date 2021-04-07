@@ -123,16 +123,15 @@ include("util.jl")
 include("config.jl")
 
 # common instrument containers
-include("instr.jl")
 include("instrument.jl")
 include("common_commands.jl")
 
 # instruments
-include("oscilloscope/scope.jl")
-include("power_supply/psu.jl")
-include("signal_generator/awg.jl")
-include("impedance_analyzer/ia.jl")
-include("multimeter/dmm.jl")
+include("oscilloscope/all.jl")
+include("power_supply/all.jl")
+include("signal_generator/all.jl")
+include("impedance_analyzer/all.jl")
+include("multimeter/all.jl")
 
 include("emulator/emulator.jl")
 end #endmodule
