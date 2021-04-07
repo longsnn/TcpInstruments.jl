@@ -31,9 +31,9 @@ TcpInstruments can be installed using the Julia package manager. From the Julia 
 
 ```julia
 pkg> add TcpInstruments
-julia>using TcpInstruments
-julia>?
-help>Instrument
+julia> using TcpInstruments
+julia> ?
+help> Instrument
 ```
 
 To make things easier you can also use a config file.
@@ -42,12 +42,12 @@ You can write your own or ask your lab advisor for the lab's config file.
 
 To get Orchard's config or update your config to Orchard's current latest version use:
 ```julia
-julia>TcpInstruments.create_config()
+julia> TcpInstruments.create_config()
 ```
 
 Should you ever need to change anything in your config you can always use:
 ```julia
-julia>TcpInstruments.edit_config()
+julia> TcpInstruments.edit_config()
 ```
 
 # Using this library
@@ -115,12 +115,12 @@ p = initialize(SRSPS310, "10.1.30.37:1234"; GPIB_ID=2)
 If you don't know the channel you can figure it out and configure
 it manually:
 ```julia
-julia>using TcpInstruments
-julia>p = initialize(SRSPS310, "10.1.30.37:1234")
-julia>scan_prologix(p)
+julia> using TcpInstruments
+julia> p = initialize(SRSPS310, "10.1.30.37:1234")
+julia> scan_prologix(p)
 2 => "PS310"
-julia>set_prologix(p, 2)
-julia>get_prologix(p)
+julia> set_prologix(p, 2)
+julia> get_prologix(p)
 2
 ```
 ### Using SRSPS310 Power Supply
@@ -162,7 +162,7 @@ SRSPS310:
 Recompile new config
 ```julia
 julia --project=.
-julia>using TcpInstruments
+julia> using TcpInstruments
 ```
 
 The `.tcp_instruments.yml` file must be in the current directory of our project. If you have multiple scripts in different directories you can
