@@ -4,18 +4,20 @@ using Dates
 using MAT
 using JLD2
 
-const R = u"Ω"
-const V = u"V"
-const A = u"A"
+const R  = u"Ω"
+const V  = u"V"
+const A  = u"A"
 const Hz = u"Hz"
+const s  = u"s"
 
-using Unitful: Current, Voltage, Frequency
+using Unitful: Current, Voltage, Frequency, Time
 
 -->(a::Unitful.AbstractQuantity, b::Unitful.Units) = Float64(uconvert(b, a))
 
-raw(a::Current) = ustrip(a --> A)
-raw(a::Voltage) = ustrip(a --> V)
+raw(a::Current)   = ustrip(a --> A)
+raw(a::Voltage)   = ustrip(a --> V)
 raw(a::Frequency) = ustrip(a --> Hz)
+raw(a::Time)      = ustrip(a --> s)
 
 function elapsed_time(start_time)
     seconds = floor(time() - start_time)
@@ -118,7 +120,7 @@ macro codeLocation()
                    end
                end
                println("Running function ", $("$(__module__)"),".$(myf) at ",$("$(__source__.file)"),":",$("$(__source__.line)"))
-               
+
                myf
            end
        end
