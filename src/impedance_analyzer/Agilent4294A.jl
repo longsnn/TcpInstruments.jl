@@ -13,9 +13,6 @@ http://literature.cdn.keysight.com/litweb/pdf/04294-90061.pdf
 - [`set_volt_dc`](@ref)
 - [`get_volt_ac`](@ref)
 - [`set_volt_ac`](@ref)
-- [`get_volt_limit_dc`](@ref)
-- [`set_volt_limit_dc`](@ref)
-
 """
 struct Agilent4294A <: ImpedanceAnalyzer end
 
