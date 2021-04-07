@@ -73,15 +73,18 @@ function autoscale_seconds(data::ScopeData)
     time_array = data.time
     m = abs(min(data.time...))
     if m >= 1
-    elseif m < 1 && m >= 1e-3
+    elseif 1 < m && m >= 1e-3
         unit = "ms" # miliseconds
         time_array = data.time * 1e3
-    elseif m < 1e-3 && m >= 1e-6
+    elseif 1e-3 < m && m >= 1e-6
         unit = "μs" # microseconds
         time_array = data.time * 1e6
-    elseif m < 1e-6 && m >= 1e-9
+    elseif 1e-6 < m && m >= 1e-9
         unit = "ns" # nanoseconds
         time_array = data.time * 1e9
+    elseif 1e-9 < m && m >= 1e-12
+        unit = "ps" # picoseconds
+        time_array = data.time * 1e12
     else
         @info "Seconds unit not found"
     end
