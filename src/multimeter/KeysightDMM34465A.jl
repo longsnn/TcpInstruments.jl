@@ -47,6 +47,8 @@ end
 
 
 """
+    get_current(obj::Instr{KeysightDMM34465A}; type="DC")
+
 Returns current
 
 # Keywords
@@ -121,6 +123,7 @@ end
 
 
 """
+    get_channel(obj::Instr{KeysightDMM34465A})
 Indicates which input terminals are selected on the front panel
 Front/Rear switch. This switch is not programmable; this query reports
 the position of the switch, but cannot change it.

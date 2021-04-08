@@ -22,25 +22,7 @@ end
 struct ScopeData
     info::Union{ScopeInfo, Nothing}
     volt::Vector{typeof(1.0u"V")}
-    time::Vector{Float64}
-end
-
-status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
-
-function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
-    time_unit, scaled_time = autoscale_seconds(data)
-    title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
-    if isempty(label)
-        label = "Channel $(data.info.channel)"
-    else
-        label = label
-    end
-    if xguide == "0"
-        xguide = "Time / " * time_unit
-    else
-        xguide = xguide
-    end
-    return scaled_time, ustrip(data.volt), title, label, xguide, yguide
+    time::Vector{T} where {T<:Time}
 end
 
 @recipe function plot(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
@@ -65,26 +47,44 @@ end
     end
 end
 
+
+status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
+
+function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
+    time_unit, scaled_time = autoscale_seconds(data)
+    title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
+    if isempty(label)
+        label = "Channel $(data.info.channel)"
+    else
+        label = label
+    end
+    if xguide == "0"
+        xguide = "Time / " * time_unit
+    else
+        xguide = xguide
+    end
+    return ustrip(scaled_time), ustrip(data.volt), title, label, xguide, yguide
+end
+
 function autoscale_seconds(data::ScopeData)
-    # temp = filter(x->x != 0, abs.(data.time))
-    # @info "test", temp == data.time
-    # m = min(temp...)
     unit = "seconds"
     time_array = data.time
     m = abs(min(data.time...))
+    m = ustrip(m)
+
     if m >= 1
     elseif 1 < m && m >= 1e-3
         unit = "ms" # miliseconds
-        time_array = data.time * 1e3
+        time_array = ms.(data.time)
     elseif 1e-3 < m && m >= 1e-6
         unit = "μs" # microseconds
-        time_array = data.time * 1e6
+        time_array = μs.(data.time)
     elseif 1e-6 < m && m >= 1e-9
         unit = "ns" # nanoseconds
-        time_array = data.time * 1e9
+        time_array = ns.(data.time)
     elseif 1e-9 < m && m >= 1e-12
         unit = "ps" # picoseconds
-        time_array = data.time * 1e12
+        time_array = ps.(data.time)
     else
         @info "Seconds unit not found"
     end

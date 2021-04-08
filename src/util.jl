@@ -8,7 +8,6 @@ const R  = u"Ω"
 const V  = u"V"
 const A  = u"A"
 const Hz = u"Hz"
-const s  = u"s"
 
 using Unitful: Current, Voltage, Frequency, Time
 

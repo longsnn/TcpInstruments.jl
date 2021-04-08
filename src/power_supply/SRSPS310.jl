@@ -19,6 +19,8 @@ struct SRSPS310 <: PowerSupply end
 
 
 """
+    enable_output(obj::Instr{SRSPS310})
+
 This will enable an output on a device.
 
 Arguments:
@@ -30,6 +32,8 @@ Supported Instruments:
 enable_output(obj::Instr{SRSPS310}) = write(obj, "HVON")
 
 """
+    disable_output(obj::Instr{SRSPS310})
+
 This will disable an output on a device.
 
 Arguments:
@@ -41,6 +45,8 @@ Supported Instruments:
 disable_output(obj::Instr{SRSPS310}) = write(obj, "HVOF")
 
 """
+    get_output(obj::Instr{SRSPS310})
+
 This will disable an output on a device.
 
 Arguments:
@@ -104,6 +110,8 @@ end
 _set_voltage(obj::Instr{SRSPS310}, v::Voltage) = write(obj, "VSET$(raw(v))")
 
 """
+    get_voltage(obj::Instr{SRSPS310})
+
 This will return the voltage of a device
 
 Voltage Limit: 1250V
@@ -132,6 +140,8 @@ Returns:
 set_voltage_limit(obj::Instr{SRSPS310}, num::Voltage) = write(obj, "VLIM$(raw(num))")
 
 """
+    get_voltage_limit(obj::Instr{SRSPS310}) 
+
 This will return the voltage limit of a device
 
 Voltage Limit: 1250V
@@ -145,6 +155,8 @@ Returns:
 get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") * V
 
 """
+    set_current_limit(obj::Instr{SRSPS310}, num::Current)
+
 This will change the current limit of a device
 
 MIN Value: 0
@@ -161,6 +173,8 @@ function set_current_limit(obj::Instr{SRSPS310}, num::Current)
 end
 
 """
+    get_current_limit(obj::Instr{SRSPS310})
+
 This will return the current limit of a device.
 
 

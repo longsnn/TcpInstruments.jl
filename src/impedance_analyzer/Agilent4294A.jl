@@ -3,6 +3,7 @@ http://literature.cdn.keysight.com/litweb/pdf/04294-90061.pdf
 # Available functions
 - `initialize()`
 - `terminate()`
+- [`get_impedance`](@ref)
 - [`get_bandwidth`](@ref)
 - [`set_bandwidth`](@ref)
 - [`get_frequency_limits`](@ref)

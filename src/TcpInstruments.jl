@@ -43,6 +43,7 @@ module TcpInstruments
 
 using Sockets
 using Unitful
+using Unitful: s, ms, μs, ns, ps
 
 import InstrumentConfig: initialize, terminate
 
