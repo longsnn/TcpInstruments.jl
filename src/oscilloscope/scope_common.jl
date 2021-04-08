@@ -82,11 +82,9 @@ function autoscale_seconds(data::ScopeData)
     elseif 1e-6 < m && m >= 1e-9
         unit = "ns" # nanoseconds
         time_array = ns.(data.time)
-    elseif 1e-9 < m && m >= 1e-12
+    else
         unit = "ps" # picoseconds
         time_array = ps.(data.time)
-    else
-        @info "Seconds unit not found"
     end
     return unit, time_array
 end
