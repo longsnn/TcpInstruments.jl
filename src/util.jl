@@ -82,12 +82,13 @@ function scan_prologix(ip::AbstractString)
 end
 
 """
-    scan_prologix(ip::Instr{T}) where {T<:Instrument}
+    scan_prologix(instr)
 
-Given any Instr with a connection to a prologix adapter return a
-Dict of GPIB bus numbers that map to the connected device names
+Given any instrument with a connection to a prologix adapter that
+supports query and write. Return a Dict of GPIB bus numbers 
+that map to the connected device names
 """
-function scan_prologix(obj::Instr{T}) where {T:<Instrument}
+function scan_prologix(obj)
     devices = Dict()
     for i in 0:15
         write(obj, "++addr $i")
