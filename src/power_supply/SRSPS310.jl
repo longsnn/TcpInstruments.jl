@@ -68,10 +68,10 @@ delta_volt and delta_time can be used to set the ramping speed when setting a ne
 Voltage limits can be set using `set_voltage_limit()`.
 
 Examples:
-`psu_h = initialize(SRSPS310)`
-`set_voltage(psu_h, 11.1u"V")`
-`set_voltage(psu_h, 1100"mV")`
-`set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms")`
+    psu_h = initialize(SRSPS310)
+    set_voltage(psu_h, 11.1u"V")
+    set_voltage(psu_h, 1100"mV")
+    set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms")
 
 Returns:
   `Nothing`
