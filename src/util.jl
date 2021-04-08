@@ -71,6 +71,36 @@ function load(filename)
 end
 
 """
+    scan_prologix(ip::AbstractString)
+
+Given an IP Address to a prologix adapter return a
+Dict of GPIB bus numbers that map to the connected device names
+"""
+function scan_prologix(ip::AbstractString)
+    instr = initialize(Instrument, ip)
+    return scan_prologix(instr)
+end
+
+"""
+    scan_prologix(ip::Instr{T}) where {T<:Instrument}
+
+Given any Instr with a connection to a prologix adapter return a
+Dict of GPIB bus numbers that map to the connected device names
+"""
+function scan_prologix(obj::Instr{T}) where {T:<Instrument}
+    devices = Dict()
+    for i in 0:15
+        write(obj, "++addr $i")
+        try
+            devices[i] = query(obj, "*IDN?"; timeout=0.5)
+        catch
+
+        end
+    end
+    return devices
+end
+
+"""
     scan_network(; network_id="10.1.30.0", host_range=1:255, v=false)
 Will scan your network and report all found devices.
 

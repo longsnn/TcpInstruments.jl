@@ -171,16 +171,3 @@ Returns:
   Current Limit
 """
 get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?") * A
-
-function scan_prologix(obj::Instr{SRSPS310})
-    devices = Dict()
-    for i in 0:15
-        write(obj, "++addr $i")
-        try
-            devices[i] = query(obj, "*IDN?"; timeout=0.5)
-        catch
-
-        end
-    end
-    devices
-end
