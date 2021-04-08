@@ -124,7 +124,7 @@ triggered mode. Right now the default is Timer. To implement
 more trigger sources see page 130 of the manual for 33612A
 
 """
-function set_mode_burst(obj::Instr{Keysight33612A}; 
+function set_mode_burst(obj::Instr{Keysight33612A};
                          chan=1,
                          mode=:trigger,
                          trig_src=:timer)
@@ -133,13 +133,13 @@ function set_mode_burst(obj::Instr{Keysight33612A};
     elseif mode == :gated
         set_burst_mode_gated(obj)
     else
-        error("""mode flag cannot be set to: $mode\n 
+        error("""mode flag cannot be set to: $mode\n
               available modes are [:trigger, :gated]""")
     end
     if trig_src == :timer
         set_trigger_source_timer(obj; chan=chan)
     else
-        error("""trig_src flag cannot be set to: $trig_src\n 
+        error("""trig_src flag cannot be set to: $trig_src\n
               available modes are [:timer]""")
     end
     write(obj, "SOURCE$chan:BURST:STATE ON")
@@ -220,9 +220,8 @@ set_burst_period(obj, num; chan=1) =
 get_burst_period(obj; chan=1) =
     f_query(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD?")
 
-set_trigger_source_timer(obj; chan=1) = 
+set_trigger_source_timer(obj; chan=1) =
     write(obj, "TRIGGER$chan:SOURCE TIMER")
 
 
 status(obj::Instr{Keysight33612A}) = query(obj, "APPLY?")
-

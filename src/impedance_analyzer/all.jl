@@ -15,8 +15,8 @@ get_frequency_limits(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
 
 """
 function set_frequency_limits(
-    obj::Instr{T}, 
-    start::Frequency, 
+    obj::Instr{T},
+    start::Frequency,
     stop::Frequency
 ) where {T <: ImpedanceAnalyzer}
     start = raw(start)
@@ -57,4 +57,3 @@ get_volt_limit_dc(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
 
 set_volt_limit_dc(obj::Instr{T}, v::Voltage) where (T <: ImpedanceAnalyzer) =
     write(obj, "MAXDCV $(raw(v))")
-

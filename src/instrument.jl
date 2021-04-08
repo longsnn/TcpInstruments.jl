@@ -107,7 +107,7 @@ Initializes a connection to the instrument at the given (input) IP address.
 - `address::String`: The ip address of the device. Ex. "10.3.30.23"
 
 # Keywords
-- `GPIB_ID::Int`: The GPIB interface ID of your device. This is optional and doesn't need to be set unless you are using a prologix controller to control it remotely. 
+- `GPIB_ID::Int`: The GPIB interface ID of your device. This is optional and doesn't need to be set unless you are using a prologix controller to control it remotely.
 """
 function initialize(model::Type{T}, address; GPIB_ID=-1) where T <: Instrument
     instr_h = CreateTcpInstr(model, address)
@@ -132,7 +132,7 @@ function initialize(model::Type{T}) where T <: Instrument
         Otherwise please add it to your config file or
         specify an ip address:
         `initialize($(string(model)), "10.1.30.XX")`
-        
+
         """)
     end
     if data isa String

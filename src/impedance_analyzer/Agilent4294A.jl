@@ -41,7 +41,7 @@ Sets bandwidth level (1-5)
 # Arguments
 - `n::Int`: Desired bandwidth level (between 1 and 5)
 """
-function set_bandwidth(i::Instr{Agilent4294A}, n) 
+function set_bandwidth(i::Instr{Agilent4294A}, n)
     !(n in 1:5) && error("$n must be an int between 1 and 5")
     write(i, "BWFACT $n")
 end
@@ -61,7 +61,7 @@ get_volt_ac(i::Instr{Agilent4294A}) = f_query(i, "POWE?") * V
 """
 set_volt_ac(i::Instr{Agilent4294A}, n::Voltage) = write(i, "POWE $(raw(n))"*"V")
 
-function get_impedance(obj::Instr{Agilent4294A}) 
+function get_impedance(obj::Instr{Agilent4294A})
     data = query(obj, "OUTPDTRC?"; timeout=3)
     data = split(data, ',')
     arr = Array{Complex, 1}()
@@ -78,19 +78,19 @@ end
 @recipe function f(impedance::Array{typeof((1.0 + 0im)R), 1}; complex=false)
     title := "Impedance"
     layout := (2, 1)
-    real_label, imag_label = if complex 
-        "Real", "Imaginary" 
+    real_label, imag_label = if complex
+        "Real", "Imaginary"
     else
         "Amplitude", "Phase"
     end
     label := [real_label, imag_label]
-    @series begin 
+    @series begin
         subplot := 1
         label := real_label
         legend := :outertopright
         return complex ?  real(impedance) : abs.(impedance)
     end
-    @series begin 
+    @series begin
         title := ""
         subplot := 2
         label := imag_label

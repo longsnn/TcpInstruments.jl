@@ -89,7 +89,7 @@ Returns:
 get_voltage(obj::Instr{VersatilePower}) = f_query(obj, "VOLTAGE?") * V
 
 """
-This will change the current limit of a device 
+This will change the current limit of a device
 
 Supported Instruments:
    - Power supply
