@@ -15,8 +15,10 @@ struct KeysightDMM34465A <: MultiMeter end
 
 Perform take a measurement with the probe mode set to thermocouple
 """
-get_tc_temperature(obj::Instr{KeysightDMM34465A}) =
-    f_query(obj, "MEASURE:TEMPERATURE? TC"; timeout=0)
+function get_tc_temperature(obj::Instr{KeysightDMM34465A})
+    units = get_temp_unit(obj)
+    return f_query(obj, "MEASURE:TEMPERATURE? TC"; timeout=0) * units
+end
 
 """
     set_tc_type(multimeter; type="K")
@@ -40,7 +42,7 @@ Returns voltage
 """
 function get_voltage(obj::Instr{KeysightDMM34465A}; type="DC")
     !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
-    f_query(obj, "MEASURE:VOLTAGE:$type?"; timeout=0)
+    f_query(obj, "MEASURE:VOLTAGE:$type?"; timeout=0) * V
 end
 
 
@@ -53,7 +55,7 @@ Returns current
 """
 function get_current(obj::Instr{KeysightDMM34465A}; type="DC")
     !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
-    f_query(obj, "MEASURE:CURRENT:$type?"; timeout=0)
+    f_query(obj, "MEASURE:CURRENT:$type?"; timeout=0) * A
 end
 
 """
@@ -67,9 +69,9 @@ Returns resistance
 """
 function get_resistance(obj::Instr{KeysightDMM34465A}; wire)
     if wire == 2
-        f_query(obj, "MEASURE:RESISTANCE?"; timeout=0)
+        f_query(obj, "MEASURE:RESISTANCE?"; timeout=0) * R
     elseif wire == 4
-        f_query(obj, "MEASURE:FRESISTANCE?"; timeout=0)
+        f_query(obj, "MEASURE:FRESISTANCE?"; timeout=0) * R
     else
         error("wire flag must be 2 or 4 not $wire")
     end
@@ -104,8 +106,18 @@ set_temp_unit_kelvin(obj::Instr{KeysightDMM34465A}) =
 
 Returns C, F or K depending on the set temperature unit
 """
-get_temp_unit(obj::Instr{KeysightDMM34465A}) =
-    query(obj, "UNIT:TEMPERATURE?")
+function get_temp_unit(obj::Instr{KeysightDMM34465A})
+   units = query(obj, "UNIT:TEMPERATURE?")
+   return if units == "C"
+       u"C"
+   elseif units == "F"
+       u"F"
+   elseif units == "K"
+       u"K"
+   else
+       error("Expected [C, F, K]. Got: $units")
+   end
+end
 
 
 """
