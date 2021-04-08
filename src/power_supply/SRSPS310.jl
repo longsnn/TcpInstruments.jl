@@ -65,16 +65,19 @@ delta_volt and delta_time can be used to set the ramping speed when setting a ne
 - delta_volt sets how big each voltage step should be.  (standard value: `Inf *u"V"`)
 - delta_time sets the time between each voltage update. (standard value: `100u"ms"`)
 
-Voltage limits can be set using `set_voltage_limit()`.
+Units are handled by the package `Unitful`.
+
+Currently set voltage limits can read using `get_voltage_limit()`.
 
 Examples:
-```julia> psu_h = initialize(SRSPS310)
+```
+julia> psu_h = initialize(SRSPS310)
 julia> set_voltage(psu_h, 11.1u"V")
 julia> set_voltage(psu_h, 1100"mV")
-julia> set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms")```
+julia> set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms")
+```
 
-Returns:
-  `Nothing`
+Returns: `Nothing`
 """
 function set_voltage(obj::Instr{SRSPS310}, volt::Voltage; delta_volt::Voltage=Inf*u"V", delta_time::Time=100u"ms")
     if delta_volt == Inf*u"V"
