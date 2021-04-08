@@ -57,24 +57,24 @@ get_output(obj::Instr{SRSPS310}) = query(obj, "*STB? 7") == "1" ? true : false
 
 
 """
-set_voltage(obj::Instr{SRSPS310}, volt::Voltage; [delta_volt::Voltage, delta_time::Time])
+    set_voltage(obj::Instr{SRSPS310}, volt::Voltage; [delta_volt::Voltage, delta_time::Time])
 
 Sets the output voltage output of a SRSPS310 power supply.
 optional parameters:
 delta_volt and delta_time can be used to set the ramping speed when setting a new voltage.
-- delta_volt sets how big each voltage step should be.  (standard value: Inf *u"V")
-- delta_time sets the time between each voltage update. (standard value: 100u"ms")
+- delta_volt sets how big each voltage step should be.  (standard value: `Inf *u"V"`)
+- delta_time sets the time between each voltage update. (standard value: `100u"ms"`)
 
-Voltage limits can be set using set\_voltage\_limit().
+Voltage limits can be set using `set_voltage_limit()`.
 
 Examples:
-psu_h = initialize(SRSPS310)
-set_voltage(psu_h, 11.1u"V")
-set_voltage(psu_h, 1100"mV")
-set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms")
+`psu_h = initialize(SRSPS310)`
+`set_voltage(psu_h, 11.1u"V")`
+`set_voltage(psu_h, 1100"mV")`
+`set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms")`
 
 Returns:
-  Nothing
+  `Nothing`
 """
 function set_voltage(obj::Instr{SRSPS310}, volt::Voltage; delta_volt::Voltage=Inf*u"V", delta_time::Time=100u"ms")
     if delta_volt == Inf*u"V"
