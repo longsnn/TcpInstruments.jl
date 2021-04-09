@@ -1,3 +1,5 @@
+import InstrumentConfig: initialize, terminate
+
 """
 An instrument is a generic device with which you can take and read measurements
 
