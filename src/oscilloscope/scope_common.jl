@@ -73,13 +73,13 @@ function autoscale_seconds(data::ScopeData)
     m = ustrip(m)
 
     if m >= 1
-    elseif 1 < m && m >= 1e-3
+    elseif 1 > m && m >= 1e-3
         unit = "ms" # miliseconds
         time_array = ms.(data.time)
-    elseif 1e-3 < m && m >= 1e-6
+    elseif 1e-3 > m && m >= 1e-6
         unit = "μs" # microseconds
         time_array = μs.(data.time)
-    elseif 1e-6 < m && m >= 1e-9
+    elseif 1e-6 > m && m >= 1e-9
         unit = "ns" # nanoseconds
         time_array = ns.(data.time)
     else
