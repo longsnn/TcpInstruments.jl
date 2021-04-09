@@ -51,7 +51,7 @@ end
 status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 
 function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
-    time_unit, scaled_time = autoscale_seconds(data)
+    time_unit, scaled_time = autoscale_seconds(data.time)
     title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
     if isempty(label)
         label = "Channel $(data.info.channel)"
@@ -66,25 +66,25 @@ function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V"
     return ustrip(scaled_time), ustrip(data.volt), title, label, xguide, yguide
 end
 
-function autoscale_seconds(data::ScopeData)
+function autoscale_seconds(time_data)
     unit = "seconds"
-    time_array = data.time
-    m = abs(min(data.time...))
+    time_array = time_data
+    m = abs(min(time_data...))
     m = ustrip(m)
 
     if m >= 1
-    elseif 1 < m && m >= 1e-3
+    elseif 1 > m && m >= 1e-3
         unit = "ms" # miliseconds
-        time_array = ms.(data.time)
-    elseif 1e-3 < m && m >= 1e-6
+        time_array = ms.(time_data)
+    elseif 1e-3 > m && m >= 1e-6
         unit = "μs" # microseconds
-        time_array = μs.(data.time)
-    elseif 1e-6 < m && m >= 1e-9
+        time_array = μs.(time_data)
+    elseif 1e-6 > m && m >= 1e-9
         unit = "ns" # nanoseconds
-        time_array = ns.(data.time)
+        time_array = ns.(time_data)
     else
         unit = "ps" # picoseconds
-        time_array = ps.(data.time)
+        time_array = ps.(time_data)
     end
     return unit, time_array
 end

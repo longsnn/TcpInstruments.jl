@@ -54,8 +54,8 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using IntensityScans
-            DocMeta.setdocmeta!(IntensityScans, :DocTestSetup, :(using TcpInstruments); recursive=true)
+            using TcpInstruments
+            DocMeta.setdocmeta!(TcpInstruments, :DocTestSetup, :(using TcpInstruments); recursive=true)
             doctest(TcpInstruments)'
       - run: julia --project=docs docs/make.jl
         env:
