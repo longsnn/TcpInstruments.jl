@@ -2,9 +2,9 @@ using TcpInstruments
 using Test
 
 try
-include("./fake_device.jl")
-catch 
-@info "External emulator found"
+    include("./fake_device.jl")
+catch
+    @error "External emulator NOT found"
 end
 
 function test_initialize(type)
