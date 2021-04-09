@@ -49,7 +49,7 @@ function get_data(instr::Instr{FakeDSOX4034A}, ch::Int; scope_stats=false)
         else
             map(x->abs(sin(x)) / 3, collect(range(0, stop=16pi, length=samples))) .* V
     end
-    time = collect(range(-0.0025, stop=0.0025, length=samples)) * ms
+    time = collect(range(-0.0025, stop=0.0025, length=samples)) * s
     return ScopeData(info, volt, time)
 end
 
