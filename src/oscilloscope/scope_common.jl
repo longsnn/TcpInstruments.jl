@@ -22,7 +22,7 @@ end
 struct ScopeData
     info::Union{ScopeInfo, Nothing}
     volt::Vector{typeof(1.0u"V")}
-    time::Vector{T} where {T<:Time}
+    time::Vector{typeof(1.0u"s")}
 end
 
 @recipe function plot(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
@@ -179,8 +179,7 @@ function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
 
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
     time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
-    # TODO @info "TIME", wfm_data[1:5]
-    return ScopeData(wfm_info, V .* volt, time)
+    return ScopeData(wfm_info, V .* volt, u"s" .* time)
 end
 
 function scope_speed_mode(instr::Instrument, speed::Int)
