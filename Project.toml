@@ -21,7 +21,7 @@ JLD2 = "0.4"
 MAT = "0.10"
 RecipesBase = "1.1"
 TestSetExtensions = "2.0"
-Unitful = "1.6"
+Unitful = "1.6, 1.7"
 YAML = "0.4"
 julia = "1"
 
