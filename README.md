@@ -6,7 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/Orchard-Ultrasound-Innovation/TcpInstruments.jl/badge.svg?branch=master)](https://coveralls.io/github/Orchard-Ultrasound-Innovation/TcpInstruments.jl?branch=master)
 [![Documentation Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://orchard-ultrasound-innovation.github.io/TcpInstruments.jl/dev/)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
-[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/Orchard-Ultrasound-Innovation/TcpInstruments.jl/v0.7.0.svg)](https://github.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl)
+[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/Orchard-Ultrasound-Innovation/TcpInstruments.jl/v0.8.0.svg)](https://github.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl)
 
 Control common lab equipment via SCPI over Ethernet and specifically not be dependent on the NIVISA library that other similar packages often have depended on.
 
@@ -22,12 +22,12 @@ SCPI is supported on almost all modern pieces of lab equipment but this code has
 - [X] HV power supply SRS PS310 via Prologix GPIB to Ethernet adaptor
 - [X] Power supply Versatile Power 100-10 XR
 - [X] Impedance analyser Agilent 4294A
-- [ ] Impedance analyser Agilent 4395A (with 43961A imp. probe)
 
 For more information on every type of instrument as well as
 their available functions and how they work:
 
-## Installation
+<details><summary>Installation</summary>
+ 
 TcpInstruments can be installed using the Julia package manager. From the Julia REPL, type ] to enter the Pkg REPL mode and run
 
 ```julia
@@ -50,6 +50,7 @@ Should you ever need to change anything in your config you can always use:
 ```julia
 julia> TcpInstruments.edit_config()
 ```
+</details>
 
 # Using this library
 To use any device you must first initialize it.
@@ -64,7 +65,7 @@ Thus `"10.1.30.36"` defaults to `"10.1.30.36:5025"`
 To see the list of commands for this device, look up this device
 in the documentation or in the repl: `help>{name-of-device}`
 
-## Util Commands
+## Utility Commands
 To see a list of all available ip addresses and devices:
 ```julia
 julia> scan_network()
@@ -92,48 +93,23 @@ set_voltage_offset(instr, 0u"V")
 
 
 # Examples
-## Waveform Generator
-###  Creating a Sin Wave Example:
+<details><summary>Waveform Generator</summary>
+ 
+###  Continious sine wave with a signal generator (in this case the Keysight 33612A):
 ```julia
-wave = initialize(Keysight33612A, "10.1.30.36")
-set_mode_cw(wave) # Set to continuous waveform mode
-set_function(wave, "SIN")
-set_frequency(wave, 1000u"Hz")
-set_amplitude(wave, 0.1u"V")
-set_voltage_offset(wave, 0u"V")
-enable_output(wave) # Starts wave
+sg = initialize(Keysight33612A, "10.1.30.36")
+set_mode_cw(sg)               # Set to continuous waveform mode
+set_function(sg, "SIN")
+set_frequency(sg, 1u"kHz")
+set_amplitude(sg, 0.1u"V")
+set_voltage_offset(sg, 100u"mV")
+enable_output(sg)             # sine output starts here
+```
+</details>
 
-```
-## GPIB Power Supply (SRSPS310) used with Prologix Controller
-### Initialize Prologix Channel
-To a initialize a device that is connected with a prologix
-controller you must specify what prologix channel the device
-is on. At this moment the prologix adapter is the only supported
-GPIB to Ethernet adapter.
-```julia
-p = initialize(SRSPS310, "10.1.30.37:1234"; GPIB_ID=2)
-```
-If you don't know the channel you can figure it out and configure
-it manually:
-```julia
-julia> using TcpInstruments
-julia> p = initialize(SRSPS310, "10.1.30.37:1234")
-julia> scan_prologix(p)
-2 => "PS310"
-julia> set_prologix(p, 2)
-julia> get_prologix(p)
-2
-```
-### Using SRSPS310 Power Supply
-```julia
-p = initialize(SRSPS310, "10.1.30.37:1234"; GPIB_ID=2)
-set_voltage_limit(p, 1250u"V")
-set_voltage(p, 1250u"V")
-set_current_limit(p, 0.021u"A") # equivalent to set_current_limit(p, 21u"mA")
-enable_output(p)
-```
 
-## Autoinitialize
+<details><summary>Autoinitialize</summary>
+ 
 Additionally you can create a `.tcp_instruments.yml` file. You 
 can save the ip address of all your devices 
 in one easy-to-find place so they don't have to be hardcoded in scripts.
@@ -182,8 +158,12 @@ __Cool tip__: Since we specified an alias for the waveform generator we can init
 wave = initialize(OleBigWave)
 ```
 (No dashes, spaces or other special characters in alias names, treat them like variables because they are)
+</details>
+
+
 ## Power Supplies
-# VersatilePower
+<details><summary>VersatilePower</summary>
+ 
 ```julia
 # Initialize automatically puts this power supply in remote mode
 pwr = initialize(VersatilePower)
@@ -195,10 +175,11 @@ enable_output(pwr)
 # Closes connection as with other devices but also puts this
 # device back into local mode
 terminate(pwr)
-
+<details>
 
 ```
-# AgilentE36312A
+<details><>summary>AgilentE36312A</summary>
+ 
 ```julia
 pwr = initialize(AgilentE36312A)
 
@@ -222,9 +203,41 @@ get_voltage(pwr; chan=1)
 
 enable_output(pwr) # Enables output on channel 3
 ```
+</details>
 
-## Scope
-### AgilentDSOX4034A
+<details><summary>GPIB Power Supply (SRSPS310) used with Prologix Controller<summary>
+ 
+### Initialize Prologix Channel
+To a initialize a device that is connected with a prologix
+controller you must specify what prologix channel the device
+is on. At this moment the prologix adapter is the only supported
+GPIB to Ethernet adapter.
+```julia
+p = initialize(SRSPS310, "10.1.30.37:1234"; GPIB_ID=2)
+```
+If you don't know the channel you can figure it out and configure
+it manually:
+```julia
+julia> using TcpInstruments
+julia> p = initialize(SRSPS310, "10.1.30.37:1234")
+julia> scan_prologix(p)
+2 => "PS310"
+julia> set_prologix(p, 2)
+julia> get_prologix(p)
+2
+```
+### Using SRSPS310 Power Supply
+```julia
+p = initialize(SRSPS310, "10.1.30.37:1234"; GPIB_ID=2)
+set_voltage_limit(p, 1250u"V")
+set_voltage(p, 1250u"V")
+set_current_limit(p, 0.021u"A") # equivalent to set_current_limit(p, 21u"mA")
+enable_output(p)
+```
+</details>
+## Oscilloscopes
+<detail><summary>AgilentDSOX4034A</summary>
+ 
 ```julia
 scope = initialize(AgilentDSOX4034A)
 
@@ -286,8 +299,11 @@ plot(data)
 ```
 
 ![wave](examples/wave.png)
+</details>
 
-# Multiple devices
+
+<details><summary>Multiple devices</summary>
+ 
 Lets say you want to use a waveform generator, power supply
 and oscilloscope all at once.
 ```julia
@@ -315,3 +331,4 @@ plot(chan1)
 
 For more examples of how to use different devices look in the
 test folder
+</details>
