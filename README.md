@@ -28,7 +28,7 @@ their available functions and how they work:
 
 <details><summary>Installation</summary>
  
-TcpInstruments can be installed using the Julia package manager. From the Julia REPL, type ] to enter the Pkg REPL mode and run
+TcpInstruments can be installed using the Julia package manager. From the Julia REPL, type `]` to enter the Pkg REPL mode and run
 
 ```julia
 pkg> add TcpInstruments
@@ -37,82 +37,33 @@ julia> ?
 help> Instrument
 ```
 
-To make things easier you can also use a config file.
-This will preset the ip addresses of the instruments so you don't need to remember them.
-You can write your own or ask your lab advisor for the lab's config file.
-
-To get Orchard's config or update your config to Orchard's current latest version use:
-```julia
-julia> TcpInstruments.create_config()
-```
-
-Should you ever need to change anything in your config you can always use:
-```julia
-julia> TcpInstruments.edit_config()
-```
 </details>
 
-# Using this library
-To use any device you must first initialize it.
+<details><summary>Autoinitialize - Storage of name-aliases and IP addresses.</summary>
 
-handler = initialize({name-of-device}, "{ip-address}")
-
-The ip address can also have a port. If no port is specified, 
-5025 is used by default.
-
-Thus `"10.1.30.36"` defaults to `"10.1.30.36:5025"`
-
-To see the list of commands for this device, look up this device
-in the documentation or in the repl: `help>{name-of-device}`
-
-## Utility Commands
-To see a list of all available ip addresses and devices:
-```julia
-julia> scan_network()
-3-element Vector{Pair{String, B} where B}:
- "10.1.30.28:????" => ""
- "10.1.30.34:5025" => "Keysight Technologies,E36312A,MY59002391,2.1.0-1.0.4-1.12"
- "10.1.30.38:5025" => "Keysight Technologies,34465A,MY59008389,A.03.01-03.15-03.01-00.52-03-02"
-```
-
-## Units
-This package uses Unitful. In order to control certain devices
-it is required to run:
-```julia
-using Unitful
-```
-
-Commands such as:
-```julia
-set_voltage_offset(instr, 0)
-```
-will not work you must specify the units:
-```julia
-set_voltage_offset(instr, 0u"V")
-```
-
-
-# Examples
-<details><summary>Waveform Generator</summary>
- 
-###  Continious sine wave with a signal generator (in this case the Keysight 33612A):
-```julia
-sg = initialize(Keysight33612A, "10.1.30.36")
-set_mode_cw(sg)               # Set to continuous waveform mode
-set_function(sg, "SIN")
-set_frequency(sg, 1u"kHz")
-set_amplitude(sg, 0.1u"V")
-set_voltage_offset(sg, 100u"mV")
-enable_output(sg)             # sine output starts here
-```
-</details>
-
-
-<details><summary>Autoinitialize</summary>
- 
-Additionally you can create a `.tcp_instruments.yml` file. You 
-can save the ip address of all your devices 
+You can create a `~/.tcp_instruments.yml` file which stores the IP-address 
+and an optional name-alias for all your devices
 in one easy-to-find place so they don't have to be hardcoded in scripts.
+
+To create an example config file that can be edited to your needs run:
+```
+create_config()
+```
+This will create a yaml file in your home directory: `~/.tcp_instruments.yml`
+
+This yaml file will be loaded everytime you use this package.
+
+You can also create a project-specific config by creating
+the config in your project root directory instead of your home
+directory. You can do this with:
+```
+create_config(pwd())
+```
+
+Once you have created a config file you can change it with
+```
+edit_config()
+```
 
 Format of `.tcp_instruments.yml` file:
 ```julia
@@ -130,34 +81,93 @@ devices are found in our `.tcp_instruments.yml` file
 ```yaml
 Keysight33612A:
     address: "10.1.30.36"
-    alias: "OleBigWave"
+    alias: "OleBigSG"
 SRSPS310:
     gpib: 2
     address: "10.1.30.37:1234"
 ```
 
-Recompile new config
+Recompile the new config which is located in the current working directory
 ```julia
-julia --project=.
+pkg> activate .
 julia> using TcpInstruments
 ```
 
-The `.tcp_instruments.yml` file must be in the current directory of our project. If you have multiple scripts in different directories you can
-can also place the config file in your home directory: `~/.tcp_instruments.yml`.
-
-Each project will first look for a config in the current directory and if none is found it will look in the home directory.
+Each TcpInstruments will first look for a config in the current directory and if none is found it will look in the home directory.
 
 The two devices from above can now be initialized as follows:
 ```julia
-wave = initialize(Keysight33612A)
+sg = initialize(Keysight33612A)
 p = initialize(SRSPS310)
 ```
 
-__Cool tip__: Since we specified an alias for the waveform generator we can initialize it this way as well:
+__Cool tip__: Since we specified an alias for the signal generator we can initialize it this way as well:
 ```julia
-wave = initialize(OleBigWave)
+sg = initialize(OleBigSG)
 ```
-(No dashes, spaces or other special characters in alias names, treat them like variables because they are)
+(No dashes, spaces or other special characters in alias names, treat them like variables, because they are.)
+</details>
+
+
+# Using this library
+To use any device you must first initialize it.
+
+handler = initialize({name-of-device}, "{ip-address}")
+
+The ip address can also have a port. If no port is specified, 
+5025 is used by default.
+
+Thus `"10.1.30.36"` defaults to `"10.1.30.36:5025"`
+
+To see the list of commands for this device, look up this device
+in the documentation or in the repl: `help> {name-of-device}`
+
+## Utility Commands
+<details><summary>scan_network()</summary>
+
+To see a list of all available ip addresses and devices:
+```julia
+julia> scan_network()
+3-element Vector{Pair{String, B} where B}:
+ "10.1.30.28:????" => ""
+ "10.1.30.34:5025" => "Keysight Technologies,E36312A,MY59002391,2.1.0-1.0.4-1.12"
+ "10.1.30.38:5025" => "Keysight Technologies,34465A,MY59008389,A.03.01-03.15-03.01-00.52-03-02"
+```
+</details>
+
+## Units
+<details><summary>This package uses Unitful.</summary> 
+
+In order to control certain devices
+it is required to run:
+```julia
+using Unitful
+```
+
+Commands such as:
+```julia
+set_voltage_offset(instr, 0)
+```
+will not work you must specify the units:
+```julia
+set_voltage_offset(instr, 0u"V")
+```
+</details>
+
+# Examples
+## Signal Generator
+<details><summary>Keysight33612A</summary>
+ 
+###  Continious sine wave with a signal generator (in this case the Keysight 33612A):
+```julia
+sg = initialize(Keysight33612A, "10.1.30.36")
+set_mode_cw(sg)               # Set to continuous waveform mode
+set_function(sg, "SIN")
+set_frequency(sg, 1u"kHz")
+set_amplitude(sg, 0.1u"V")
+set_voltage_offset(sg, 100u"mV")
+enable_output(sg)             # sine output starts here
+```
 </details>
 
 
@@ -175,10 +185,10 @@ enable_output(pwr)
 # Closes connection as with other devices but also puts this
 # device back into local mode
 terminate(pwr)
-<details>
-
 ```
-<details><>summary>AgilentE36312A</summary>
+</details>
+
+<details><summary>AgilentE36312A</summary>
  
 ```julia
 pwr = initialize(AgilentE36312A)
@@ -205,7 +215,7 @@ enable_output(pwr) # Enables output on channel 3
 ```
 </details>
 
-<details><summary>GPIB Power Supply (SRSPS310) used with Prologix Controller<summary>
+<details><summary>GPIB Power Supply (SRSPS310) used with Prologix Controller</summary>
  
 ### Initialize Prologix Channel
 To a initialize a device that is connected with a prologix
@@ -235,9 +245,11 @@ set_current_limit(p, 0.021u"A") # equivalent to set_current_limit(p, 21u"mA")
 enable_output(p)
 ```
 </details>
+
 ## Oscilloscopes
-<detail><summary>AgilentDSOX4034A</summary>
+<details><summary>AgilentDSOX4034A</summary>
  
+
 ```julia
 scope = initialize(AgilentDSOX4034A)
 
@@ -287,39 +299,40 @@ save(multi_data)
 
 Additionally you can grab data from all open channels
 (Let's say only channels 1 & 2 are activated for now)
-```
+```julia
 scope = initialize(AgilentDSOX4034A)
 data = get_data(scope)    
 ```
 Since the only activated channels are now only 1 & 2 this returns an array of waves (equivalent to `get_data(scope, [1,2]))
 
 You can also plot multiple waves at once:
-```
+```julia
 plot(data)
 ```
 
 ![wave](examples/wave.png)
+
 </details>
 
 
 <details><summary>Multiple devices</summary>
  
-Lets say you want to use a waveform generator, power supply
+Lets say you want to use a signal generator, power supply
 and oscilloscope all at once.
 ```julia
 using TcpInstruments
-using Plots; gr()
+using Plots; plotly()
 
 scope = initialize(AgilentDSOX4034A)
 pwr = initialize(VersatilePower)
-wave = initialize(Keysight33612A)
+sg = initialize(Keysight33612A)
 
 set_mode_cw(wave)
-set_function(wave, "SIN")
-set_frequency(wave, 1000u"Hz")
-set_amplitude(wave, 0.1u"A")
-set_voltage_offset(wave, 0u"V")
-enable_output(wave)
+set_function(sg, "SIN")
+set_frequency(sg, 1000u"Hz")
+set_amplitude(sg, 0.1u"A")
+set_voltage_offset(sg, 0u"V")
+enable_output(sg)
 
 set_voltage(pwr, 20u"V")
 set_current_limit(pwr, 4u"A")
