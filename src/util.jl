@@ -4,19 +4,18 @@ using Dates
 using MAT
 using JLD2
 
-const R  = u"Ω"
-const V  = u"V"
-const A  = u"A"
+const R = u"Ω"
+const V = u"V"
+const A = u"A"
 const Hz = u"Hz"
+const s = u"s"
 
 using Unitful: Current, Voltage, Frequency, Time
 
--->(a::Unitful.AbstractQuantity, b::Unitful.Units) = Float64(uconvert(b, a))
-
-raw(a::Current)   = ustrip(a --> A)
-raw(a::Voltage)   = ustrip(a --> V)
-raw(a::Frequency) = ustrip(a --> Hz)
-raw(a::Time)      = ustrip(a --> s)
+raw(a::Current)   = Float64(ustrip(uconvert(A, a)))
+raw(a::Voltage)   = Float64(ustrip(uconvert(V, a)))
+raw(a::Frequency) = Float64(ustrip(uconvert(Hz, a)))
+raw(a::Time)      = Float64(ustrip(uconvert(s, a)))
 
 function elapsed_time(start_time)
     seconds = floor(time() - start_time)
@@ -38,7 +37,7 @@ Save data to a file
 By default saves to julia format (.jld2) but can also export
 data to matlab by using the format=:matlab keyword argument
 """
-function save(data; filename="", format=:julia)
+function save(data; filename = "", format = :julia)
     if isempty(filename)
         t = Dates.format(Dates.now(), "yy-mm-dd_HH:MM:SS")
         filename = "scan_" * t
@@ -84,7 +83,7 @@ end
     scan_prologix(instr)
 
 Given any instrument with a connection to a prologix adapter that
-supports query and write. Return a Dict of GPIB bus numbers 
+supports query and write. Return a Dict of GPIB bus numbers
 that map to the connected device names
 """
 function scan_prologix(obj)
@@ -92,7 +91,7 @@ function scan_prologix(obj)
     for i in 0:15
         write(obj, "++addr $i")
         try
-            devices[i] = query(obj, "*IDN?"; timeout=0.5)
+            devices[i] = query(obj, "*IDN?"; timeout = 0.5)
         catch
 
         end
@@ -109,22 +108,22 @@ By default it only searches for devices connected on port: 5025
 If you would like to search for devices on a different port set the
 v flag to true.
 """
-function scan_network(; network="10.1.30.0", host_range=1:255, v=false)
+function scan_network(; network = "10.1.30.0", host_range = 1:255, v = false)
     @info "Scanning $(network[1:end-1])$(host_range[1])-$(host_range[end])"
     ips = asyncmap(
-        x->connect_to_scpy(x; v=v),
-        [network[1:end-1]*"$host" for host in host_range]
+        x -> connect_to_scpy(x; v = v),
+        [network[1:end-1] * "$host" for host in host_range],
     )
     return [s for s in ips if !isempty(s)]
 end
 
-function connect_to_scpy(ip_str; v=false)
+function connect_to_scpy(ip_str; v = false)
     scpy_port = 5025
     temp_ip = ip_str * ":$scpy_port"
     proc = @spawn temp_ip => info(initialize(Instrument, temp_ip))
     sleep(2)
     if proc.state == :runnable
-        schedule(proc, ErrorException("Timed out"), error=true)
+        schedule(proc, ErrorException("Timed out"), error = true)
         return ""
     elseif proc.state == :done
         return fetch(proc)
@@ -136,24 +135,31 @@ function connect_to_scpy(ip_str; v=false)
     end
 end
 
-udef(func) =  error("$(func) not implemented")
+udef(func) = error("$(func) not implemented")
 
 macro codeLocation()
-           return quote
-               st = stacktrace(backtrace())
-               myf = ""
-               for frm in st
-                   funcname = frm.func
-                   if frm.func != :backtrace && frm.func!= Symbol("macro expansion")
-                       myf = frm.func
-                       break
-                   end
-               end
-               println("Running function ", $("$(__module__)"),".$(myf) at ",$("$(__source__.file)"),":",$("$(__source__.line)"))
+    return quote
+        st = stacktrace(backtrace())
+        myf = ""
+        for frm in st
+            funcname = frm.func
+            if frm.func != :backtrace && frm.func != Symbol("macro expansion")
+                myf = frm.func
+                break
+            end
+        end
+        println(
+            "Running function ",
+            $("$(__module__)"),
+            ".$(myf) at ",
+            $("$(__source__.file)"),
+            ":",
+            $("$(__source__.line)"),
+        )
 
-               myf
-           end
-       end
+        myf
+    end
+end
 
 function alias_print(msg)
     printstyled("[ Aliasing: ", color = :blue, bold = true)
@@ -164,14 +170,14 @@ end
 	split_str_into_host_and_port(str)
 Splits a string like "192.168.1.1:5056" into ("192.168.1.1", 5056)
 """
-function split_str_into_host_and_port(str::AbstractString)::Tuple{String, Int}
+function split_str_into_host_and_port(str::AbstractString)
 	spl_str = split(str, ":")
     isempty(spl_str) && error("IP address string is empty!")
-	host = spl_str[1]
-	if length(spl_str) == 1
-		port = 0
-	else
-		port = parse(Int, spl_str[2])
-	end
-	return (host, port)
+    host = spl_str[1]
+    if length(spl_str) == 1
+        port = 0
+    else
+        port = parse(Int, spl_str[2])
+    end
+    return (host, port)
 end

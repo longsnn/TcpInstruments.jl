@@ -105,7 +105,7 @@ end
 Initializes a connection to the instrument at the given (input) IP address.
 
 # Arguments
-- `model`: They device type you are connecting to. Use `help> -->Instrument` to see available options.
+- `model`: They device type you are connecting to. Use `help> Instrument` to see available options.
 - `address::String`: The ip address of the device. Ex. "10.3.30.23"
 
 # Keywords
