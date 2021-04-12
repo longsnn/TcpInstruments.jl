@@ -13,7 +13,7 @@ Control common lab equipment via SCPI over Ethernet and specifically not be depe
 This package is based on code from [GenericInstruments.jl](https://ci.appveyor.com/project/iuliancioarca/GenericInstruments-jl)
 which was again based on [Instruments.jl](https://github.com/BBN-Q/Instruments.jl). 
 
-SCPI is supported on almost all modern pieces of lab equipment but this code has been tested on the following devices:
+SCPI is supported on almost all modern pieces of lab equipment and this code has during development been tested on the following devices:
 - [X] Oscilloscope Keysight DSOX4034A
 - [X] Oscilloscope Keysight DSOX4024A
 - [X] Multimeter Keysight DMM34465A
@@ -23,8 +23,6 @@ SCPI is supported on almost all modern pieces of lab equipment but this code has
 - [X] Power supply Versatile Power 100-10 XR
 - [X] Impedance analyser Agilent 4294A
 
-For more information on every type of instrument as well as
-their available functions and how they work:
 
 <details><summary>Installation</summary>
  
@@ -314,8 +312,10 @@ plot(data)
 
 </details>
 
+## Impedance Analyzers
+TODO: example with the Agilent4294A.
 
-<details><summary>Multiple devices</summary>
+## Multiple devices
  
 Lets say you want to use a signal generator, power supply
 and oscilloscope all at once.
@@ -324,10 +324,10 @@ using TcpInstruments
 using Plots; plotly()
 
 scope = initialize(AgilentDSOX4034A)
-pwr = initialize(VersatilePower)
-sg = initialize(Keysight33612A)
+pwr   = initialize(VersatilePower)
+sg    = initialize(Keysight33612A)
 
-set_mode_cw(wave)
+set_mode_cw(sg)
 set_function(sg, "SIN")
 set_frequency(sg, 1000u"Hz")
 set_amplitude(sg, 0.1u"A")
@@ -338,10 +338,7 @@ set_voltage(pwr, 20u"V")
 set_current_limit(pwr, 4u"A")
 enable_output(pwr)
 
-chan1, chan2 = get_data(scope, [1,2])
-plot(chan1)
+data_array = get_data(scope, [1,2])
+plot(data_array)
 ```
 
-For more examples of how to use different devices look in the
-test folder
-</details>
