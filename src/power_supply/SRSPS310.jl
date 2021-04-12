@@ -63,13 +63,14 @@ get_output(obj::Instr{SRSPS310}) = query(obj, "*STB? 7") == "1" ? true : false
 
 
 """
-    set_voltage(obj::Instr{SRSPS310}, volt::Voltage; [delta_volt::Voltage, delta_time::Time])
+    set_voltage(obj::Instr{SRSPS310}, volt::Voltage; [delta_volt::Voltage, delta_time::Time, verbose::Bool])
 
 Sets the output voltage output of a SRSPS310 power supply.
 optional parameters:
 delta_volt and delta_time can be used to set the ramping speed when setting a new voltage.
-- delta_volt sets how big each voltage step should be.  (standard value: `Inf *u"V"`)
-- delta_time sets the time between each voltage update. (standard value: `100u"ms"`)
+- delta_volt sets the maximum of each voltage step.  (std value: `Inf *u"V"`)
+- delta_time sets the minimum time between each voltage update. (std value: `100u"ms"`)
+- verbose when true prints info on ramping speed and steps (std value: `false`)
 
 Units are handled by the package `Unitful`.
 
@@ -80,28 +81,32 @@ Examples:
 julia> psu_h = initialize(SRSPS310)
 julia> set_voltage(psu_h, 11.1u"V")
 julia> set_voltage(psu_h, 1100"mV")
-julia> set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms")
+julia> set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms", verbose=true)
 ```
 
 Returns: `Nothing`
 """
-function set_voltage(obj::Instr{SRSPS310}, volt::Voltage; delta_volt::Voltage=Inf*u"V", delta_time::Time=100u"ms")
+function set_voltage(obj::Instr{SRSPS310}, v_end::Voltage; delta_volt::Voltage=Inf*u"V", delta_time::Time=100u"ms", verbose::Bool=false)
     if delta_volt == Inf*u"V"
-        _set_voltage(obj, v)
-    else
+        _set_voltage(obj, v_end)
+    else # TODO: Fix for negative ramps
         v_start = get_voltage(obj)
-        v_end   = volt
-        v_steps = v_start:delta_volt:v_end
+        v_diff = v_end - v_start
+        nsteps = ceil(v_diff/delta_volt)
+        v_step = v_diff / nsteps
+        v_arr  = v_start+v_step:v_step:v_end
+        ramp_time = (length(v_arr)-1)*delta_time
+        dv_dt = uconvert(V/s, v_diff/ramp_time)
 
-        for v in v_steps
-            _set_voltage(obj, v)
-            sleep(raw(delta_time))
-            _set_voltage(obj, v)
+        if verbose
+            println("dV/dt: $(dv_dt), Ramping time: $(ramp_time), Voltage steps: $(length(v_arr)).")
         end
 
-        if v_steps[end] != voltage
-            sleep(raw(delta_time))
+        for (idx, v) in enumerate(v_arr)
             _set_voltage(obj, v)
+            if idx != length(v_arr)
+                sleep(raw(delta_time))
+            end
         end
     end
     return nothing
@@ -140,7 +145,7 @@ Returns:
 set_voltage_limit(obj::Instr{SRSPS310}, num::Voltage) = write(obj, "VLIM$(raw(num))")
 
 """
-    get_voltage_limit(obj::Instr{SRSPS310}) 
+    get_voltage_limit(obj::Instr{SRSPS310})
 
 This will return the voltage limit of a device
 
