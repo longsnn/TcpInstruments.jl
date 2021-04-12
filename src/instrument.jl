@@ -6,7 +6,7 @@ An instrument is a generic device with which you can take and read measurements
 All instruments can be initialized and terminated. For more
 information on how to connect to a supported instrument:
 ```
-help>initialize
+help> initialize
 ```
 
 You can use the help feature on any supported instrument group.
@@ -15,8 +15,8 @@ For more information on the actual instruments you can initialize use julia's he
 
 For example lets say you want to learn about oscilloscopes.
 ```
-julia>?
-help>Oscilloscope
+julia> ?
+help> Oscilloscope
 
   Supported Instruments:
   ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
@@ -27,7 +27,7 @@ help>Oscilloscope
 Pick one of the supported instruments for more information on
 how to use it and for all its available functions:
 ```
-help>AgilentDSOX4034A
+help> AgilentDSOX4034A
 ```
 
 
