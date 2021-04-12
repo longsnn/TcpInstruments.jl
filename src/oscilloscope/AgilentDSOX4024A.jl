@@ -32,24 +32,24 @@ Plot waves from all available channels
 ```
 > using Plots
 > data_array = get_data(scope_h)
-> plot(data_struct)
+> plot(data_array)
 ```
 
 Low Pass Filter
 Turn on Low Pass Filter 25
 ```
-> lpf_on(scope)
+> lpf_on(scope_h)
 ```
 
 Check if low pass filter is on
 ```
-> get_lpf_state(scope) == "1"
+> get_lpf_state(scope_h) == "1"
 ```
 
 Turn on Low Pass Filter 25MHz
 ```
 > lpf_off(scope)
-> get_lpf_state(scope) == "0"
+> get_lpf_state(scope_h) == "0"
 ```
 
 Impedance
