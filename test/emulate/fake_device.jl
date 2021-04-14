@@ -2,12 +2,12 @@ using Sockets
 import Base.Threads.@spawn
 
 println(PROGRAM_FILE)
-println("Orchid Emulator")
+println("Instruments Emulator")
 port = 8080
 println("port: ", port)
 server = listen(port)
 
-tcp(msg) = printstyled("[ TCP: " * msg * "\n", color = :blue, bold = true) 
+tcp(msg) = printstyled("[ TCP: " * msg * "\n", color = :blue, bold = true)
 
 kill = false
 function close_emulator()
