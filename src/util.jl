@@ -8,14 +8,13 @@ const R = u"Ω"
 const V = u"V"
 const A = u"A"
 const Hz = u"Hz"
-const s = u"s"
 
 using Unitful: Current, Voltage, Frequency, Time
 
 raw(a::Current)   = Float64(ustrip(uconvert(A, a)))
 raw(a::Voltage)   = Float64(ustrip(uconvert(V, a)))
 raw(a::Frequency) = Float64(ustrip(uconvert(Hz, a)))
-raw(a::Time)      = Float64(ustrip(uconvert(s, a)))
+raw(a::Time)      = Float64(ustrip(uconvert(u"s", a)))
 
 function elapsed_time(start_time)
     seconds = floor(time() - start_time)
