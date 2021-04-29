@@ -6,14 +6,10 @@ http://literature.cdn.keysight.com/litweb/pdf/04294-90061.pdf
 - [`get_impedance`](@ref)
 - [`get_bandwidth`](@ref)
 - [`set_bandwidth`](@ref)
-- [`get_frequency_limits`](@ref)
-- [`set_frequency_limits`](@ref)
-- [`get_num_data_points`](@ref)
-- [`set_num_data_points`](@ref)
-- [`get_volt_dc`](@ref)
-- [`set_volt_dc`](@ref)
 - [`get_volt_ac`](@ref)
 - [`set_volt_ac`](@ref)
+- [`get_channel`](@ref)
+- [`set_channel`](@ref)
 """
 struct Agilent4294A <: ImpedanceAnalyzer end
 
