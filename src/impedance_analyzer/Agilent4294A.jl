@@ -62,6 +62,12 @@ get_volt_ac(i::Instr{Agilent4294A}) = f_query(i, "POWE?") * V
 """
 set_volt_ac(i::Instr{Agilent4294A}, n::Voltage) = write(i, "POWE $(raw(n))"*"V")
 
+
+"""
+    get_impedance(Instr{Agilent4294A})
+Gets the impedance from the impedance analyser. This function doesn't change any settings on
+the device, it only grabs data using the current settings.
+"""
 function get_impedance(obj::Instr{Agilent4294A})
     data = query(obj, "OUTPDTRC?"; timeout=20)
     data = split(data, ',')
@@ -101,9 +107,17 @@ end
     end
 end
 
+"""
+    get_channel(i::Instr{Agilent4294A})
+Returns which channel is currently active, either 1 or 2.
 
+"""
 get_channel(i::Instr{Agilent4294A}) = query(i, "TRAC?") == "A" ? 1 : 2
 
+"""
+    set_channel(i::Instr{Agilent4294A}, n::Int)
+Sets which channel the impedance analyser is using. `n` must be 1 or 2.
+"""
 function set_channel(i::Instr{Agilent4294A}, n::Int)
     !(n in [1,2]) && error("Channel cannot be: $n (must be 1 or 2)")
     n == 1 ? write(i, "TRAC A") :  write(i, "TRAC B")
