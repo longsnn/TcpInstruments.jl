@@ -63,7 +63,7 @@ get_volt_ac(i::Instr{Agilent4294A}) = f_query(i, "POWE?") * V
 set_volt_ac(i::Instr{Agilent4294A}, n::Voltage) = write(i, "POWE $(raw(n))"*"V")
 
 function get_impedance(obj::Instr{Agilent4294A})
-    data = query(obj, "OUTPDTRC?"; timeout=3)
+    data = query(obj, "OUTPDTRC?"; timeout=20)
     data = split(data, ',')
     arr = Array{Complex, 1}()
     get_f(i) = parse(Float64, data[i])
