@@ -264,12 +264,12 @@ function get_data(
     instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
     inbounds=false, scope_stats=false
 )
-    if ch_vec == nothing || !inbounds
+    if ch_vec === nothing || !inbounds
         statuses = asyncmap(x->(x, status(instr, x)), 1:4)
         filter!(x -> x[2], statuses)
         valid_channels = map(x -> x[begin], statuses)
     end
-    if ch_vec == nothing
+    if ch_vec === nothing
         ch_vec = valid_channels
         !inbounds && @info "Loading channels: $ch_vec"
     else
