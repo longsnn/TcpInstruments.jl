@@ -13,7 +13,7 @@ function elapsed_time(func, start_time)
 end
 
 """
-    scan_network(; ip_network="10.1.30.", ip_range=1:255, v=false)
+    scan_network(; ip_network="10.1.30.", ip_range=1:255)
 Will scan your network and report all found devices.
 
 By default it only searches for devices connected on port: 5025
@@ -21,19 +21,30 @@ By default it only searches for devices connected on port: 5025
 If you would like to search for devices on a different port set the
 v flag to true.
 """
-function scan_network(; ip_network="10.1.30.", ip_range=1:255, v=false)
+function scan_network(; ip_network="10.1.30.", ip_range=1:255)
+    ip_network = ensure_ending_dot(ip_network)
+
     @info "Scanning $ip_network$(ip_range[1])-$(ip_range[end])"
-    ips = asyncmap(
-        x->connect_to_scpy(x; v=v),
+    # Scan for SCPI devices
+    ips1 = asyncmap(
+        x->_get_info_from_ip(x),
         [ip_network*"$ip" for ip in ip_range]
     )
+    # Scan for Prologix device
+    ips2 = asyncmap(
+        x->_get_info_from_ip(x; port=1234),
+        [ip_network*"$ip" for ip in ip_range]
+    )
+    println(typeof(ips2))
+    ips_tot = [ips1 ips2]
+    println(typeof(ips_tot))
     return [s for s in ips if !isempty(s)]
 end
+ensure_ending_dot(ip_network) = ip_network[end] != '.' ? ip_network*'.' : ip_network
 
-function connect_to_scpy(ip_str; v=false)
-    scpy_port = 5025
-    temp_ip = ip_str * ":$scpy_port"
-    proc = @spawn temp_ip => info(initialize(Instrument, temp_ip))
+function _get_info_from_ip(ip_str; port = 5025)
+    temp_ip = ip_str * ":$port"
+    proc = @spawn temp_ip => _get_instr_info_and_close(temp_ip)
     sleep(2)
     if proc.state == :runnable
         schedule(proc, ErrorException("Timed out"), error=true)
@@ -46,6 +57,13 @@ function connect_to_scpy(ip_str; v=false)
     else
         error("Undefined $(proc.state)")
     end
+end
+
+function _get_instr_info_and_close(ip)
+    instr = initialize(Instrument, ip)
+    info_str = info(instr)
+    close(instr)
+    return info_str
 end
 
 udef(func) =  error("$(func) not implemented")
@@ -62,7 +80,7 @@ macro codeLocation()
                    end
                end
                println("Running function ", $("$(__module__)"),".$(myf) at ",$("$(__source__.file)"),":",$("$(__source__.line)"))
-               
+
                myf
            end
        end
