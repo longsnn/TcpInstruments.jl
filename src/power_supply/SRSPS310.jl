@@ -1,5 +1,6 @@
 """
-GPIB Enabled Device. Requires an attached Prologix Controller
+    SRSPS310
+    GPIB Enabled Device. Requires an attached Prologix Controller
 to work.
 
 
@@ -110,7 +111,7 @@ Returns:
 get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") # VLIM?
 
 """
-This will change the current limit of a device 
+This will change the current limit of a device
 
 MIN Value: 0
 Max Value: { 2.1e-3 | 0.021 } (21mA)
@@ -135,7 +136,7 @@ Returns:
 """
 get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?")
 
-function scan_prologix(obj::Instr{SRSPS310}) 
+function scan_prologix(obj::Instr{SRSPS310})
     devices = Dict()
     for i in 0:15
         write(obj, "++addr $i")
@@ -145,5 +146,5 @@ function scan_prologix(obj::Instr{SRSPS310})
 
         end
     end
-    devices
+    return devices
 end
