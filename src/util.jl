@@ -52,19 +52,40 @@ function _get_info_from_ip(ip_str; port = 5025)
     elseif proc.state == :done
         return fetch(proc)
     elseif proc.state == :failed
-        v && return ip_str * ":????"
         return ""
     else
-        error("Undefined $(proc.state)")
+        error("Uncaught state: $(proc.state)")
     end
 end
 
 function _get_instr_info_and_close(ip)
-    instr = initialize(Instrument, ip)
-    info_str = info(instr)
-    close(instr)
+    obj = initialize(Instrument, ip)
+    info_str = info(obj)
+    close(obj)
     return info_str
 end
+
+"""
+    scan_prologix(ip::AbstractString)
+    Scans all GPIB addresses on a prologix device having the ip-address `ip`.
+"""
+function scan_prologix(ip::AbstractString)
+    devices = Dict()
+    prologix_port = ":1234"
+    full_ip = ip * prologix_port
+    obj = initialize(Instrument, ip)
+
+    for i in 0:15
+        write(obj, "++addr $i")
+        try
+            devices[i] = query(obj, "*IDN?"; timeout=0.5)
+        catch
+
+        end
+    end
+    return devices
+end
+
 
 udef(func) =  error("$(func) not implemented")
 
@@ -81,7 +102,7 @@ macro codeLocation()
                end
                println("Running function ", $("$(__module__)"),".$(myf) at ",$("$(__source__.file)"),":",$("$(__source__.line)"))
 
-               myf
+               return myf
            end
        end
 
