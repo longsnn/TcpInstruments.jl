@@ -1,4 +1,5 @@
 import InstrumentConfig: initialize, terminate
+import Base: close
 """
 An instrument is a generic device with which you can take and read measurements
 
@@ -58,7 +59,7 @@ abstract type MultiMeter <: Instrument end
 # Supported Instruments
 - `AgilentE36312A`
 - `VersatilePower`
-- `PS310`
+- `SRSPS310`
 """
 abstract type PowerSupply <: Instrument end
 
@@ -107,7 +108,7 @@ Initializes a connection to the instrument at the given (input) IP address.
 - `address::String`: The ip address of the device. Ex. "10.3.30.23"
 
 # Keywords
-- `GPIB_ID::Int`: The GPIB interface ID of your device. This is optional and doesn't need to be set unless you are using a prologix controller to control it remotely. 
+- `GPIB_ID::Int`: The GPIB interface ID of your device. This is optional and doesn't need to be set unless you are using a prologix controller to control it remotely.
 """
 function initialize(model::Type{T}, address; GPIB_ID=-1) where T <: Instrument
     instr_h = CreateTcpInstr(model, address)
@@ -132,7 +133,7 @@ function initialize(model::Type{T}) where T <: Instrument
         Otherwise please add it to your config file or
         specify an ip address:
         `initialize($(string(model)), "10.1.30.XX")`
-        
+
         """
     end
     if data isa String
@@ -158,6 +159,14 @@ function terminate(instr::Instrument)
     local_mode(instr)
 end
 
+"""
+    close(instr)
+
+Closes the TCP connection.
+The exact same as terminate(instr)
+"""
+close(instr::Instrument) = terminate(instr)
+
 reset(obj) = write(obj, "*RST")
 
 remote_mode(obj)   = nothing
@@ -169,4 +178,3 @@ get_prologix_chan(obj) = query(obj, "++addr")
 Asks an instrument to print model number and other device info.
 """
 info(obj) = query(obj, "*IDN?")
-
