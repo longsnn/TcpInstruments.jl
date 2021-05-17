@@ -42,21 +42,12 @@ disable_output(obj::Instr{Keysight33612A}; chan=1) =
 get_output(obj::Instr{Keysight33612A}; chan=1) =
     write(obj, "OUTPUT$chan?")
 
-get_voltage_offset(obj::Instr{Keysight33612A}; chan=1) =
-    f_query(obj, "SOURCE$chan:VOLTAGE:OFFSET?")
-set_voltage_offset(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOURCE$chan:VOLTAGE:OFFSET $num")
+set_voltage_offset(obj::Instr{Keysight33612A}, num; chan=1) = write(obj, "SOURCE$chan:VOLTAGE:OFFSET $(Float64(num))")
 
-get_amplitude(obj::Instr{Keysight33612A}; chan=1) =
-    f_query(obj, "SOURCE$chan:VOLTAGE?")
-set_amplitude(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOURCE$chan:VOLTAGE $num")
+set_amplitude(obj::Instr{Keysight33612A}, num; chan=1) = write(obj, "SOURCE$chan:VOLTAGE $(Float64(num))")
 
 
-get_frequency(obj::Instr{Keysight33612A}; chan=1) =
-    f_query(obj, "SOURCE$chan:FREQUENCY?") # +4.0E+05
-set_frequency(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOURCE$chan:FREQUENCY $num") # +4.0E+05
+set_frequency(obj::Instr{Keysight33612A}, num; chan=1) = write(obj, "SOURCE$chan:FREQUENCY $(Float64(num))") # +4.0E+05
 
 """
     get_function(instr)
@@ -194,8 +185,7 @@ Sets the number of cycles for burst mode
 # Keywords
 - `chan`: Specify channel: Default is 1
 """
-set_burst_num_cycles(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOURCE$chan:BURST:NCYCLES $num")
+set_burst_num_cycles(obj::Instr{Keysight33612A}, num; chan=1) = write(obj, "SOURCE$chan:BURST:NCYCLES $(Float64(num))")
 
 """
     set_burst_period(obj, num; chan=1)
@@ -205,8 +195,7 @@ set_burst_num_cycles(obj::Instr{Keysight33612A}, num; chan=1) =
 # Keywords
 - `chan`: Specify channel: Default is 1
 """
-set_burst_period(obj, num; chan=1) =
-    write(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD $num")
+set_burst_period(obj, num; chan::Integer=1) = write(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD $(Float64(num))")
 
 """
     get_burst_period(instr)

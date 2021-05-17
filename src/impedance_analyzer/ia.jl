@@ -42,8 +42,7 @@ get_volt_dc(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
     set_volt_dc(instr, volts)
 
 """
-set_volt_dc(obj::Instr{T}, num) where (T <: ImpedanceAnalyzer) =
-    write(obj, "DCV $num")
+set_volt_dc(obj::Instr{T}, num) where (T <: ImpedanceAnalyzer) = write(obj, "DCV $(Float64(num))")
 
 """
     get_volt_limit_dc(instr)

@@ -74,7 +74,7 @@ function psu_chan(obj, num, cmd; float=false)
         else
             ans = query(obj, cmd)
         end
-    else 
+    else
         write(obj, cmd)
     end
     num != 0 && set_channel(obj, original_chan)
@@ -140,7 +140,7 @@ Supported Instruments:
 Returns:
   String: {"0"|"1"}
 """
-function get_output(obj::Instr{AgilentE36312A}) 
+function get_output(obj::Instr{AgilentE36312A})
     output = query(obj, ":OUTPUT:STATE?")
     if output == "0"
         return false
@@ -173,7 +173,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE $num")
+set_voltage(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE $(Float64(num))")
 
 """
 This will return the voltage of a device's channel.
@@ -197,7 +197,7 @@ Returns:
 get_voltage(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE?"; float=true)
 
 """
-This will change the current limit of a device on a given 
+This will change the current limit of a device on a given
 channel
 
 
@@ -218,7 +218,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURCE:CURRENT $num")
+set_current_limit(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURCE:CURRENT $(Float64(num))")
 
 """
 This will return the current limit of a device.

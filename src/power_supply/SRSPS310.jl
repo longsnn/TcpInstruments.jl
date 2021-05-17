@@ -66,7 +66,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage(obj::Instr{SRSPS310}, num) = write(obj, "VSET$num")
+set_voltage(obj::Instr{SRSPS310}, num) = write(obj, "VSET$(Float64(num))")
 
 """
 This will return the voltage of a device
@@ -94,7 +94,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage_limit(obj::Instr{SRSPS310}, num) = write(obj, "VLIM$num")
+set_voltage_limit(obj::Instr{SRSPS310}, num) = write(obj, "VLIM$(Float64(num))")
 
 """
 This will return the voltage limit of a device
@@ -121,7 +121,7 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{SRSPS310}, num) = write(obj, "ILIM$num")
+set_current_limit(obj::Instr{SRSPS310}, num) = write(obj, "ILIM$(Float64(num))")
 
 """
 This will return the current limit of a device.
