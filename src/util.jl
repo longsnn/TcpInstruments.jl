@@ -26,32 +26,35 @@ function scan_network(; ip_network="10.1.30.", ip_range=1:255)
 
     @info "Scanning $ip_network$(ip_range[1])-$(ip_range[end])"
     # Scan for SCPI devices
-    ips1 = asyncmap(
+    ips_scpi = asyncmap(
         x->_get_info_from_ip(x),
         [ip_network*"$ip" for ip in ip_range]
     )
     # Scan for Prologix device
-    ips2 = asyncmap(
+    ips_prlx = asyncmap(
         x->_get_info_from_ip(x; port=1234),
         [ip_network*"$ip" for ip in ip_range]
     )
-    println(typeof(ips2))
-    ips_tot = [ips1 ips2]
-    println(typeof(ips_tot))
-    return [s for s in ips if !isempty(s)]
+    ips_all = vcat(ips_scpi, ips_prlx)
+    print("\n")
+    return [ip for ip in ips_all if !isempty(ip)]
 end
 ensure_ending_dot(ip_network) = ip_network[end] != '.' ? ip_network*'.' : ip_network
 
 function _get_info_from_ip(ip_str; port = 5025)
     temp_ip = ip_str * ":$port"
+    print(".")
     proc = @spawn temp_ip => _get_instr_info_and_close(temp_ip)
     sleep(2)
     if proc.state == :runnable
+        print("t")
         schedule(proc, ErrorException("Timed out"), error=true)
         return ""
     elseif proc.state == :done
+        print("o")
         return fetch(proc)
     elseif proc.state == :failed
+        print("x")
         return ""
     else
         error("Uncaught state: $(proc.state)")
