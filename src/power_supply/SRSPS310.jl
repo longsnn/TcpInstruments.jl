@@ -46,7 +46,7 @@ disable_output(obj::Instr{SRSPS310}) = write(obj, "HVOF")
 
 """
     get_output(obj::Instr{SRSPS310})
-This will get and return the output from a device.
+This will get and return whether the output from SRSPS310 is enabled.
 
 Arguments:
     - obj
