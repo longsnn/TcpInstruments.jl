@@ -48,13 +48,10 @@ set_volt_dc(obj::Instr{T}, num) where (T <: ImpedanceAnalyzer) = write(obj, "DCV
     get_volt_limit_dc(instr)
 
 """
-get_volt_limit_dc(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
-    f_query(obj, "MAXDCV?")
+get_volt_limit_dc(obj::Instr{T}) where (T <: ImpedanceAnalyzer) = f_query(obj, "MAXDCV?")
 
 """
     set_volt_limit_dc(instr, volt_limit)
 
 """
-set_volt_limit_dc(obj::Instr{T}, v) where (T <: ImpedanceAnalyzer) =
-    write(obj, "MAXDCV $v")
-
+set_volt_limit_dc(obj::Instr{T}, v) where (T <: ImpedanceAnalyzer) = write(obj, "MAXDCV $v")
