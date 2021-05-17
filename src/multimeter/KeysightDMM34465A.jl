@@ -15,8 +15,10 @@ struct KeysightDMM34465A <: MultiMeter end
 
 Perform take a measurement with the probe mode set to thermocouple
 """
-get_tc_temperature(obj::Instr{KeysightDMM34465A}) =
-    f_query(obj, "MEASURE:TEMPERATURE? TC"; timeout=0)
+function get_tc_temperature(obj::Instr{KeysightDMM34465A})
+    units = get_temp_unit(obj)
+    return f_query(obj, "MEASURE:TEMPERATURE? TC"; timeout=0) * units
+end
 
 """
     set_tc_type(multimeter; type="K")
@@ -25,7 +27,9 @@ get_tc_temperature(obj::Instr{KeysightDMM34465A}) =
 - `type`: Can be E, J, K, N, R, T (Defaults to K)
 """
 function set_tc_type(obj::Instr{KeysightDMM34465A}; type="K")
-    @assert string(type) in ["E", "J", "K", "N", "R", "T"]
+    if !(string(type) in ["E", "J", "K", "N", "R", "T"])
+        error("$type must be one of [E, J, K, N, R, T]")
+    end
     write(obj, "CONFIGURE:TEMPERATURE TC,$type")
 end
 
@@ -37,12 +41,14 @@ Returns voltage
 
 """
 function get_voltage(obj::Instr{KeysightDMM34465A}; type="DC")
-    @assert type in ["AC","DC"] "$type not valid!\nMust be AC or DC"
-    f_query(obj, "MEASURE:VOLTAGE:$type?"; timeout=0)
+    !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
+    f_query(obj, "MEASURE:VOLTAGE:$type?"; timeout=0) * V
 end
 
 
 """
+    get_current(obj::Instr{KeysightDMM34465A}; type="DC")
+
 Returns current
 
 # Keywords
@@ -50,8 +56,8 @@ Returns current
 
 """
 function get_current(obj::Instr{KeysightDMM34465A}; type="DC")
-    @assert type in ["AC","DC"] "$type not valid!\nMust be AC or DC"
-    f_query(obj, "MEASURE:CURRENT:$type?"; timeout=0)
+    !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
+    f_query(obj, "MEASURE:CURRENT:$type?"; timeout=0) * A
 end
 
 """
@@ -65,9 +71,9 @@ Returns resistance
 """
 function get_resistance(obj::Instr{KeysightDMM34465A}; wire)
     if wire == 2
-        f_query(obj, "MEASURE:RESISTANCE?"; timeout=0)
+        f_query(obj, "MEASURE:RESISTANCE?"; timeout=0) * R
     elseif wire == 4
-        f_query(obj, "MEASURE:FRESISTANCE?"; timeout=0)
+        f_query(obj, "MEASURE:FRESISTANCE?"; timeout=0) * R
     else
         error("wire flag must be 2 or 4 not $wire")
     end
@@ -102,11 +108,22 @@ set_temp_unit_kelvin(obj::Instr{KeysightDMM34465A}) =
 
 Returns C, F or K depending on the set temperature unit
 """
-get_temp_unit(obj::Instr{KeysightDMM34465A}) =
-    query(obj, "UNIT:TEMPERATURE?")
+function get_temp_unit(obj::Instr{KeysightDMM34465A})
+   units = query(obj, "UNIT:TEMPERATURE?")
+   return if units == "C"
+       u"C"
+   elseif units == "F"
+       u"F"
+   elseif units == "K"
+       u"K"
+   else
+       error("Expected [C, F, K]. Got: $units")
+   end
+end
 
 
 """
+    get_channel(obj::Instr{KeysightDMM34465A})
 Indicates which input terminals are selected on the front panel
 Front/Rear switch. This switch is not programmable; this query reports
 the position of the switch, but cannot change it.

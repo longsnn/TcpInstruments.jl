@@ -89,13 +89,13 @@ end
         @test get_current_limit(p) == cur
     end
 
-    test_current(0.001)
-    test_current(0.002)
-    test_current(0.005)
-    test_current(0.010)
-    test_current(0.020)
-    test_current(0.021)
+    test_current(0.001A)
+    test_current(0.002A)
+    test_current(0.005A)
+    test_current(0.010A)
+    test_current(0.020A)
+    test_current(0.021A)
 
-    test_current(0.000)
+    test_current(0.000A)
 
 end

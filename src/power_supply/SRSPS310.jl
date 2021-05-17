@@ -19,6 +19,8 @@ struct SRSPS310 <: PowerSupply end
 
 
 """
+    enable_output(obj::Instr{SRSPS310})
+
 This will enable an output on a device.
 
 Arguments:
@@ -30,6 +32,8 @@ Supported Instruments:
 enable_output(obj::Instr{SRSPS310}) = write(obj, "HVON")
 
 """
+    disable_output(obj::Instr{SRSPS310})
+
 This will disable an output on a device.
 
 Arguments:
@@ -41,34 +45,77 @@ Supported Instruments:
 disable_output(obj::Instr{SRSPS310}) = write(obj, "HVOF")
 
 """
+    get_output(obj::Instr{SRSPS310})
 This will get and return the output from a device.
 
 Arguments:
-  - obj
+    - obj
     - must be a Power Supply Instrument
 Supported Instruments:
-   - Power supply
+    - Power supply
 
 # Returns
-- true if High Voltage Output is Off
-- false if High Voltage Output is On
+- true if High Voltage Output is Off (<- check if this should state `On`)
+- false if High Voltage Output is On (<- check if this should state `Off`)
 """
 get_output(obj::Instr{SRSPS310}) = query(obj, "*STB? 7") == "1" ? true : false
 
-"""
-This will change the voltage output of a device.
-
-To see the (adjustable) voltage limit the the function `get_voltage_limit(instr)`
-
-Supported Instruments:
-   - Power supply
-
-Returns:
-  Nothing
-"""
-set_voltage(obj::Instr{SRSPS310}, num) = write(obj, "VSET$(Float64(num))")
 
 """
+    set_voltage(obj::Instr{SRSPS310}, volt::Voltage; [delta_volt::Voltage, delta_time::Time, verbose::Bool])
+
+Sets the output voltage output of a SRSPS310 power supply.
+optional parameters:
+delta_volt and delta_time can be used to set the ramping speed when setting a new voltage.
+- delta_volt sets the maximum of each voltage step.  (std value: `Inf *u"V"`)
+- delta_time sets the minimum time between each voltage update. (std value: `100u"ms"`)
+- verbose when true prints info on ramping speed and steps (std value: `false`)
+
+Units are handled by the package `Unitful`.
+
+Currently set voltage limits can read using `get_voltage_limit()`.
+
+Examples:
+```
+julia> psu_h = initialize(SRSPS310)
+julia> set_voltage(psu_h, 11.1u"V")
+julia> set_voltage(psu_h, 1100"mV")
+julia> set_voltage(psu_h, 100"V", delta_volt = 2u"V", delta_time=100u"ms", verbose=true)
+```
+
+Returns: `Nothing`
+"""
+function set_voltage(obj::Instr{SRSPS310}, v_end::Voltage; delta_volt::Voltage=Inf*u"V", delta_time::Time=100u"ms", verbose::Bool=false)
+    if delta_volt == Inf*u"V"
+        _set_voltage(obj, v_end)
+    else # TODO: Fix for negative ramps
+        v_start = get_voltage(obj)
+        v_diff = v_end - v_start
+        nsteps = ceil(v_diff/delta_volt)
+        v_step = v_diff / nsteps
+        v_arr  = v_start+v_step:v_step:v_end
+        ramp_time = (length(v_arr)-1)*delta_time
+        dv_dt = uconvert(V/s, v_diff/ramp_time)
+
+        if verbose
+            println("dV/dt: $(dv_dt), Ramping time: $(ramp_time), Voltage steps: $(length(v_arr)).")
+        end
+
+        for (idx, v) in enumerate(v_arr)
+            _set_voltage(obj, v)
+            if idx != length(v_arr)
+                sleep(raw(delta_time))
+            end
+        end
+    end
+    return nothing
+end
+
+_set_voltage(obj::Instr{SRSPS310}, v::Voltage) = write(obj, "VSET$(raw(v))")
+
+"""
+    get_voltage(obj::Instr{SRSPS310})
+
 This will return the voltage of a device
 
 Voltage Limit: 1250V
@@ -79,7 +126,7 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage(obj::Instr{SRSPS310}) = f_query(obj, "VSET?") # VLIM?
+get_voltage(obj::Instr{SRSPS310}) = f_query(obj, "VSET?") * V
 
 """
     set_voltage_limit(::SRSPS310, voltage_limit)
@@ -94,9 +141,11 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage_limit(obj::Instr{SRSPS310}, num) = write(obj, "VLIM$(Float64(num))")
+set_voltage_limit(obj::Instr{SRSPS310}, num::Voltage) = write(obj, "VLIM$(raw(num))")
 
 """
+    get_voltage_limit(obj::Instr{SRSPS310})
+
 This will return the voltage limit of a device
 
 Voltage Limit: 1250V
@@ -107,9 +156,11 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") # VLIM?
+get_voltage_limit(obj::Instr{SRSPS310}) = f_query(obj, "VLIM?") * V
 
 """
+    set_current_limit(obj::Instr{SRSPS310}, num::Current)
+
 This will change the current limit of a device
 
 MIN Value: 0
@@ -121,9 +172,13 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{SRSPS310}, num) = write(obj, "ILIM$(Float64(num))")
+function set_current_limit(obj::Instr{SRSPS310}, num::Current)
+    write(obj, "ILIM$(raw(num))")
+end
 
 """
+    get_current_limit(obj::Instr{SRSPS310})
+
 This will return the current limit of a device.
 
 
@@ -133,17 +188,4 @@ Supported Instruments:
 Returns:
   Current Limit
 """
-get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?")
-
-function scan_prologix(obj::Instr{SRSPS310})
-    devices = Dict()
-    for i in 0:15
-        write(obj, "++addr $i")
-        try
-            devices[i] = query(obj, "*IDN?"; timeout=0.5)
-        catch
-
-        end
-    end
-    return devices
-end
+get_current_limit(obj::Instr{SRSPS310}) = f_query(obj, "ILIM?") * A

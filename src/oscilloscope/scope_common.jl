@@ -21,26 +21,8 @@ end
 
 struct ScopeData
     info::Union{ScopeInfo, Nothing}
-    volt::Array{Float64,1}
-    time::Array{Float64,1}
-end
-
-status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
-
-function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
-    time_unit, scaled_time = autoscale_seconds(data)
-    title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
-    if isempty(label)
-        label = "Channel $(data.info.channel)"
-    else
-        label = label
-    end
-    if xguide == "0"
-        xguide = "Time / " * time_unit
-    else
-        xguide = xguide
-    end
-    return scaled_time, data.volt, title, label, xguide, yguide
+    volt::Vector{typeof(1.0u"V")}
+    time::Vector{typeof(1.0u"s")}
 end
 
 @recipe function plot(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
@@ -65,25 +47,44 @@ end
     end
 end
 
-function autoscale_seconds(data::ScopeData)
-    # temp = filter(x->x != 0, abs.(data.time))
-    # @info "test", temp == data.time
-    # m = min(temp...)
-    unit = "seconds"
-    time_array = data.time
-    m = abs(min(data.time...))
-    if m >= 1
-    elseif m < 1 && m >= 1e-3
-        unit = "ms" # miliseconds
-        time_array = data.time * 1e3
-    elseif m < 1e-3 && m >= 1e-6
-        unit = "μs" # microseconds
-        time_array = data.time * 1e6
-    elseif m < 1e-6 && m >= 1e-9
-        unit = "ns" # nanoseconds
-        time_array = data.time * 1e9
+
+status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
+
+function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
+    time_unit, scaled_time = autoscale_seconds(data.time)
+    title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
+    if isempty(label)
+        label = "Channel $(data.info.channel)"
     else
-        @info "Seconds unit not found"
+        label = label
+    end
+    if xguide == "0"
+        xguide = "Time / " * time_unit
+    else
+        xguide = xguide
+    end
+    return ustrip(scaled_time), ustrip(data.volt), title, label, xguide, yguide
+end
+
+function autoscale_seconds(time_data)
+    unit = "seconds"
+    time_array = time_data
+    m = abs(min(time_data...))
+    m = ustrip(m)
+
+    if m >= 1
+    elseif 1 > m && m >= 1e-3
+        unit = "ms" # miliseconds
+        time_array = ms.(time_data)
+    elseif 1e-3 > m && m >= 1e-6
+        unit = "μs" # microseconds
+        time_array = μs.(time_data)
+    elseif 1e-6 > m && m >= 1e-9
+        unit = "ns" # nanoseconds
+        time_array = ns.(time_data)
+    else
+        unit = "ps" # picoseconds
+        time_array = ps.(time_data)
     end
     return unit, time_array
 end
@@ -178,8 +179,7 @@ function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
 
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
     time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
-    # TODO @info "TIME", wfm_data[1:5]
-    return ScopeData(wfm_info, volt, time)
+    return ScopeData(wfm_info, V .* volt, u"s" .* time)
 end
 
 function scope_speed_mode(instr::Instrument, speed::Integer)
@@ -190,10 +190,10 @@ function scope_speed_mode(instr::Instrument, speed::Integer)
         scope_waveform_mode_16bit(instr)
         scope_waveform_points_mode(instr, 0)
     elseif speed == 5
-        scope_waveform_mode_16bit(instr)
+        scope_waveform_mode_8bit(instr)
         scope_waveform_points_mode(instr, 1)
     elseif speed == 6
-        scope_waveform_mode_16bit(instr)
+        scope_waveform_mode_8bit(instr)
         scope_waveform_points_mode(instr, 0)
     end
 end
@@ -240,7 +240,9 @@ function scope_read_raw_waveform(instr::Instrument)
     num_header_bytes = 2
     #@show header_a_str = read_n_bytes(instr, num_header_bytes)
     header_a_uint8 = read(instr.sock, 2)
-    @assert (header_a_uint8[1] == UInt8('#'))  "The waveform data format is not formated as expected."
+    if !(header_a_uint8[1] == UInt8('#'))
+        error("The waveform data format is not formated as expected.")
+    end
     header_b_length = parse(Int,convert(Char, header_a_uint8[2]))
     header_b_uint8 = read(instr.sock, header_b_length)
     num_waveform_samples = parse(Int,String(convert.(Char,header_b_uint8)))
@@ -262,12 +264,12 @@ function get_data(
     instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
     inbounds=false, scope_stats=false
 )
-    if ch_vec == nothing || !inbounds
+    if ch_vec === nothing || !inbounds
         statuses = asyncmap(x->(x, status(instr, x)), 1:4)
         filter!(x -> x[2], statuses)
         valid_channels = map(x -> x[begin], statuses)
     end
-    if ch_vec == nothing
+    if ch_vec === nothing
         ch_vec = valid_channels
         !inbounds && @info "Loading channels: $ch_vec"
     else
@@ -284,4 +286,24 @@ function get_data(
     wfm_data = [get_data(instr, ch; scope_stats=scope_stats) for ch in ch_vec]
     run(instr)
     return wfm_data
+end
+
+
+function fake_signal(n)
+    fs = 2.0e9;
+    f0 = 10.0e6;
+    dt = 1/fs
+    num_cycles = 10
+    t = (0:(num_cycles*fs/f0-1)) .* dt
+    s = sin.(2*pi*f0.*t)
+
+    if n >= length(s)
+        n_zeros = n-length(s)
+        n_pre  = Int(floor(n_zeros/2))
+        n_post = Int(ceil(n_zeros/2))
+        out = [zeros(n_pre); s; zeros(n_post)]
+    else
+        out = s[1:n]
+    end
+    return out
 end

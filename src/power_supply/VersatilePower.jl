@@ -29,6 +29,8 @@ struct VersatilePower <: PowerSupply end
 
 
 """
+    enable_output(obj::Instr{VersatilePower})
+
 This will enable an output on a device.
 
 Arguments:
@@ -40,6 +42,8 @@ Supported Instruments:
 enable_output(obj::Instr{VersatilePower}) = write(obj, "OUTPUT ON")
 
 """
+    disable_output(obj::Instr{VersatilePower})
+
 This will disable an output on a device.
 
 Arguments:
@@ -52,6 +56,8 @@ disable_output(obj::Instr{VersatilePower}) = write(obj, "OUTPUT OFF")
 
 
 """
+    get_output(obj::Instr{VersatilePower})
+
 This will return the state of an output on a device.
 
 Arguments:
@@ -66,6 +72,8 @@ Returns:
 get_output(obj::Instr{VersatilePower}) = query(obj, "OUTPUT?")
 
 """
+    set_voltage(obj::Instr{VersatilePower}, num::Voltage)
+
 This will change the voltage output of a device.
 
 
@@ -75,9 +83,11 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage(obj::Instr{VersatilePower}, num) = write(obj, "VOLTAGE $(Float64(num))")
+set_voltage(obj::Instr{VersatilePower}, num::Voltage) = write(obj, "VOLTAGE $(raw(num))")
 
 """
+    get_voltage(obj::Instr{VersatilePower})
+
 This will return the voltage of a device
 
 Supported Instruments:
@@ -86,9 +96,11 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage(obj::Instr{VersatilePower}) = query(obj, "VOLTAGE?")
+get_voltage(obj::Instr{VersatilePower}) = f_query(obj, "VOLTAGE?") * V
 
 """
+    set_current_limit(obj::Instr{VersatilePower}, num::Current)
+
 This will change the current limit of a device
 
 Supported Instruments:
@@ -97,9 +109,11 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{VersatilePower}, num) = write(obj, "CURRENT $(Float64(num))")
+set_current_limit(obj::Instr{VersatilePower}, num::Current) = write(obj, "CURRENT $(raw(num))")
 
 """
+    get_current_limit(obj::Instr{VersatilePower})
+
 This will return the current limit of a device.
 
 
@@ -112,6 +126,16 @@ Returns:
 get_current_limit(obj::Instr{VersatilePower}) = query(obj, "CURRENT?")
 
 
+"""
+    remote_mode(obj::Instr{VersatilePower})
+
+Set device to remote mode
+"""
 remote_mode(obj::Instr{VersatilePower}) = write(obj, "SYSTEM:MODE REMOTE")
 
+"""
+    local_mode(obj::Instr{VersatilePower})
+
+Set device to remote mode
+"""
 local_mode(obj::Instr{VersatilePower}) =   write(obj, "SYSTEM:MODE LOCAL")

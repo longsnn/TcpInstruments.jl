@@ -1,7 +1,25 @@
 using TcpInstruments
 using Test
 using TestSetExtensions
+using Unitful
 
+#using Aqua
+#Aqua.test_all(TcpInstruments)
+
+const A = u"A"
+
+
+@testset "Fake Scope" begin
+    f = initialize(TcpInstruments.FakeDSOX4034A)
+
+    data = get_data(f, 1)
+    @test data isa TcpInstruments.ScopeData
+    @test length(data.time) == length(data.volt)
+    @test data.volt[1] isa Unitful.Voltage
+
+    data = get_data(f, [1,2,3,4])
+    @test length(data) == 4
+end
 
 @testset "TcpInstruments.jl" begin
     include("./emulate/test_fake_device.jl")

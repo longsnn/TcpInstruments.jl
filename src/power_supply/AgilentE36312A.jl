@@ -13,6 +13,8 @@
 struct AgilentE36312A <: PowerSupply end
 
 """
+    set_channel(obj::Instr{AgilentE36312A}, chan)
+
 This will set the global channel on a device.
 
 Any commands like set_voltage that affect the
@@ -38,6 +40,8 @@ Returns:
 set_channel(obj::Instr{AgilentE36312A}, chan) = write(obj, "INST:NSEL $chan")
 
 """
+    get_channel(obj::Instr{AgilentE36312A}; v=false)
+
 This will return the global or default channel of a device.
 
 Allows you to see what the global channel is set to at the
@@ -82,6 +86,8 @@ function psu_chan(obj, num, cmd; float=false)
 end
 
 """
+    enable_output(obj::Instr{AgilentE36312A})
+
 This will enable an output on a device.
 
 If the device has multiple channels it will enable the
@@ -101,6 +107,8 @@ Supported Instruments:
 enable_output(obj::Instr{AgilentE36312A}) = write(obj, ":OUTPUT:STATe ON")
 
 """
+    disable_output(obj::Instr{AgilentE36312A})
+
 This will disable an output on a device.
 
 If the device has multiple channels it will disable the
@@ -121,6 +129,8 @@ disable_output(obj::Instr{AgilentE36312A}) = write(obj, ":OUTPUT:STATE OFF")
 
 
 """
+    get_output(obj::Instr{AgilentE36312A})
+
 This will return the state of an output on a device.
 
 If the device has multiple channels is will display the
@@ -152,6 +162,8 @@ function get_output(obj::Instr{AgilentE36312A})
 end
 
 """
+    set_voltage(obj::Instr{AgilentE36312A}, num::Voltage; chan=0)
+
 This will change the voltage output voltage of a device.
 
 
@@ -173,9 +185,11 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_voltage(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE $(Float64(num))")
+set_voltage(obj::Instr{AgilentE36312A}, num::Voltage; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE $(raw(num))")
 
 """
+    get_voltage(obj::Instr{AgilentE36312A}; chan=0)
+
 This will return the voltage of a device's channel.
 
 
@@ -194,9 +208,11 @@ Supported Instruments:
 Returns:
   Voltage
 """
-get_voltage(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE?"; float=true)
+get_voltage(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE?"; float=true) * V
 
 """
+    set_current_limit(obj::Instr{AgilentE36312A}, num::Current; chan=0)
+
 This will change the current limit of a device on a given
 channel
 
@@ -205,7 +221,7 @@ Parameters:
   - obj
     - must be a Power Supply Instrument
   - num
-    - integer or decimal of the desired current limit
+    - Desired current limit of type Unitful Amps: 1.0u"A"
   - chan
     - This is an optional parameter
     - If not provided it will use the default channel (see `set_channel`)
@@ -218,9 +234,11 @@ Supported Instruments:
 Returns:
   Nothing
 """
-set_current_limit(obj::Instr{AgilentE36312A}, num; chan=0) = psu_chan(obj, chan, "SOURCE:CURRENT $(Float64(num))")
+set_current_limit(obj::Instr{AgilentE36312A}, num::Current; chan=0) = psu_chan(obj, chan, "SOURCE:CURRENT $(raw(num))")
 
 """
+    get_current_limit(obj::Instr{AgilentE36312A}; chan=0)
+
 This will return the current limit of a device.
 
 
@@ -239,4 +257,4 @@ Supported Instruments:
 Returns:
   Current Limit
 """
-get_current_limit(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURCE:CURRENT?"; float=false)
+get_current_limit(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURCE:CURRENT?"; float=false) * A

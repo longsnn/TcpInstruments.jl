@@ -3,8 +3,8 @@ using InstrumentConfig
 const EXAMPLE_FILE = "https://raw.githubusercontent.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl/master/.tcp_instruments.yml" 
 
 const tcp_config = InstrumentConfig.Config(
-    ".tcp_instruments.yml"; 
-    example = EXAMPLE_FILE
+    ".tcp_instruments.yml",
+    @__MODULE__
 )
 
 function get_config()

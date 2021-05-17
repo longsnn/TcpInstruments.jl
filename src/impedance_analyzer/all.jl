@@ -5,17 +5,24 @@ include("./Agilent4395A.jl")
     get_frequency_limits(instr)
 
 # Returns
-`Tuple{Float64, Float64}`: (lower_limit, upper_limit)
+`Tuple{Frequency, Frequency}`: (lower_limit, upper_limit)
 """
 get_frequency_limits(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
-    f_query(obj, "STAR?"), f_query(obj, "STOP?")
+    f_query(obj, "STAR?") * u"Hz", f_query(obj, "STOP?") * u"Hz"
 
 """
     set_frequency_limits(instr, lower_limit, upper_limit)
 
 """
-set_frequency_limits(obj::Instr{T}, start, stop) where (T <: ImpedanceAnalyzer) =
+function set_frequency_limits(
+    obj::Instr{T},
+    start::Frequency,
+    stop::Frequency
+) where {T <: ImpedanceAnalyzer}
+    start = raw(start)
+    stop = raw(stop)
     write(obj, "STAR $start; STOP $stop")
+end
 
 """
     set_num_data_points(instr, num_points)
@@ -36,22 +43,11 @@ get_num_data_points(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
 
 """
 get_volt_dc(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
-    f_query(obj, "DCV?")
+    f_query(obj, "DCV?") * V
 
 """
     set_volt_dc(instr, volts)
 
 """
-set_volt_dc(obj::Instr{T}, num) where (T <: ImpedanceAnalyzer) = write(obj, "DCV $(Float64(num))")
-
-"""
-    get_volt_limit_dc(instr)
-
-"""
-get_volt_limit_dc(obj::Instr{T}) where (T <: ImpedanceAnalyzer) = f_query(obj, "MAXDCV?")
-
-"""
-    set_volt_limit_dc(instr, volt_limit)
-
-"""
-set_volt_limit_dc(obj::Instr{T}, v) where (T <: ImpedanceAnalyzer) = write(obj, "MAXDCV $v")
+set_volt_dc(obj::Instr{T}, num::Voltage) where (T <: ImpedanceAnalyzer) =
+    write(obj, "DCV $(raw(num))")

@@ -2,9 +2,9 @@ using TcpInstruments
 using Test
 
 try
-include("./fake_device.jl")
-catch 
-@info "External emulator found"
+    include("./fake_device.jl")
+catch
+    @error "External emulator NOT found"
 end
 
 function test_initialize(type)
@@ -53,9 +53,9 @@ end
     handle = test_initialize(SRSPS310)
     enable_output(handle)
     disable_output(handle)
-    set_current_limit(handle, 1)
-    set_current_limit(handle, 2)
-    set_current_limit(handle, 5)
+    set_current_limit(handle, 1A)
+    set_current_limit(handle, 2A)
+    set_current_limit(handle, 5A)
     terminate(handle)
     @info "Successfully disconnected"
 end

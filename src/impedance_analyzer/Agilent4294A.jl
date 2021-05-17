@@ -3,19 +3,13 @@ http://literature.cdn.keysight.com/litweb/pdf/04294-90061.pdf
 # Available functions
 - `initialize()`
 - `terminate()`
+- [`get_impedance`](@ref)
 - [`get_bandwidth`](@ref)
 - [`set_bandwidth`](@ref)
-- [`get_frequency_limits`](@ref)
-- [`set_frequency_limits`](@ref)
-- [`get_num_data_points`](@ref)
-- [`set_num_data_points`](@ref)
-- [`get_volt_dc`](@ref)
-- [`set_volt_dc`](@ref)
 - [`get_volt_ac`](@ref)
 - [`set_volt_ac`](@ref)
-- [`get_volt_limit_dc`](@ref)
-- [`set_volt_limit_dc`](@ref)
-
+- [`get_channel`](@ref)
+- [`set_channel`](@ref)
 """
 struct Agilent4294A <: ImpedanceAnalyzer end
 
@@ -44,8 +38,8 @@ Sets bandwidth level (1-5)
 # Arguments
 - `n::Int`: Desired bandwidth level (between 1 and 5)
 """
-function set_bandwidth(i::Instr{Agilent4294A}, n) 
-    @assert n in 1:5 "$n must be an int between 1 and 5"
+function set_bandwidth(i::Instr{Agilent4294A}, n)
+    !(n in 1:5) && error("$n must be an int between 1 and 5")
     write(i, "BWFACT $n")
 end
 
@@ -54,7 +48,7 @@ end
 
 Returns oscillator (ac) voltage
 """
-get_volt_ac(i::Instr{Agilent4294A}) = query(i, "POWE?")
+get_volt_ac(i::Instr{Agilent4294A}) = f_query(i, "POWE?") * V
 
 """
     set_volt_ac(instr, voltage)
@@ -62,10 +56,16 @@ get_volt_ac(i::Instr{Agilent4294A}) = query(i, "POWE?")
 # Arguments
 - `voltage`: Desired voltage, range for voltage setting: 5E-3 to 1
 """
-set_volt_ac(i::Instr{Agilent4294A}, n) = write(i, "POWE $n"*"V")
+set_volt_ac(i::Instr{Agilent4294A}, n::Voltage) = write(i, "POWE $(raw(n))"*"V")
 
-function get_impedance(obj::Instr{Agilent4294A}) 
-    data = query(obj, "OUTPDTRC?"; timeout=3)
+
+"""
+    get_impedance(Instr{Agilent4294A})
+Gets the impedance from the impedance analyser. This function doesn't change any settings on
+the device, it only grabs data using the current settings.
+"""
+function get_impedance(obj::Instr{Agilent4294A})
+    data = query(obj, "OUTPDTRC?"; timeout=20)
     data = split(data, ',')
     arr = Array{Complex, 1}()
     get_f(i) = parse(Float64, data[i])
@@ -74,38 +74,47 @@ function get_impedance(obj::Instr{Agilent4294A})
         img_i = i * 2
         push!(arr, get_f(real_i) + get_f(img_i)im)
     end
-    return arr
+    return arr * R
 end
 
-@recipe function f(impedance::Array{Complex, 1}; complex=false)
+
+@recipe function f(impedance::Array{typeof((1.0 + 0im)R), 1}; complex=false)
     title := "Impedance"
     layout := (2, 1)
-    real_label, imag_label = if complex 
-        "Real", "Imaginary" 
+    real_label, imag_label = if complex
+        "Real", "Imaginary"
     else
         "Amplitude", "Phase"
     end
     label := [real_label, imag_label]
-    @series begin 
+    @series begin
         subplot := 1
         label := real_label
         legend := :outertopright
-        real(impedance)
+        return complex ?  real(impedance) : abs.(impedance)
     end
-    @series begin 
+    @series begin
         title := ""
         subplot := 2
         label := imag_label
         legend := :outertopright
         linecolor := :red
-        imag(impedance)
+        return complex ?  imag(impedance) : rad2deg.(angle.(impedance))
     end
 end
 
+"""
+    get_channel(i::Instr{Agilent4294A})
+Returns which channel is currently active, either 1 or 2.
 
+"""
 get_channel(i::Instr{Agilent4294A}) = query(i, "TRAC?") == "A" ? 1 : 2
 
+"""
+    set_channel(i::Instr{Agilent4294A}, n::Int)
+Sets which channel the impedance analyser is using. `n` must be 1 or 2.
+"""
 function set_channel(i::Instr{Agilent4294A}, n::Int)
-    @assert n in [1,2] "Channel cannot be: $n (must be 1 or 2)"
+    !(n in [1,2]) && error("Channel cannot be: $n (must be 1 or 2)")
     n == 1 ? write(i, "TRAC A") :  write(i, "TRAC B")
 end
