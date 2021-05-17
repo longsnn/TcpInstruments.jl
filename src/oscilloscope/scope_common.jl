@@ -149,40 +149,40 @@ set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMP
 - `"FIFT"`: 50Ω
 - `"ONEM"`: 1MΩ
 """
-get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
- 
+get_impedance(instr::Instrument; chan::Integer=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
+
 """
     run(scope)
 Run Oscilloscope
 """
-run(obj::Instr{T}) where T <: Oscilloscope = write(obj, "RUN")   
+run(obj::Instr{T}) where T <: Oscilloscope = write(obj, "RUN")
 """
     stop(scope)
 Stop Oscilloscope
 """
-stop(obj::Instr{T}) where T <: Oscilloscope = write(obj, "STOP") 
+stop(obj::Instr{T}) where T <: Oscilloscope = write(obj, "STOP")
 
 scope_waveform_preamble_get(instr) = query(instr, "WAVEFORM:PREAMBLE?")
 scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
 scope_waveform_source_get(instr) = query(instr, "WAVEFORM:SOURCE?")
 scope_waveform_mode_8bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT BYTE")
 scope_waveform_mode_16bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT WORD")
-scope_waveform_num_points(instr::Instrument, num_points::Int) = write(instr, "WAVEFORM:POINTS $num_points")
+scope_waveform_num_points(instr::Instrument, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
 scope_waveform_num_points(instr::Instrument, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
-scope_waveform_points_mode(instr::Instrument, mode_idx::Int) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
+scope_waveform_points_mode(instr::Instrument, mode_idx::Integer) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
-function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo) 
+function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
     # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
-    
+
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
     time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
     # TODO @info "TIME", wfm_data[1:5]
     return ScopeData(wfm_info, volt, time)
 end
 
-function scope_speed_mode(instr::Instrument, speed::Int)
+function scope_speed_mode(instr::Instrument, speed::Integer)
     if speed == 1
         scope_waveform_mode_16bit(instr)
         scope_waveform_points_mode(instr, 1)
@@ -198,7 +198,7 @@ function scope_speed_mode(instr::Instrument, speed::Int)
     end
 end
 
-function scope_waveform_info_get(instr::Instrument, ch::Int; scope_stats=false)
+function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=false)
     str = scope_waveform_preamble_get(instr)
     # TODO @info "preamble", str
     str_array = split(str, ",")
@@ -218,11 +218,11 @@ function scope_waveform_info_get(instr::Instrument, ch::Int; scope_stats=false)
         low_pass_filter =  get_lpf_state(instr; chan=ch)
     else
         imp = ""
-        coupling = "" 
+        coupling = ""
         low_pass_filter = ""
     end
     return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
-end 
+end
 
 
 function scope_read_binary_data(instr)
@@ -250,12 +250,12 @@ function scope_read_raw_waveform(instr::Instrument)
 end
 
 
-function get_data(instr::Instrument, ch::Int; scope_stats=false)
+function get_data(instr::Instrument, ch::Integer; scope_stats=false)
     scope_waveform_source_set(instr, ch)
     #instrument_empty_buffer(instr)
     wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
     raw_data = scope_read_raw_waveform(instr);
-    return scope_parse_raw_waveform(raw_data, wfm_info) 
+    return scope_parse_raw_waveform(raw_data, wfm_info)
 end
 
 function get_data(
