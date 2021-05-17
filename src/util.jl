@@ -16,10 +16,9 @@ end
     scan_network(; ip_network="10.1.30.", ip_range=1:255)
 Will scan your network and report all found devices.
 
-By default it only searches for devices connected on port: 5025
-
-If you would like to search for devices on a different port set the
-v flag to true.
+By searches for devices connected on port:
+    - 5025 (scpi)
+    - 1234 (prologix)
 """
 function scan_network(; ip_network="10.1.30.", ip_range=1:255)
     ip_network = ensure_ending_dot(ip_network)
