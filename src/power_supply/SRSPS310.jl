@@ -1,7 +1,6 @@
 """
     SRSPS310
-    GPIB Enabled Device. Requires an attached Prologix Controller
-to work.
+    GPIB Enabled Device. Requires an attached Prologix Controller to work.
 
 
 # Available functions
@@ -42,7 +41,7 @@ Supported Instruments:
 disable_output(obj::Instr{SRSPS310}) = write(obj, "HVOF")
 
 """
-This will disable an output on a device.
+This will get and return the output from a device.
 
 Arguments:
   - obj
@@ -59,7 +58,7 @@ get_output(obj::Instr{SRSPS310}) = query(obj, "*STB? 7") == "1" ? true : false
 """
 This will change the voltage output of a device.
 
-Voltage Limit: The value of get_voltage_limit()
+To see the (adjustable) voltage limit the the function `get_voltage_limit(instr)`
 
 Supported Instruments:
    - Power supply
