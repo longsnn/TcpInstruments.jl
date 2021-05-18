@@ -108,18 +108,13 @@ By searches for devices connected on port:
 """
 function scan_network(; network="10.1.30.", host_range=1:255)
     network = ensure_ending_dot(network)
-
     @info "Scanning $network$(host_range[1])-$(host_range[end])"
+
     # Scan for SCPI devices
-    ips_scpi = asyncmap(
-        x->_get_info_from_ip(x),
-        [network*"$ip" for ip in host_range]
-    )
+    ips_scpi = asyncmap(x-> _get_info_from_ip(x), [network*"$ip" for ip in host_range])
     # Scan for Prologix device
-    ips_prlx = asyncmap(
-        x->_get_info_from_ip(x; port=1234),
-        [network*"$ip" for ip in host_range]
-    )
+    ips_prlx = asyncmap(x-> _get_info_from_ip(x; port=1234), [network*"$ip" for ip in host_range])
+
     ips_all = vcat(ips_scpi, ips_prlx)
     print("\n")
     return [ip for ip in ips_all if !isempty(ip)]
@@ -132,21 +127,24 @@ function _get_info_from_ip(ip_str; port = 5025)
     proc = @spawn temp_ip => _get_instr_info_and_close(temp_ip)
     sleep(2)
     if proc.state == :runnable
-        print("t")
-        schedule(proc, ErrorException("Timed out"), error=true)
+        print("t") # for time out
+        kill_task(proc)
         return ""
     elseif proc.state == :done
-        print("o")
+        printstyled("s"; color = :green) # for success
         return fetch(proc)
     elseif proc.state == :failed
-        print("x")
+        print("f") # for failed
         return ""
     else
         error("Uncaught state: $(proc.state)")
     end
 end
 
+kill_task(proc) = schedule(proc, ErrorException("Timed out"), error=true)
+
 function _get_instr_info_and_close(ip)
+
     obj = initialize(Instrument, ip)
     info_str = info(obj)
     close(obj)
