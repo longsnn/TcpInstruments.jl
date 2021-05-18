@@ -29,7 +29,7 @@ struct VersatilePower <: PowerSupply end
 
 
 """
-    enable_output(obj::Instr{VersatilePower}) 
+    enable_output(obj::Instr{VersatilePower})
 
 This will enable an output on a device.
 
@@ -42,7 +42,7 @@ Supported Instruments:
 enable_output(obj::Instr{VersatilePower}) = write(obj, "OUTPUT ON")
 
 """
-    disable_output(obj::Instr{VersatilePower}) 
+    disable_output(obj::Instr{VersatilePower})
 
 This will disable an output on a device.
 
@@ -72,7 +72,7 @@ Returns:
 get_output(obj::Instr{VersatilePower}) = query(obj, "OUTPUT?")
 
 """
-    set_voltage(obj::Instr{VersatilePower}, num::Voltage) 
+    set_voltage(obj::Instr{VersatilePower}, num::Voltage)
 
 This will change the voltage output of a device.
 
@@ -99,7 +99,7 @@ Returns:
 get_voltage(obj::Instr{VersatilePower}) = f_query(obj, "VOLTAGE?") * V
 
 """
-    set_current_limit(obj::Instr{VersatilePower}, num::Current) 
+    set_current_limit(obj::Instr{VersatilePower}, num::Current)
 
 This will change the current limit of a device
 
@@ -112,7 +112,7 @@ Returns:
 set_current_limit(obj::Instr{VersatilePower}, num::Current) = write(obj, "CURRENT $(raw(num))")
 
 """
-    get_current_limit(obj::Instr{VersatilePower}) 
+    get_current_limit(obj::Instr{VersatilePower})
 
 This will return the current limit of a device.
 
@@ -127,14 +127,14 @@ get_current_limit(obj::Instr{VersatilePower}) = query(obj, "CURRENT?")
 
 
 """
-    remote_mode(obj::Instr{VersatilePower}) 
+    remote_mode(obj::Instr{VersatilePower})
 
 Set device to remote mode
 """
 remote_mode(obj::Instr{VersatilePower}) = write(obj, "SYSTEM:MODE REMOTE")
 
 """
-    local_mode(obj::Instr{VersatilePower}) 
+    local_mode(obj::Instr{VersatilePower})
 
 Set device to remote mode
 """

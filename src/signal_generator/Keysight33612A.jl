@@ -35,12 +35,9 @@ enable_output(wave) # Starts wave
 """
 struct Keysight33612A <: WaveformGenerator end
 
-enable_output(obj::Instr{Keysight33612A}; chan=1) =
-    write(obj, "OUTPUT$chan ON")
-disable_output(obj::Instr{Keysight33612A}; chan=1) =
-    write(obj, "OUTPUT$chan OFF")
-get_output(obj::Instr{Keysight33612A}; chan=1) =
-    write(obj, "OUTPUT$chan?")
+enable_output(obj::Instr{Keysight33612A}; chan=1)  = write(obj, "OUTPUT$chan ON")
+disable_output(obj::Instr{Keysight33612A}; chan=1) = write(obj, "OUTPUT$chan OFF")
+get_output(obj::Instr{Keysight33612A}; chan=1)     = write(obj, "OUTPUT$chan?")
 
 get_voltage_offset(obj::Instr{Keysight33612A}; chan=1) =
     f_query(obj, "SOURCE$chan:VOLTAGE:OFFSET?") * V
@@ -68,8 +65,7 @@ set_frequency(obj::Instr{Keysight33612A}, num::Frequency; chan=1) =
 - `String`: Will return one of these shortened forms:
 {SINusoid|SQUare|TRIangle|RAMP|PULSe|PRBS|NOISe|ARB|DC}
 """
-get_function(obj::Instr{Keysight33612A}; chan=1) =
-    query(obj, "SOURCE$chan:FUNCTION?") # +4.0E+05
+get_function(obj::Instr{Keysight33612A}; chan=1) = query(obj, "SOURCE$chan:FUNCTION?") # +4.0E+05
 
 """
 set_function(instr, func; chan=1)
@@ -87,13 +83,11 @@ set_function(obj::Instr{Keysight33612A}, func; chan=1) = write(obj, "SOURCE$chan
     Sets the burst mode of a device to Triggered Mode
 
 """
-set_burst_mode_trigger(obj::Instr{Keysight33612A}; chan=1) =
-    write(obj, "SOURCE$chan:BURST:MODE TRIG")
+set_burst_mode_trigger(obj::Instr{Keysight33612A}; chan=1) = write(obj, "SOURCE$chan:BURST:MODE TRIG")
 """
 Sets the burst mode of a device to Gated Mode
 """
-set_burst_mode_gated(obj::Instr{Keysight33612A}; chan=1) =
-    write(obj, "SOURCE$chan:BURST:MODE GATED")
+set_burst_mode_gated(obj::Instr{Keysight33612A}; chan=1) = write(obj, "SOURCE$chan:BURST:MODE GATED")
 
 """
     get_burst_mode(instr)
@@ -103,8 +97,7 @@ Returns the burst mode of a device:
     "TRIG" ~ If the device is in Triggered Mode
     "GAT" ~ If the device is in Gated Mode
 """
-get_burst_mode(obj::Instr{Keysight33612A}; chan=1) =
-    query(obj, "SOURCE$chan:BURST:MODE?")
+get_burst_mode(obj::Instr{Keysight33612A}; chan=1) = query(obj, "SOURCE$chan:BURST:MODE?")
 
 """
 ```
@@ -154,8 +147,7 @@ Puts the device in continuous waveform/turns off burst mode
 # Keywords
 - `chan`: Specify channel: Default is 1
 """
-set_mode_cw(obj::Instr{Keysight33612A}; chan=1) =
-    write(obj, "SOURCE$chan:BURST:STATE OFF")
+set_mode_cw(obj::Instr{Keysight33612A}; chan=1) = write(obj, "SOURCE$chan:BURST:STATE OFF")
 
 """
     get_mode(instr)
@@ -167,8 +159,7 @@ Returns:
     "CW" ~ if device is in continous wavefrom mode
     "BURST" ~ if device is in BURST mode
 """
-get_mode(obj::Instr{Keysight33612A}; chan=1) =
-    query(obj, "SOURCE$chan:BURST:STATE?") == "1" ? "BURST" : "CW"
+get_mode(obj::Instr{Keysight33612A}; chan=1) = query(obj, "SOURCE$chan:BURST:STATE?") == "1" ? "BURST" : "CW"
 
 """
     get_burst_num_of_cycles(instr)
@@ -180,8 +171,7 @@ get_mode(obj::Instr{Keysight33612A}; chan=1) =
 # Returns
 - `Float64`: number of cycles burst mode is set to
 """
-get_burst_num_cycles(obj::Instr{Keysight33612A}; chan=1) =
-    f_query(obj, "SOURCE$chan:BURST:NCYCLES?")
+get_burst_num_cycles(obj::Instr{Keysight33612A}; chan=1) = f_query(obj, "SOURCE$chan:BURST:NCYCLES?")
 
 """
     set_burst_num_of_cycles(instr, cycles)
@@ -194,8 +184,7 @@ Sets the number of cycles for burst mode
 # Keywords
 - `chan`: Specify channel: Default is 1
 """
-set_burst_num_cycles(obj::Instr{Keysight33612A}, num; chan=1) =
-    write(obj, "SOURCE$chan:BURST:NCYCLES $num")
+set_burst_num_cycles(obj::Instr{Keysight33612A}, num; chan=1) = write(obj, "SOURCE$chan:BURST:NCYCLES $(Float64(num))")
 
 """
     set_burst_period(obj, num; chan=1)
@@ -205,8 +194,7 @@ set_burst_num_cycles(obj::Instr{Keysight33612A}, num; chan=1) =
 # Keywords
 - `chan`: Specify channel: Default is 1
 """
-set_burst_period(obj, num; chan=1) =
-    write(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD $num")
+set_burst_period(obj, num; chan::Integer=1) = write(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD $(Float64(num))")
 
 """
     get_burst_period(instr)
@@ -217,11 +205,9 @@ set_burst_period(obj, num; chan=1) =
 # Returns
 - `Float64`: number of cycles burst mode is set to
 """
-get_burst_period(obj; chan=1) =
-    f_query(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD?")
+get_burst_period(obj; chan::Integer=1) = f_query(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD?")
 
-set_trigger_source_timer(obj; chan=1) =
-    write(obj, "TRIGGER$chan:SOURCE TIMER")
+set_trigger_source_timer(obj; chan::Integer=1) = write(obj, "TRIGGER$chan:SOURCE TIMER")
 
 
 status(obj::Instr{Keysight33612A}) = query(obj, "APPLY?")

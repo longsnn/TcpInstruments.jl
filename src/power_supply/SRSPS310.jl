@@ -1,6 +1,6 @@
 """
-GPIB Enabled Device. Requires an attached Prologix Controller
-to work.
+    SRSPS310
+    GPIB Enabled Device. Requires an attached Prologix Controller to work.
 
 
 # Available functions
@@ -46,18 +46,17 @@ disable_output(obj::Instr{SRSPS310}) = write(obj, "HVOF")
 
 """
     get_output(obj::Instr{SRSPS310})
-
-This will disable an output on a device.
+This will get and return whether the output from SRSPS310 is enabled.
 
 Arguments:
-  - obj
+    - obj
     - must be a Power Supply Instrument
 Supported Instruments:
-   - Power supply
+    - Power supply
 
 # Returns
-- true if High Voltage Output is Off
-- false if High Voltage Output is On
+- true if High Voltage Output is Off (<- check if this should state `On`)
+- false if High Voltage Output is On (<- check if this should state `Off`)
 """
 get_output(obj::Instr{SRSPS310}) = query(obj, "*STB? 7") == "1" ? true : false
 
@@ -81,7 +80,7 @@ Examples:
 julia> psu_h = initialize(SRSPS310)
 julia> set_voltage(psu_h, 11.1u"V")
 julia> set_voltage(psu_h, 1100"mV")
-julia> set_voltage(psu_h, 100"V", delta_volt = 5u"V", delta_time=50u"ms", verbose=true)
+julia> set_voltage(psu_h, 100"V", delta_volt = 2u"V", delta_time=100u"ms", verbose=true)
 ```
 
 Returns: `Nothing`

@@ -150,7 +150,7 @@ set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMP
 - `"FIFT"`: 50Ω
 - `"ONEM"`: 1MΩ
 """
-get_impedance(instr::Instrument; chan=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
+get_impedance(instr::Instrument; chan::Integer=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
 
 """
     run(scope)
@@ -168,9 +168,9 @@ scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$c
 scope_waveform_source_get(instr) = query(instr, "WAVEFORM:SOURCE?")
 scope_waveform_mode_8bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT BYTE")
 scope_waveform_mode_16bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT WORD")
-scope_waveform_num_points(instr::Instrument, num_points::Int) = write(instr, "WAVEFORM:POINTS $num_points")
+scope_waveform_num_points(instr::Instrument, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
 scope_waveform_num_points(instr::Instrument, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
-scope_waveform_points_mode(instr::Instrument, mode_idx::Int) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
+scope_waveform_points_mode(instr::Instrument, mode_idx::Integer) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
@@ -182,7 +182,7 @@ function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
     return ScopeData(wfm_info, V .* volt, u"s" .* time)
 end
 
-function scope_speed_mode(instr::Instrument, speed::Int)
+function scope_speed_mode(instr::Instrument, speed::Integer)
     if speed == 1
         scope_waveform_mode_16bit(instr)
         scope_waveform_points_mode(instr, 1)
@@ -198,7 +198,7 @@ function scope_speed_mode(instr::Instrument, speed::Int)
     end
 end
 
-function scope_waveform_info_get(instr::Instrument, ch::Int; scope_stats=false)
+function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=false)
     str = scope_waveform_preamble_get(instr)
     # TODO @info "preamble", str
     str_array = split(str, ",")
@@ -252,7 +252,7 @@ function scope_read_raw_waveform(instr::Instrument)
 end
 
 
-function get_data(instr::Instrument, ch::Int; scope_stats=false)
+function get_data(instr::Instrument, ch::Integer; scope_stats=false)
     scope_waveform_source_set(instr, ch)
     #instrument_empty_buffer(instr)
     wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)

@@ -13,7 +13,7 @@
 struct AgilentE36312A <: PowerSupply end
 
 """
-    set_channel(obj::Instr{AgilentE36312A}, chan) 
+    set_channel(obj::Instr{AgilentE36312A}, chan)
 
 This will set the global channel on a device.
 
@@ -40,7 +40,7 @@ Returns:
 set_channel(obj::Instr{AgilentE36312A}, chan) = write(obj, "INST:NSEL $chan")
 
 """
-    get_channel(obj::Instr{AgilentE36312A}; v=false) 
+    get_channel(obj::Instr{AgilentE36312A}; v=false)
 
 This will return the global or default channel of a device.
 
@@ -162,7 +162,7 @@ function get_output(obj::Instr{AgilentE36312A})
 end
 
 """
-    set_voltage(obj::Instr{AgilentE36312A}, num::Voltage; chan=0) 
+    set_voltage(obj::Instr{AgilentE36312A}, num::Voltage; chan=0)
 
 This will change the voltage output voltage of a device.
 
@@ -211,7 +211,7 @@ Returns:
 get_voltage(obj::Instr{AgilentE36312A}; chan=0) = psu_chan(obj, chan, "SOURCE:VOLTAGE?"; float=true) * V
 
 """
-    set_current_limit(obj::Instr{AgilentE36312A}, num::Current; chan=0) 
+    set_current_limit(obj::Instr{AgilentE36312A}, num::Current; chan=0)
 
 This will change the current limit of a device on a given
 channel

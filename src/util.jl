@@ -102,39 +102,80 @@ end
     scan_network(; network_id="10.1.30.0", host_range=1:255, v=false)
 Will scan your network and report all found devices.
 
-By default it only searches for devices connected on port: 5025
-
-If you would like to search for devices on a different port set the
-v flag to true.
+By searches for devices connected on port:
+    - 5025 (scpi)
+    - 1234 (prologix)
 """
-function scan_network(; network = "10.1.30.0", host_range = 1:255, v = false)
-    @info "Scanning $(network[1:end-1])$(host_range[1])-$(host_range[end])"
-    ips = asyncmap(
-        x -> connect_to_scpy(x; v = v),
-        [network[1:end-1] * "$host" for host in host_range],
-    )
-    return [s for s in ips if !isempty(s)]
-end
+function scan_network(; network="10.1.30.", host_range=1:255)
+    network = ensure_ending_dot(network)
 
-function connect_to_scpy(ip_str; v = false)
-    scpy_port = 5025
-    temp_ip = ip_str * ":$scpy_port"
-    proc = @spawn temp_ip => info(initialize(Instrument, temp_ip))
+    @info "Scanning $network$(host_range[1])-$(host_range[end])"
+    # Scan for SCPI devices
+    ips_scpi = asyncmap(
+        x->_get_info_from_ip(x),
+        [network*"$ip" for ip in host_range]
+    )
+    # Scan for Prologix device
+    ips_prlx = asyncmap(
+        x->_get_info_from_ip(x; port=1234),
+        [network*"$ip" for ip in host_range]
+    )
+    ips_all = vcat(ips_scpi, ips_prlx)
+    print("\n")
+    return [ip for ip in ips_all if !isempty(ip)]
+end
+ensure_ending_dot(network) = network[end] != '.' ? network*'.' : network
+
+function _get_info_from_ip(ip_str; port = 5025)
+    temp_ip = ip_str * ":$port"
+    print(".")
+    proc = @spawn temp_ip => _get_instr_info_and_close(temp_ip)
     sleep(2)
     if proc.state == :runnable
-        schedule(proc, ErrorException("Timed out"), error = true)
+        print("t")
+        schedule(proc, ErrorException("Timed out"), error=true)
         return ""
     elseif proc.state == :done
+        print("o")
         return fetch(proc)
     elseif proc.state == :failed
-        v && return ip_str * ":????"
+        print("x")
         return ""
     else
-        error("Undefined $(proc.state)")
+        error("Uncaught state: $(proc.state)")
     end
 end
 
-udef(func) = error("$(func) not implemented")
+function _get_instr_info_and_close(ip)
+    obj = initialize(Instrument, ip)
+    info_str = info(obj)
+    close(obj)
+    return info_str
+end
+
+"""
+    scan_prologix(ip::AbstractString)
+    Scans all GPIB addresses on a prologix device having the ip-address `ip`.
+"""
+function scan_prologix(ip::AbstractString)
+    devices = Dict()
+    prologix_port = ":1234"
+    full_ip = ip * prologix_port
+    obj = initialize(Instrument, ip)
+
+    for i in 0:15
+        write(obj, "++addr $i")
+        try
+            devices[i] = query(obj, "*IDN?"; timeout=0.5)
+        catch
+
+        end
+    end
+    return devices
+end
+
+
+udef(func) =  error("$(func) not implemented")
 
 macro codeLocation()
     return quote
