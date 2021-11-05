@@ -88,6 +88,7 @@ export set_temp_unit_celsius, set_temp_unit_farenheit, set_temp_unit_kelvin
 export get_temp_unit
 
 # Impedance
+export read_float32
 export get_bandwidth, set_bandwidth
 export get_frequency_limits, set_frequency_limits
 export get_num_data_points, set_num_data_points

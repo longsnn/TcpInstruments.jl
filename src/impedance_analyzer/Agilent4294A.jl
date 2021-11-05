@@ -118,3 +118,40 @@ function set_channel(i::Instr{Agilent4294A}, n::Int)
     !(n in [1,2]) && error("Channel cannot be: $n (must be 1 or 2)")
     n == 1 ? write(i, "TRAC A") :  write(i, "TRAC B")
 end
+
+
+function read_float32(ia::Instr{Agilent4294A})
+    num_acq_points = get_num_acq_points(ia)
+    num_values_per_point = 2
+    num_bytes_per_point = 4
+    num_data_bytes = num_acq_points * num_values_per_point * num_bytes_per_point
+    
+    write(ia, "FORM2")
+    write(ia, "OUTPDTRC?")
+    read_data_file_header(ia)
+    data = ntoh.(reinterpret(Float32, read_num_bytes(ia, num_data_bytes)))
+    # read end of line character
+    read(ia)
+
+    return data
+end
+
+
+function get_num_acq_points(ia::Instr{Agilent4294A})
+    write(ia, "POIN?")
+    num_acq_points = read(ia)
+    return parse(Int, num_acq_points)
+end
+
+
+function read_data_file_header(ia::Instr{Agilent4294A})
+    num_bytes_in_header = 8
+    file_header = read_num_bytes(ia, num_bytes_in_header)
+    return file_header
+end
+
+
+function read_num_bytes(ia::Instr{Agilent4294A}, num_bytes)
+    output = read(ia.sock, num_bytes)
+    return output
+end
