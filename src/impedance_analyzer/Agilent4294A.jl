@@ -171,3 +171,22 @@ function read_num_bytes(ia::Instr{Agilent4294A}, num_bytes)
     output = read(ia.sock, num_bytes)
     return output
 end
+
+
+function get_frequency_range(ia::Instr{Agilent4294A})
+    write(ia, "STAR?")
+    freq_lower_bound = parse(Int, read(ia))
+    write(ia, "STOP?")
+    freq_upper_bound = parse(Int, read(ia))
+    return freq_lower_bound, freq_upper_bound
+end
+
+
+function set_frequency_range(ia::Instr{Agilent4294A}, lower_bound, upper_bound)
+    if lower_bound > upper_bound
+        error("Lower bound ($lower_bound) is larger than upper bound ($upper_bound)")
+    end
+    write(ia, "STAR $(lower_bound)MHZ")
+    write(ia, "STOP $(upper_bound)MHZ")
+    return nothing
+end
