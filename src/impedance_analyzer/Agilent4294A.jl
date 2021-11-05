@@ -190,3 +190,9 @@ function set_frequency_range(ia::Instr{Agilent4294A}, lower_bound, upper_bound)
     write(ia, "STOP $(upper_bound)MHZ")
     return nothing
 end
+
+
+function set_num_acq_points(ia::Instr{Agilent4294A}, num_acq_points)
+    write(ia, "POIN $num_acq_points")
+    return nothing
+end
