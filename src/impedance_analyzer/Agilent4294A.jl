@@ -64,17 +64,33 @@ set_volt_ac(i::Instr{Agilent4294A}, n::Voltage) = write(i, "POWE $(raw(n))"*"V")
 Gets the impedance from the impedance analyser. This function doesn't change any settings on
 the device, it only grabs data using the current settings.
 """
-function get_impedance(obj::Instr{Agilent4294A})
-    data = query(obj, "OUTPDTRC?"; timeout=20)
-    data = split(data, ',')
-    arr = Array{Complex, 1}()
-    get_f(i) = parse(Float64, data[i])
-    for i in 1:Int(length(data) / 2)
-        real_i = i * 2 - 1
-        img_i = i * 2
-        push!(arr, get_f(real_i) + get_f(img_i)im)
-    end
-    return arr * R
+function get_impedance(ia::Instr{Agilent4294A})
+    perform_single_acquisition(ia)
+    is_acquisition_complete = get_acquisition_status(ia)
+
+    write(ia, "MEAS COMP")
+    set_channel(ia, 1)
+    data = read_float32(ia)
+    write(ia, "MEAS IMPH")
+
+    impedance = data[1:2:end] .+ (data[2:2:end])im
+    return impedance * R
+end
+
+
+function perform_single_acquisition(ia::Instr{Agilent4294A})
+    write(ia, "HOLD")
+    write(ia, "TRGS INT")
+    write(ia, "SING")
+    return nothing
+end
+
+
+# this function should be blocking
+function get_acquisition_status(ia::Instr{Agilent4294A})
+    write(ia, "*OPC?")
+    output = read(ia)
+    return parse(Bool, output)
 end
 
 
