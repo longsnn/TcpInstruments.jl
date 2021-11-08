@@ -137,7 +137,7 @@ end
 
 
 function read_float32(ia::Instr{Agilent4294A})
-    num_acq_points = get_num_acq_points(ia)
+    num_acq_points = get_num_data_points(ia)
     num_values_per_point = 2
     num_bytes_per_point = 4
     num_data_bytes = num_acq_points * num_values_per_point * num_bytes_per_point
@@ -153,13 +153,6 @@ function read_float32(ia::Instr{Agilent4294A})
 end
 
 
-function get_num_acq_points(ia::Instr{Agilent4294A})
-    write(ia, "POIN?")
-    num_acq_points = read(ia)
-    return parse(Int, num_acq_points)
-end
-
-
 function read_data_file_header(ia::Instr{Agilent4294A})
     num_bytes_in_header = 8
     file_header = read_num_bytes(ia, num_bytes_in_header)
@@ -170,10 +163,4 @@ end
 function read_num_bytes(ia::Instr{Agilent4294A}, num_bytes)
     output = read(ia.sock, num_bytes)
     return output
-end
-
-
-function set_num_acq_points(ia::Instr{Agilent4294A}, num_acq_points)
-    write(ia, "POIN $num_acq_points")
-    return nothing
 end

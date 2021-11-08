@@ -54,15 +54,22 @@ end
     set_num_data_points(instr, num_points)
 
 """
-set_num_data_points(obj::Instr{T}, n) where (T <: ImpedanceAnalyzer) =
-    write(obj, "POIN $n")
+function set_num_data_points(ia::Instr{T}, num_data_points) where T <: ImpedanceAnalyzer
+    write(ia, "POIN $num_data_points")
+    return nothing
+end
+
 
 """
     get_num_data_points(instr)
 
 """
-get_num_data_points(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
-    i_query(obj, "POIN?")
+function get_num_data_points(ia::Instr{T}) where T <: ImpedanceAnalyzer
+    write(ia, "POIN?")
+    num_data_points = parse(Int64, read(ia))
+    return num_data_points
+end
+
 
 """
     get_volt_dc(instr)
