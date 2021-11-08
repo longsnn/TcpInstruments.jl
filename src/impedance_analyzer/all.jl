@@ -7,22 +7,48 @@ include("./Agilent4395A.jl")
 # Returns
 `Tuple{Frequency, Frequency}`: (lower_limit, upper_limit)
 """
-get_frequency_limits(obj::Instr{T}) where (T <: ImpedanceAnalyzer) =
-    f_query(obj, "STAR?") * u"Hz", f_query(obj, "STOP?") * u"Hz"
+function get_frequency_limits(ia::Instr{T}) where T <: ImpedanceAnalyzer
+    lower_bound = get_frequency_lower_bound(ia)
+    upper_bound = get_frequency_upper_bound(ia)
+    return lower_bound, upper_bound
+end
+
+function get_frequency_lower_bound(ia::Instr{T}) where T <: ImpedanceAnalyzer
+    write(ia, "STAR?")
+    lower_bound = parse(Float64, read(ia)) * u"Hz"
+    return uconvert(u"MHz", lower_bound)
+end
+
+function get_frequency_upper_bound(ia::Instr{T}) where T <: ImpedanceAnalyzer
+    write(ia, "STOP?")
+    upper_bound = parse(Float64, read(ia)) * u"Hz"
+    return uconvert(u"MHz", upper_bound)
+end
+
 
 """
     set_frequency_limits(instr, lower_limit, upper_limit)
 
 """
-function set_frequency_limits(
-    obj::Instr{T},
-    start::Frequency,
-    stop::Frequency
-) where {T <: ImpedanceAnalyzer}
-    start = raw(start)
-    stop = raw(stop)
-    write(obj, "STAR $start; STOP $stop")
+function set_frequency_limits(ia::Instr{T}, lower_bound::Frequency, upper_bound::Frequency) where T <: ImpedanceAnalyzer
+    if lower_bound > upper_bound
+        error("Lower bound ($lower_bound) is larger than upper bound ($upper_bound)")
+    end
+    set_frequency_lower_bound(ia, lower_bound)
+    set_frequency_upper_bound(ia, upper_bound)
+    return nothing
 end
+
+function set_frequency_lower_bound(ia::Instr{T}, lower_bound::Frequency) where T <: ImpedanceAnalyzer
+    write(ia, "STAR $(raw(lower_bound))")
+    return nothing
+end
+
+function set_frequency_upper_bound(ia::Instr{T}, upper_bound::Frequency) where T <: ImpedanceAnalyzer
+    write(ia, "STOP $(raw(upper_bound))")
+    return nothing
+end
+
 
 """
     set_num_data_points(instr, num_points)
