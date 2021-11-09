@@ -42,40 +42,39 @@ help> AgilentDSOX4034A
 
 """
 abstract type Instrument end
+
+
 """
-# Supported Instruments
 - [`AgilentDSOX4024A`](@ref)
-- `AgilentDSOX4034A`
+- [`AgilentDSOX4034A`](@ref)
 """
 abstract type Oscilloscope <: Instrument end
 
+
 """
-# Supported Instruments
-- KeysightDMM34465A
+- [`KeysightDMM34465A`](@ref)
 """
 abstract type MultiMeter <: Instrument end
 
+
 """
-# Supported Instruments
-- `AgilentE36312A`
-- `VersatilePower`
-- `PS310`
+- [`AgilentE36312A`](@ref)
+- [`PS310`](@ref)
+- [`VersatilePower`](@ref)
 """
 abstract type PowerSupply <: Instrument end
 
 
 # Maybe store ips in a config file and it dynamically shows you address?
 """
-# Supported Instruments:
-- `Keysight33612A`: Default ip ~ "10.1.30.36"
+- [`Keysight33612A`](@ref)
 """
 abstract type WaveformGenerator <: Instrument end
 
-"""
-# Supported Instruments:
-- `Agilent4294A`
-- `Agilent4395A`
 
+"""
+- [`Agilent4294A`](@ref)
+- [`Agilent4395A`](@ref)
 """
 abstract type ImpedanceAnalyzer <: Instrument end
 
