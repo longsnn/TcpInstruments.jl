@@ -48,7 +48,7 @@ function save(data; filename = "", format = :julia)
             data = ScopeData(data.info, ustrip(data.volt), data.time)
         end
         file = matopen(filename * ".mat", "w")
-        write(file, "data", ustrip(data))
+        write(file, "data", raw.(data))
         close(file)
     end
 end
