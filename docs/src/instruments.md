@@ -14,6 +14,10 @@ WaveformGenerator
 ```
 
 ## ImpedanceAnalyzer
+```@autodocs
+Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: ImpedanceAnalyzer && t != ImpedanceAnalyzer
+```
 
 ## Oscilloscope
 ```@autodocs
@@ -34,3 +38,7 @@ Filter = t -> typeof(t) === DataType && t <: PowerSupply && t != PowerSupply
 ```
 
 ## WaveformGenerator
+```@autodocs
+Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: WaveformGenerator && t != WaveformGenerator
+```

@@ -59,7 +59,7 @@ abstract type MultiMeter <: Instrument end
 
 """
 - [`AgilentE36312A`](@ref)
-- [`PS310`](@ref)
+- [`SRSPS310`](@ref)
 - [`VersatilePower`](@ref)
 """
 abstract type PowerSupply <: Instrument end
