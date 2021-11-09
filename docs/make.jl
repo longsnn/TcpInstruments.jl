@@ -10,6 +10,7 @@ makedocs(
     pages = [
              "Home" => "index.md",
              "Supported Instruments" => "instruments.md",
+             "Functions" => "functions.md",
             ],
     modules = [TcpInstruments]
 )
