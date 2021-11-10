@@ -9,8 +9,8 @@ makedocs(
     ),
     pages = [
              "Home" => "index.md",
-             "General" => "general.md",
              "Supported Instruments" => "instruments.md",
+             "Functions" => "functions.md",
             ],
     modules = [TcpInstruments]
 )

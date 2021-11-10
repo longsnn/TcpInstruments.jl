@@ -98,13 +98,15 @@ function scan_prologix(obj)
     return devices
 end
 
-"""
-    scan_network(; network_id="10.1.30.0", host_range=1:255, v=false)
-Will scan your network and report all found devices.
 
-By searches for devices connected on port:
-    - 5025 (scpi)
-    - 1234 (prologix)
+"""
+    scan_network(; network_id="10.1.30.0", host_range=1:255)
+
+By default, report all found devices between addresses `10.1.30.1` to `10.1.30.255`.
+
+Searches for devices connected on port:
+- 5025 (scpi)
+- 1234 (prologix)
 """
 function scan_network(; network="10.1.30.", host_range=1:255)
     network = ensure_ending_dot(network)

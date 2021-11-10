@@ -42,40 +42,39 @@ help> AgilentDSOX4034A
 
 """
 abstract type Instrument end
+
+
 """
-# Supported Instruments
 - [`AgilentDSOX4024A`](@ref)
-- `AgilentDSOX4034A`
+- [`AgilentDSOX4034A`](@ref)
 """
 abstract type Oscilloscope <: Instrument end
 
+
 """
-# Supported Instruments
-- KeysightDMM34465A
+- [`KeysightDMM34465A`](@ref)
 """
 abstract type MultiMeter <: Instrument end
 
+
 """
-# Supported Instruments
-- `AgilentE36312A`
-- `VersatilePower`
-- `PS310`
+- [`AgilentE36312A`](@ref)
+- [`SRSPS310`](@ref)
+- [`VersatilePower`](@ref)
 """
 abstract type PowerSupply <: Instrument end
 
 
 # Maybe store ips in a config file and it dynamically shows you address?
 """
-# Supported Instruments:
-- `Keysight33612A`: Default ip ~ "10.1.30.36"
+- [`Keysight33612A`](@ref)
 """
 abstract type WaveformGenerator <: Instrument end
 
-"""
-# Supported Instruments:
-- `Agilent4294A`
-- `Agilent4395A`
 
+"""
+- [`Agilent4294A`](@ref)
+- [`Agilent4395A`](@ref)
 """
 abstract type ImpedanceAnalyzer <: Instrument end
 
@@ -99,17 +98,19 @@ function Base.show(io::IO, ::MIME"text/plain", i::TcpInstruments.Instr)
     println("    Connected: $(i.connected)")
 end
 
+
 """
-    initialize(model, address)
+    initialize(model::Type{Instrument})
+    initialize(model::Type{Instrument}, address::String; GPIB_ID::Int=-1)
 
 Initializes a connection to the instrument at the given (input) IP address.
 
 # Arguments
-- `model`: They device type you are connecting to. Use `help> Instrument` to see available options.
-- `address::String`: The ip address of the device. Ex. "10.3.30.23"
+- `model`: The device type you are connecting to. Use `help> Instrument` to see available options
+- `address` (optional): The ip address of the device. Ex. "10.3.30.23". If not provided, TcpInstruments will look for the address in the config file
 
 # Keywords
-- `GPIB_ID::Int`: The GPIB interface ID of your device. This is optional and doesn't need to be set unless you are using a prologix controller to control it remotely.
+- `GPIB_ID`: The GPIB interface ID of your device. This is optional and doesn't need to be set unless you are using a prologix controller to control it remotely
 """
 function initialize(model::Type{T}, address; GPIB_ID=-1) where T <: Instrument
     instr_h = CreateTcpInstr(model, address)
@@ -150,8 +151,9 @@ function initialize(model::Type{T}) where T <: Instrument
     return initialize(model, address, GPIB_ID=gpib)
 end
 
+
 """
-    terminate(instr)
+    terminate(instr::Instrument)
 
 Closes the TCP connection.
 """
@@ -166,8 +168,11 @@ remote_mode(obj)   = nothing
 local_mode(obj) = nothing
 set_prologix_chan(obj, chan) = write(obj, "++addr $chan")
 get_prologix_chan(obj) = query(obj, "++addr")
+
+
 """
-    info(instr_h)
+    info(instr::Instrument)
+    
 Asks an instrument to print model number and other device info.
 """
 info(obj) = query(obj, "*IDN?")

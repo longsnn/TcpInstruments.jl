@@ -4,37 +4,41 @@ CurrentModule = TcpInstruments
 
 # Supported Instruments
 
-A list of all current supported instruments
-
-- link to [`initialize`](@ref)
-- link to [`AgilentDSOX4034A`](@ref)
-## ImpedanceAnalyzer
-
-## Oscilloscope
+A list of all currently supported instruments:
 ```@docs
+ImpedanceAnalyzer
+MultiMeter
 Oscilloscope
+PowerSupply
+WaveformGenerator
 ```
+
+## ImpedanceAnalyzer
 ```@autodocs
 Modules = [TcpInstruments]
-Filter = t -> typeof(t) === DataType && t <: Oscilloscope && typeof(t) != Oscilloscope
+Filter = t -> typeof(t) === DataType && t <: ImpedanceAnalyzer && t != ImpedanceAnalyzer
+```
+
+## Oscilloscope
+```@autodocs
+Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: Oscilloscope && t != Oscilloscope
 ```
 
 ## MultiMeter
-```@docs
-MultiMeter
-```
 ```@autodocs
 Modules = [TcpInstruments]
-Filter = t -> typeof(t) === DataType && t <: MultiMeter && typeof(t) != MultiMeter
+Filter = t -> typeof(t) === DataType && t <: MultiMeter && t != MultiMeter
 ```
 
 ## PowerSupply
-```@docs
-PowerSupply
-```
 ```@autodocs
 Modules = [TcpInstruments]
-Filter = t -> typeof(t) === DataType && t <: PowerSupply && typeof(t) != PowerSupply
+Filter = t -> typeof(t) === DataType && t <: PowerSupply && t != PowerSupply
 ```
 
 ## WaveformGenerator
+```@autodocs
+Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: WaveformGenerator && t != WaveformGenerator
+```
