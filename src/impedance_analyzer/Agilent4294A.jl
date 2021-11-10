@@ -86,7 +86,7 @@ function perform_single_acquisition(ia::Instr{Agilent4294A})
 end
 
 
-# this function should be blocking
+# this function is blocking (lightly tested only)
 function get_acquisition_status(ia::Instr{Agilent4294A})
     write(ia, "*OPC?")
     output = read(ia)
@@ -137,15 +137,15 @@ end
 
 
 function read_float32(ia::Instr{Agilent4294A})
-    num_acq_points = get_num_data_points(ia)
+    num_data_points = get_num_data_points(ia)
     num_values_per_point = 2
     num_bytes_per_point = 4
-    num_data_bytes = num_acq_points * num_values_per_point * num_bytes_per_point
+    num_data_bytes = num_data_points * num_values_per_point * num_bytes_per_point
     
-    write(ia, "FORM2")
-    write(ia, "OUTPDTRC?")
-    read_data_file_header(ia)
-    data = ntoh.(reinterpret(Float32, read_num_bytes(ia, num_data_bytes)))
+    set_data_output_to_float32(ia)
+    request_data_trace(ia)
+    get_data_header(ia)
+    data = ntoh.(reinterpret(Float32, read_num_bytes(ia, num_data_bytes)))       
     # read end of line character
     read(ia)
 
@@ -153,10 +153,22 @@ function read_float32(ia::Instr{Agilent4294A})
 end
 
 
-function read_data_file_header(ia::Instr{Agilent4294A})
+function set_data_output_to_float32(ia::Instr{Agilent4294A})
+    write(ia, "FORM2")
+    return nothing
+end
+
+
+function request_data_trace(ia::Instr{Agilent4294A})
+    write(ia, "OUTPDTRC?")
+    return nothing
+end
+
+
+function get_data_header(ia::Instr{Agilent4294A})
     num_bytes_in_header = 8
-    file_header = read_num_bytes(ia, num_bytes_in_header)
-    return file_header
+    data_header = read_num_bytes(ia, num_bytes_in_header)
+    return data_header
 end
 
 
