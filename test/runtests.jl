@@ -38,5 +38,20 @@ const A = u"A"
             @test host_out == host
             @test port_out == 0
         end
+
+        @testset "Save to Matlab file" begin
+            data = randn(100)u"V"
+            data_nounit = ustrip(data)
+            filename = "./testfile"
+
+            save(data, filename = filename, format = :matlab)
+            data_loaded = load(filename*".mat")
+
+            @test data_loaded == data_nounit
+
+            rm(filename*".mat")
+        end
+
     end
+
 end
