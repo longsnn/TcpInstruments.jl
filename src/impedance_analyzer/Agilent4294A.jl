@@ -149,6 +149,10 @@ function read_float32(ia::Instr{Agilent4294A})
     # read end of line character
     read(ia)
 
+    if length(data) != num_data_points
+        error("Transferred data did not have the expected number of data points (transferred: $(length(data)), expected: $num_data_points)")
+    end
+
     return data
 end
 
