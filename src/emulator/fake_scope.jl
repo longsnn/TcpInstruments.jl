@@ -23,22 +23,8 @@ num_samples(i::Instr{FakeDSOX4034A}) = i.model.num_samples
 
 
 function get_data(instr::Instr{FakeDSOX4034A}, ch::Int; scope_stats=false)
-    samples = num_samples(instr)
-    info = ScopeInfo(
-        "8bit", 
-        "Normal", 
-        samples,
-        7.68e-8, 
-        -0.0025, 
-        0.0, 
-        0.0167364, 
-        1.28425, 
-        128.0, 
-        "", 
-        "", 
-        "", 
-        ch
-    )
+    info = get_default_scope_info(instr, ch)
+    samples = info.num_points
 
     volt = if ch == 1
             map(sin, collect(range(0, stop=6pi, length=samples))) .* V
@@ -53,3 +39,27 @@ function get_data(instr::Instr{FakeDSOX4034A}, ch::Int; scope_stats=false)
     return ScopeData(info, volt, time)
 end
 
+
+function get_default_scope_info(scope::Instr{FakeDSOX4034A}, channel::Int)
+    format = "8bit"
+    type = "Normal"
+    num_points = num_samples(scope)
+    x_increment = 7.68e-8
+    x_origin = -0.0025
+    x_reference = 0.0
+    y_increment = 0.0167364
+    y_origin = 1.28425
+    y_reference = 128.0
+    impedance = ""
+    coupling = ""
+    low_pass_filter = ""
+    return ScopeInfo(format, type, num_points, 
+                     x_increment, x_origin, x_reference,
+                     y_increment, y_origin, y_reference, 
+                     impedance, coupling, low_pass_filter, channel)
+end
+
+
+function scope_waveform_info_get(scope::Instr{FakeDSOX4034A}, channel::Int)
+    return get_default_scope_info(scope, channel)
+end
