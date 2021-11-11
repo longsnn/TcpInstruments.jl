@@ -237,18 +237,36 @@ end
 
 function scope_read_raw_waveform(instr::Instrument)
     write(instr, "WAV:DATA?")
-    num_header_bytes = 2
-    #@show header_a_str = read_n_bytes(instr, num_header_bytes)
-    header_a_uint8 = read(instr.sock, 2)
-    if !(header_a_uint8[1] == UInt8('#'))
-        error("The waveform data format is not formated as expected.")
-    end
-    header_b_length = parse(Int,convert(Char, header_a_uint8[2]))
-    header_b_uint8 = read(instr.sock, header_b_length)
-    num_waveform_samples = parse(Int,String(convert.(Char,header_b_uint8)))
+    num_waveform_samples = get_num_waveform_samples(instr)
     raw_data = read(instr.sock, num_waveform_samples);
+    # read end of line character
     dummy = readline(instr.sock)
     return raw_data
+end
+
+
+function get_num_waveform_samples(instr::Instrument)
+    header = get_data_header(instr)
+    num_header_description_bytes = 2
+    num_waveform_samples = parse(Int, header[num_header_description_bytes+1:end])
+    return num_waveform_samples
+end
+
+
+function get_data_header(instr::Instrument)
+    # data header is an ASCII character string "#8DDDDDDDD", where the Ds indicate how many
+    # bytes follow (p.1433 of Keysight InfiniiVision 4000 X-Series Oscilloscopes
+    # Programmer's Guide)
+    num_header_description_bytes = 2
+    header_description_uint8 = read(instr.sock, num_header_description_bytes)
+    if header_description_uint8[1] != UInt8('#')
+        error("The waveform data format is not formatted as expected")
+    end
+    header_block_length = parse(Int, convert(Char, header_description_uint8[2]))
+    header_block_uint8 = read(instr.sock, header_block_length)
+    header = vcat(header_description_uint8, header_block_uint8)
+    header = String(convert.(Char, header))
+    return header
 end
 
 
