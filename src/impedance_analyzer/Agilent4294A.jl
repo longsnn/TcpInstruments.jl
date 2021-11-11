@@ -64,17 +64,33 @@ set_volt_ac(i::Instr{Agilent4294A}, n::Voltage) = write(i, "POWE $(raw(n))"*"V")
 Gets the impedance from the impedance analyser. This function doesn't change any settings on
 the device, it only grabs data using the current settings.
 """
-function get_impedance(obj::Instr{Agilent4294A})
-    data = query(obj, "OUTPDTRC?"; timeout=20)
-    data = split(data, ',')
-    arr = Array{Complex, 1}()
-    get_f(i) = parse(Float64, data[i])
-    for i in 1:Int(length(data) / 2)
-        real_i = i * 2 - 1
-        img_i = i * 2
-        push!(arr, get_f(real_i) + get_f(img_i)im)
-    end
-    return arr * R
+function get_impedance(ia::Instr{Agilent4294A})
+    perform_single_acquisition(ia)
+    is_acquisition_complete = get_acquisition_status(ia)
+
+    write(ia, "MEAS COMP")
+    set_channel(ia, 1)
+    data = read_float32(ia)
+    write(ia, "MEAS IMPH")
+
+    impedance = data[1:2:end] .+ (data[2:2:end])im
+    return impedance * R
+end
+
+
+function perform_single_acquisition(ia::Instr{Agilent4294A})
+    write(ia, "HOLD")
+    write(ia, "TRGS INT")
+    write(ia, "SING")
+    return nothing
+end
+
+
+# this function is blocking (lightly tested only)
+function get_acquisition_status(ia::Instr{Agilent4294A})
+    write(ia, "*OPC?")
+    output = read(ia)
+    return parse(Bool, output)
 end
 
 
@@ -117,4 +133,50 @@ Sets which channel the impedance analyser is using. `n` must be 1 or 2.
 function set_channel(i::Instr{Agilent4294A}, n::Int)
     !(n in [1,2]) && error("Channel cannot be: $n (must be 1 or 2)")
     n == 1 ? write(i, "TRAC A") :  write(i, "TRAC B")
+end
+
+
+function read_float32(ia::Instr{Agilent4294A})
+    num_data_points = get_num_data_points(ia)
+    num_values_per_point = 2
+    num_bytes_per_point = 4
+    num_data_bytes = num_data_points * num_values_per_point * num_bytes_per_point
+    
+    set_data_output_to_float32(ia)
+    request_data_trace(ia)
+    get_data_header(ia)
+    data = ntoh.(reinterpret(Float32, read_num_bytes(ia, num_data_bytes)))       
+    # read end of line character
+    read(ia)
+
+    if length(data) != num_data_points
+        error("Transferred data did not have the expected number of data points (transferred: $(length(data)), expected: $num_data_points)")
+    end
+
+    return data
+end
+
+
+function set_data_output_to_float32(ia::Instr{Agilent4294A})
+    write(ia, "FORM2")
+    return nothing
+end
+
+
+function request_data_trace(ia::Instr{Agilent4294A})
+    write(ia, "OUTPDTRC?")
+    return nothing
+end
+
+
+function get_data_header(ia::Instr{Agilent4294A})
+    num_bytes_in_header = 8
+    data_header = read_num_bytes(ia, num_bytes_in_header)
+    return data_header
+end
+
+
+function read_num_bytes(ia::Instr{Agilent4294A}, num_bytes)
+    output = read(ia.sock, num_bytes)
+    return output
 end
