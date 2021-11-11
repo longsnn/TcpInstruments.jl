@@ -19,6 +19,18 @@ end
 # Start Tests
 @testset "Fake Instruments" begin
 
+
+@testset "FakeDSOX4034A" begin
+    fake_scope = initialize(TcpInstruments.FakeDSOX4034A)
+    channel = 1
+    scope_info = TcpInstruments.scope_waveform_info_get(fake_scope, channel)
+    @test scope_info.num_points == 65104
+
+    data = get_data(fake_scope, channel)
+    @test length(data.volt) == scope_info.num_points
+end
+    
+
 @testset "Scope Interface" begin
     handle = test_initialize(AgilentDSOX4034A)
 
