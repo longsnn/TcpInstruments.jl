@@ -174,14 +174,6 @@ scope_waveform_points_mode(instr::Instrument, mode_idx::Integer) = write(instr, 
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
-function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
-    # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
-
-    volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
-    time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
-    return ScopeData(wfm_info, V .* volt, u"s" .* time)
-end
-
 function scope_speed_mode(instr::Instrument, speed::Integer)
     if speed == 1
         scope_waveform_mode_16bit(instr)
@@ -197,6 +189,49 @@ function scope_speed_mode(instr::Instrument, speed::Integer)
         scope_waveform_points_mode(instr, 0)
     end
 end
+
+
+function scope_read_binary_data(instr)
+end
+
+
+function get_data(
+    instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
+    inbounds=false, scope_stats=false
+)
+    if ch_vec === nothing || !inbounds
+        statuses = asyncmap(x->(x, status(instr, x)), 1:4)
+        filter!(x -> x[2], statuses)
+        valid_channels = map(x -> x[begin], statuses)
+    end
+    if ch_vec === nothing
+        ch_vec = valid_channels
+        !inbounds && @info "Loading channels: $ch_vec"
+    else
+        unique!(ch_vec)
+        if !inbounds
+            for ch in ch_vec
+                if !(ch in valid_channels)
+                    error("Channel $ch is offline, data cannot be read")
+                end
+            end
+        end
+    end
+    stop(instr) # Makes sure the data from each channel is from the same trigger event
+    wfm_data = [get_data(instr, ch; scope_stats=scope_stats) for ch in ch_vec]
+    run(instr)
+    return wfm_data
+end
+
+
+function get_data(instr::Instrument, ch::Integer; scope_stats=false)
+    scope_waveform_source_set(instr, ch)
+    #instrument_empty_buffer(instr)
+    wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
+    raw_data = scope_read_raw_waveform(instr);
+    return scope_parse_raw_waveform(raw_data, wfm_info)
+end
+
 
 function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=false)
     str = scope_waveform_preamble_get(instr)
@@ -222,12 +257,6 @@ function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=fal
         low_pass_filter = ""
     end
     return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
-end
-
-
-function scope_read_binary_data(instr)
-
-
 end
 
 
@@ -270,40 +299,12 @@ function get_data_header(instr::Instrument)
 end
 
 
-function get_data(instr::Instrument, ch::Integer; scope_stats=false)
-    scope_waveform_source_set(instr, ch)
-    #instrument_empty_buffer(instr)
-    wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
-    raw_data = scope_read_raw_waveform(instr);
-    return scope_parse_raw_waveform(raw_data, wfm_info)
-end
+function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
+    # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
 
-function get_data(
-    instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
-    inbounds=false, scope_stats=false
-)
-    if ch_vec === nothing || !inbounds
-        statuses = asyncmap(x->(x, status(instr, x)), 1:4)
-        filter!(x -> x[2], statuses)
-        valid_channels = map(x -> x[begin], statuses)
-    end
-    if ch_vec === nothing
-        ch_vec = valid_channels
-        !inbounds && @info "Loading channels: $ch_vec"
-    else
-        unique!(ch_vec)
-        if !inbounds
-            for ch in ch_vec
-                if !(ch in valid_channels)
-                    error("Channel $ch is offline, data cannot be read")
-                end
-            end
-        end
-    end
-    stop(instr) # Makes sure the data from each channel is from the same trigger event
-    wfm_data = [get_data(instr, ch; scope_stats=scope_stats) for ch in ch_vec]
-    run(instr)
-    return wfm_data
+    volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
+    time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
+    return ScopeData(wfm_info, V .* volt, u"s" .* time)
 end
 
 
