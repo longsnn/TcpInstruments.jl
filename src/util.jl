@@ -48,7 +48,7 @@ function save(data; filename = "", format = :julia)
             data = ScopeData(data.info, ustrip(data.volt), data.time)
         end
         file = matopen(filename * ".mat", "w")
-        write(file, "data", data)
+        write(file, "data", raw.(data))
         close(file)
     end
 end
@@ -61,10 +61,14 @@ Loads saved data from a file
 function load(filename)
     ext = split(filename, '.')[end]
     if ext == "jld2"
-        jldopen(filename)["data"]
+        data = jldopen(filename)["data"]
+    elseif ext == "mat"
+         data = matread(filename)["data"]
     else
         error("unsupported file type: $ext")
     end
+
+    return data
 end
 
 """
