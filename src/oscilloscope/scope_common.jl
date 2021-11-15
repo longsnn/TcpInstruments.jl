@@ -191,10 +191,6 @@ function scope_speed_mode(instr::Instrument, speed::Integer)
 end
 
 
-function scope_read_binary_data(instr)
-end
-
-
 function get_data(
     instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
     inbounds=false, scope_stats=false
@@ -226,7 +222,6 @@ end
 
 function get_data(instr::Instrument, ch::Integer; scope_stats=false)
     scope_waveform_source_set(instr, ch)
-    #instrument_empty_buffer(instr)
     wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
     raw_data = scope_read_raw_waveform(instr);
     return scope_parse_raw_waveform(raw_data, wfm_info)
@@ -235,7 +230,6 @@ end
 
 function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=false)
     str = scope_waveform_preamble_get(instr)
-    # TODO @info "preamble", str
     str_array = split(str, ",")
     format      = RESOLUTION_MODE[str_array[1]]
     type        = TYPE[str_array[2]]
