@@ -25,6 +25,7 @@ struct ScopeData
     time::Vector{typeof(1.0u"s")}
 end
 
+
 @recipe function plot(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
     scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
     title := t
@@ -33,6 +34,7 @@ end
     yguide := y
     return scaled_time, volts
 end
+
 
 @recipe function plot(data_array::Array{ScopeData, 1}; label="", xguide="0", yguide="Voltage / V")
     for data in data_array
@@ -50,6 +52,7 @@ end
 
 status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 
+
 function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
     time_unit, scaled_time = autoscale_seconds(data.time)
     title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
@@ -65,6 +68,7 @@ function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V"
     end
     return ustrip(scaled_time), ustrip(data.volt), title, label, xguide, yguide
 end
+
 
 function autoscale_seconds(time_data)
     unit = "seconds"
@@ -89,6 +93,7 @@ function autoscale_seconds(time_data)
     return unit, time_array
 end
 
+
 """
     get_coupling(scope, chan=1)
 
@@ -96,14 +101,15 @@ returns "AC" or "DC"
 """
 get_coupling(instr::Instrument; chan=1) = query(instr, "CHANNEL$chan:COUPLING?")
 
+
 """
     lpf_on(scope, chan=1)
 
 Turn on an internal low-pass filter. When the filter is on, the bandwidth of
 the specified channel is limited to approximately 25 MHz.
-
 """
 lpf_on(instr::Instrument, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
+
 
 """
     lpf_off(scope, chan=1)
@@ -111,6 +117,7 @@ lpf_on(instr::Instrument, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
 Turn off an internal low-pass filter.
 """
 lpf_off(instr::Instrument, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
+
 
 """
     get_lpf_state(scope, chan=1)
@@ -121,12 +128,14 @@ returns "0" or "1"
 """
 get_lpf_state(instr::Instrument; chan=1) = query(instr, "CHANNEL$chan:BWLIMIT?")
 
+
 """
     set_impedance_1Mohm(scope, chan=1)
 
 Set impedance to 1MΩ
 """
 set_impedance_1Mohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE ONEMEG")
+
 
 """
     set_impedance_50ohm(scope)
@@ -138,6 +147,7 @@ set_impedance_1Mohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMP
 Set impedance to 50Ω
 """
 set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE FIFTY")
+
 
 """
     get_impedance(scope)
@@ -152,16 +162,22 @@ set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMP
 """
 get_impedance(instr::Instrument; chan::Integer=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
 
+
 """
     run(scope)
+
 Run Oscilloscope
 """
 run(obj::Instr{T}) where T <: Oscilloscope = write(obj, "RUN")
+
+
 """
     stop(scope)
+    
 Stop Oscilloscope
 """
 stop(obj::Instr{T}) where T <: Oscilloscope = write(obj, "STOP")
+
 
 scope_waveform_preamble_get(instr) = query(instr, "WAVEFORM:PREAMBLE?")
 scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
