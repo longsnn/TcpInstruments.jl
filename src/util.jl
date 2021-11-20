@@ -71,37 +71,6 @@ function load(filename)
     return data
 end
 
-"""
-    scan_prologix(ip::AbstractString)
-
-Given an IP Address to a prologix adapter return a
-Dict of GPIB bus numbers that map to the connected device names
-"""
-function scan_prologix(ip::AbstractString)
-    instr = initialize(Instrument, ip)
-    return scan_prologix(instr)
-end
-
-"""
-    scan_prologix(instr)
-
-Given any instrument with a connection to a prologix adapter that
-supports query and write. Return a Dict of GPIB bus numbers
-that map to the connected device names
-"""
-function scan_prologix(obj)
-    devices = Dict()
-    for i in 0:15
-        write(obj, "++addr $i")
-        try
-            devices[i] = query(obj, "*IDN?"; timeout = 0.5)
-        catch
-
-        end
-    end
-    return devices
-end
-
 
 """
     scan_network(; network_id="10.1.30.0", host_range=1:255)
@@ -117,8 +86,12 @@ function scan_network(; network="10.1.30.", host_range=1:255)
     @info "Scanning $network$(host_range[1])-$(host_range[end])"
 
     # Scan for SCPI devices
+    println("Scanning for SCPI devices")
     ips_scpi = asyncmap(x-> _get_info_from_ip(x), [network*"$ip" for ip in host_range])
+    println("")
+
     # Scan for Prologix device
+    println("Scanning for Prologix devices")
     ips_prlx = asyncmap(x-> _get_info_from_ip(x; port=1234), [network*"$ip" for ip in host_range])
 
     ips_all = vcat(ips_scpi, ips_prlx)
@@ -129,7 +102,6 @@ ensure_ending_dot(network) = network[end] != '.' ? network*'.' : network
 
 function _get_info_from_ip(ip_str; port = 5025)
     temp_ip = ip_str * ":$port"
-    print(".")
     proc = @spawn temp_ip => _get_instr_info_and_close(temp_ip)
     sleep(2)
     if proc.state == :runnable
@@ -153,7 +125,7 @@ function _get_instr_info_and_close(ip)
 
     obj = initialize(Instrument, ip)
     info_str = info(obj)
-    close(obj)
+    terminate(obj)
     return info_str
 end
 
