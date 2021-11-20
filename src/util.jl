@@ -117,8 +117,12 @@ function scan_network(; network="10.1.30.", host_range=1:255)
     @info "Scanning $network$(host_range[1])-$(host_range[end])"
 
     # Scan for SCPI devices
+    println("Scanning for SCPI devices")
     ips_scpi = asyncmap(x-> _get_info_from_ip(x), [network*"$ip" for ip in host_range])
+    println("")
+
     # Scan for Prologix device
+    println("Scanning for Prologix devices")
     ips_prlx = asyncmap(x-> _get_info_from_ip(x; port=1234), [network*"$ip" for ip in host_range])
 
     ips_all = vcat(ips_scpi, ips_prlx)
@@ -129,7 +133,6 @@ ensure_ending_dot(network) = network[end] != '.' ? network*'.' : network
 
 function _get_info_from_ip(ip_str; port = 5025)
     temp_ip = ip_str * ":$port"
-    print(".")
     proc = @spawn temp_ip => _get_instr_info_and_close(temp_ip)
     sleep(2)
     if proc.state == :runnable
@@ -153,7 +156,7 @@ function _get_instr_info_and_close(ip)
 
     obj = initialize(Instrument, ip)
     info_str = info(obj)
-    close(obj)
+    terminate(obj)
     return info_str
 end
 
