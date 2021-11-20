@@ -71,37 +71,6 @@ function load(filename)
     return data
 end
 
-"""
-    scan_prologix(ip::AbstractString)
-
-Given an IP Address to a prologix adapter return a
-Dict of GPIB bus numbers that map to the connected device names
-"""
-function scan_prologix(ip::AbstractString)
-    instr = initialize(Instrument, ip)
-    return scan_prologix(instr)
-end
-
-"""
-    scan_prologix(instr)
-
-Given any instrument with a connection to a prologix adapter that
-supports query and write. Return a Dict of GPIB bus numbers
-that map to the connected device names
-"""
-function scan_prologix(obj)
-    devices = Dict()
-    for i in 0:15
-        write(obj, "++addr $i")
-        try
-            devices[i] = query(obj, "*IDN?"; timeout = 0.5)
-        catch
-
-        end
-    end
-    return devices
-end
-
 
 """
     scan_network(; network_id="10.1.30.0", host_range=1:255)
