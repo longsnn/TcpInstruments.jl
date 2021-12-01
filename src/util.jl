@@ -44,11 +44,18 @@ function save(data; filename = "", format = :julia)
     if format == :julia
         @save (filename * ".jld2") data
     elseif format == :matlab
+        file = matopen(filename * ".mat", "w"; compress=true)
         if isa(data, ScopeData)
-            data = ScopeData(data.info, ustrip.(data.volt), ustrip.(data.time))
+            info = data.info
+            volt = ustrip.(data.volt)
+            time = ustrip.(data.time)
+            write(file, "info", info)
+            write(file, "volt", volt)
+            write(file, "time", time)
+        else
+            write(file, "data", raw.(data))
         end
-        file = matopen(filename * ".mat", "w")
-        write(file, "data", raw.(data))
+
         close(file)
     end
 end
