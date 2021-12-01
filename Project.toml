@@ -1,6 +1,6 @@
 name = "TcpInstruments"
 uuid = "aaee30c5-7b57-4441-b61a-ab7186f11903"
-authors = ["Esti Gajda", "mofii"]
+authors = ["Morten F. Rasmussen <10264458+mofii@users.noreply.github.com>, Steve Leung <steve@orchardultrasound.com>, and Esti Gajda"]
 version = "0.8.6"
 
 [deps]
