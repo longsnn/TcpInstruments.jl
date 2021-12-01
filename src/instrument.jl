@@ -138,17 +138,21 @@ function initialize(model::Type{T}) where T <: Instrument
 
         """)
     end
+
+    # TODO: refactor the following using traits
     if data isa String
-        return initialize(model, data)
+        instr_h = initialize(model, data)
+    else
+        address = get(data, "address", "")
+        gpib = get(data, "gpib", "")
+        if isempty(gpib)
+            instr_h = initialize(model, address)
+        else
+            instr_h = initialize(model, address, GPIB_ID=gpib)
+        end
     end
 
-    address = get(data, "address", "")
-    gpib = get(data, "gpib", "")
-
-    if isempty(gpib)
-        return initialize(model, address)
-    end
-    return initialize(model, address, GPIB_ID=gpib)
+    return instr_h
 end
 
 
@@ -172,7 +176,7 @@ get_prologix_chan(obj) = query(obj, "++addr")
 
 """
     info(instr::Instrument)
-    
+
 Asks an instrument to print model number and other device info.
 """
 info(obj) = query(obj, "*IDN?")
