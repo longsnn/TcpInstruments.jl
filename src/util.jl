@@ -39,7 +39,7 @@ data to matlab by using the format=:matlab keyword argument
 function save(data; filename = "", format = :julia)
     if isempty(filename)
         t = Dates.format(Dates.now(), "yy-mm-dd_HH:MM:SS")
-        filename = "scan_" * t
+        filename = "InstrumentData_" * t
     end
     if format == :julia
         @save (filename * ".jld2") data
