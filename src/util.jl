@@ -39,16 +39,23 @@ data to matlab by using the format=:matlab keyword argument
 function save(data; filename = "", format = :julia)
     if isempty(filename)
         t = Dates.format(Dates.now(), "yy-mm-dd_HH:MM:SS")
-        filename = "scan_" * t
+        filename = "InstrumentData_" * t
     end
     if format == :julia
         @save (filename * ".jld2") data
     elseif format == :matlab
+        file = matopen(filename * ".mat", "w"; compress=true)
         if isa(data, ScopeData)
-            data = ScopeData(data.info, ustrip(data.volt), data.time)
+            info = data.info
+            volt = ustrip.(data.volt)
+            time = ustrip.(data.time)
+            write(file, "info", info)
+            write(file, "volt", volt)
+            write(file, "time", time)
+        else
+            write(file, "data", raw.(data))
         end
-        file = matopen(filename * ".mat", "w")
-        write(file, "data", raw.(data))
+
         close(file)
     end
 end
