@@ -52,6 +52,23 @@ const A = u"A"
             rm(filename*".mat")
         end
 
+        @testset "Save Oscilloscope Data to Matlab file" begin
+            volt = randn(100)u"V"
+            time = (collect(0:(length(volt)-1))./1e6)u"s"
+            info = TcpInstruments.ScopeInfo("8bit", "Normal", 100, 1e-6, 0.0, 0.0, 0.0, 0.0, 0.0, "50ohm", "DC", "ON", 1)
+
+            data = ScopeData(info, volt, time)
+
+            filename = "./testfile"
+
+            save(data, filename = filename, format = :matlab)
+            data_loaded = load(filename*".mat")
+
+            @test data_loaded == data_nounit
+
+            rm(filename*".mat")
+        end
+
     end
 
 end
