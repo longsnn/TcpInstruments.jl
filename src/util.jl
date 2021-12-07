@@ -15,6 +15,7 @@ raw(a::Current)   = Float64(ustrip(uconvert(A, a)))
 raw(a::Voltage)   = Float64(ustrip(uconvert(V, a)))
 raw(a::Frequency) = Float64(ustrip(uconvert(Hz, a)))
 raw(a::Time)      = Float64(ustrip(uconvert(u"s", a)))
+raw(non_unitful_input) = non_unitful_input
 
 function elapsed_time(start_time)
     seconds = floor(time() - start_time)

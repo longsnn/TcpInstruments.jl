@@ -42,14 +42,28 @@ const A = u"A"
         @testset "Save to Matlab file" begin
             data = randn(100)u"V"
             data_nounit = ustrip(data)
-            filename = "./testfile"
 
-            save(data, filename = filename, format = :matlab)
-            data_loaded = load(filename*".mat")
+            # save unitful input
+            filename_1 = "./testfile_1"
+            save(data, filename=filename_1, format=:matlab)
+            data_loaded_1 = load(filename_1 * ".mat")
+            @test data_loaded_1 == data_nounit
+            rm(filename_1 * ".mat")
 
-            @test data_loaded == data_nounit
+            # save non-unitful input (numbers)
+            filename_2 = "./testfile_2"
+            save(data_nounit, filename=filename_2, format=:matlab)
+            data_loaded_2 = load(filename_2 * ".mat")
+            @test data_loaded_2 == data_nounit
+            rm(filename_2 * ".mat")
 
-            rm(filename*".mat")
+            # save non-unitful input (string)
+            val = "not unitful, and not a number"
+            filename_3 = "./testfile_3"
+            save(val, filename=filename_3, format=:matlab)
+            data_loaded_3 = load(filename_3 * ".mat")
+            @test data_loaded_3 == val
+            rm(filename_3 * ".mat")
         end
 
     end
