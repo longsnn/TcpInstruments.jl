@@ -9,6 +9,20 @@ using Unitful
 const A = u"A"
 
 @testset ExtendedTestSet "TcpInstruments" begin
+
+    "Helper function: expected_number_and_unit(function_name, val, true_val_scaled, true_unit)"
+    function expected_number_and_unit(function_name, val, true_val_scaled, true_unit)
+        scaled_val, unit = function_name(val)
+        same = (scaled_val ≈ true_val_scaled)
+        if same == true
+            same = (unit == true_unit)
+        end
+
+        return same
+    end
+
+
+
     #=
     @testset "Fake Scope" begin
         f = initialize(TcpInstruments.FakeDSOX4034A)
@@ -58,7 +72,7 @@ const A = u"A"
 
 
 
-function test_number_and_unit(function_name, val, true_val_scaled, true_unit)
-    scaled_val, unit = function_name(val)
-    @test (scaled_val, unit) == (true_val_scaled, true_unit)
+
+    end
+
 end
