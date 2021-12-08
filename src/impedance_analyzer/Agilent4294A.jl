@@ -72,9 +72,12 @@ function get_impedance(ia::Instr{Agilent4294A})
     set_channel(ia, 1)
     data = read_float32(ia)
     write(ia, "MEAS IMPH")
-
     impedance = data[1:2:end] .+ (data[2:2:end])im
-    return impedance * R
+
+    info = get_impedance_analyzer_info(ia)
+    frequency = get_frequency(ia)
+
+    return ImpedanceAnalyzerData(info, frequency, impedance * R)
 end
 
 
@@ -149,8 +152,9 @@ function read_float32(ia::Instr{Agilent4294A})
     # read end of line character
     read(ia)
 
-    if length(data) != num_data_points
-        error("Transferred data did not have the expected number of data points (transferred: $(length(data)), expected: $num_data_points)")
+    num_values = num_data_points * num_values_per_point
+    if length(data) != num_values
+        error("Transferred data did not have the expected number of data points\nTransferred: $(length(data))\nExpected: $num_values ($num_data_points * $num_values_per_point)\n")
     end
 
     return data

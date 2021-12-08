@@ -15,7 +15,7 @@ end
 struct ImpedanceAnalyzerData
     info::Union{ImpedanceAnalyzerInfo, Nothing}
     frequency::Vector{typeof(1.0u"Hz")}
-    impedance::Vector{typeof(1.0u"Ω")}
+    impedance::Vector{typeof((1.0+1.0im)*u"Ω")}
 end
 
 function Base.show(io::IO, data::ImpedanceAnalyzerData)
@@ -78,6 +78,15 @@ function get_sweep_direction(ia::Instr{<:ImpedanceAnalyzer})
     write(ia, "SWED?")
     sweep_direction = read(ia)
     return sweep_direction
+end
+
+
+function get_frequency(ia::Instr{<:ImpedanceAnalyzer})
+    start_frequency = get_frequency_lower_bound(ia)
+    end_frequency = get_frequency_upper_bound(ia)
+    num_points = get_num_data_points(ia)
+    frequency = collect(LinRange(start_frequency, end_frequency, num_points))
+    return frequency
 end
 
 
