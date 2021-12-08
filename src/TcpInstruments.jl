@@ -120,6 +120,7 @@ export Keysight33612A
 
 export scan_network
 
+include("types.jl")
 include("util.jl")
 include("config.jl")
 
