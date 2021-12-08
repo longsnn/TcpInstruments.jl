@@ -3,12 +3,12 @@ include("./Agilent4395A.jl")
 
 
 struct ImpedanceAnalyzerInfo
-    dc_voltage::Float64
-    ac_voltage::Float64
-    num_averages::Float64
-    bandwidth_level::Float64
-    point_delay_time::Float64
-    sweep_delay_time::Float64
+    dc_voltage::Unitful.Voltage
+    ac_voltage::Unitful.Voltage
+    num_averages::Int64
+    bandwidth_level::Int64
+    point_delay_time::Unitful.Time
+    sweep_delay_time::Unitful.Time
     sweep_direction::String
 end
 
