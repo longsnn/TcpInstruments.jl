@@ -1,5 +1,9 @@
 using RecipesBase
 
+import Base.show
+using UnicodePlots
+
+
 const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 

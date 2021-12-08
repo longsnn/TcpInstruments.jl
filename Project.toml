@@ -12,6 +12,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
 TestSetExtensions = "98d24dd4-01ad-11ea-1b02-c9a08f80db04"
+UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
