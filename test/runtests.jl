@@ -68,6 +68,39 @@ const A = u"A"
             rm(filename*".mat")
         end
 
+        @testset "format_time" begin
+            using TcpInstruments: format_time
+            @test expected_number_and_unit(format_time, 1e3,     1000,   "s")
+            @test expected_number_and_unit(format_time, 1,          1,   "s")
+            @test expected_number_and_unit(format_time, 0,          0,   "s")
+            @test expected_number_and_unit(format_time, -1,        -1,   "s")
+            @test expected_number_and_unit(format_time, -2e-2,    -20,  "ms")
+            @test expected_number_and_unit(format_time, -3e-3,     -3,  "ms")
+            @test expected_number_and_unit(format_time, -4e-4,   -400,  "µs")
+            @test expected_number_and_unit(format_time, -5e-5,    -50,  "µs")
+            @test expected_number_and_unit(format_time, -6e-6,     -6,  "µs")
+            @test expected_number_and_unit(format_time, -7e-7,   -700,  "ns")
+            @test expected_number_and_unit(format_time, -8e-8,    -80,  "ns")
+            @test expected_number_and_unit(format_time, -9e-9,     -9,  "ns")
+            @test expected_number_and_unit(format_time, -10e-10,   -1,  "ns")
+            @test expected_number_and_unit(format_time, -11e-11, -110,  "ps")
+            @test expected_number_and_unit(format_time, -12e-12,  -12,  "ps")
+            @test expected_number_and_unit(format_time, -13e-13, -1.3,  "ps")
+            @test expected_number_and_unit(format_time, -14e-14, -0.14, "ps")
+        end
+
+
+        @testset "format_volt" begin
+            using TcpInstruments: format_volt
+            @test expected_number_and_unit(format_volt, 1001, 1.001, "kV")
+            @test expected_number_and_unit(format_volt, 1000,  1000,  "V")
+            @test expected_number_and_unit(format_volt, 1.1,    1.1,  "V")
+            @test expected_number_and_unit(format_volt, 0,        0,  "V")
+            @test expected_number_and_unit(format_volt, 1e-1,   100, "mV")
+            @test expected_number_and_unit(format_volt, 2.2e-2,  22, "mV")
+            @test expected_number_and_unit(format_volt, 3.3e-3, 3.3, "mV")
+            @test expected_number_and_unit(format_volt, 3.3e-6, 3.3, "µV")
+            @test expected_number_and_unit(format_volt, 7.6e-9, 7.6, "nV")
     end
 
 
