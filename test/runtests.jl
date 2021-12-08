@@ -54,4 +54,9 @@ const A = u"A"
 
     end
 
+
+
+function test_number_and_unit(function_name, val, true_val_scaled, true_unit)
+    scaled_val, unit = function_name(val)
+    @test (scaled_val, unit) == (true_val_scaled, true_unit)
 end
