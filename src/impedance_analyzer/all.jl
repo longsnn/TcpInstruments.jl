@@ -19,6 +19,38 @@ struct ImpedanceAnalyzerData
 end
 
 
+function get_impedance_analyzer_info(ia::Instr{<:ImpedanceAnalyzer})
+    dc_voltage = get_volt_dc(ia)
+    ac_voltage = get_volt_ac(ia)
+    num_averages = get_num_averages(ia)
+    bandwidth_level = get_bandwidth(ia)
+    point_delay_time = get_point_delay_time(ia)
+    sweep_delay_time = get_sweep_delay_time(ia)
+    sweep_direction = get_sweep_direction(ia)
+    return ImpedanceAnalyzerInfo(dc_voltage, ac_voltage, num_averages, bandwidth_level, point_delay_time, sweep_delay_time, sweep_direction)
+end
+
+
+function get_num_averages(ia::Instr{<:ImpedanceAnalyzer})
+    return -1
+end
+
+
+function get_point_delay_time(ia::Instr{<:ImpedanceAnalyzer})
+    return -1
+end
+
+
+function get_sweep_delay_time(ia::Instr{<:ImpedanceAnalyzer})
+    return -1
+end
+
+
+function get_sweep_direction(ia::Instr{<:ImpedanceAnalyzer})
+    return "PLACEHOLDER"
+end
+
+
 """
     get_frequency_limits(instr)
 
