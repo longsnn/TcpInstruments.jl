@@ -9,6 +9,7 @@ using Unitful
 const A = u"A"
 
 @testset ExtendedTestSet "TcpInstruments" begin
+    #=
     @testset "Fake Scope" begin
         f = initialize(TcpInstruments.FakeDSOX4034A)
 
@@ -21,9 +22,10 @@ const A = u"A"
         @test length(data) == 4
     end
 
-    @testset "TcpInstruments.jl" begin
+    @testset "FakeDevice" begin
         include("./emulate/test_fake_device.jl")
     end
+    =#
 
     @testset "Util Functions" begin
         @testset "split_str_into_host_and_port" begin
