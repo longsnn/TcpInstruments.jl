@@ -55,9 +55,13 @@ function save_to_matfile(matfile, data::ScopeData)
     info = data.info
     volt = ustrip.(data.volt)
     time = ustrip.(data.time)
+    volt_unit = string(unit(data.volt[1]))
+    time_unit = string(unit(data.time[1]))
     write(matfile, "info", info)
     write(matfile, "volt", volt)
     write(matfile, "time", time)
+    write(matfile, "volt_unit", volt_unit)
+    write(matfile, "time_unit", time_unit)
 end
 
 function save_to_matfile(matfile, data::ImpedanceAnalyzerData)
