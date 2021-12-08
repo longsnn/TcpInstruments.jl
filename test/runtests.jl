@@ -17,8 +17,15 @@ const A = u"A"
         @test length(data.time) == length(data.volt)
         @test data.volt[1] isa Unitful.Voltage
 
+        @testset "Save scope data" begin
+            save_filename = "./scope_save_data"
+            save(data, filename=save_filename, format=:matlab)
+            rm(save_filename * ".mat")
+        end
+
         data = get_data(f, [1,2,3,4])
         @test length(data) == 4
+        # TODO: fix bug where saving multichannel scope data fails (output is a vector of ScopeData)
     end
 
     @testset "TcpInstruments.jl" begin
