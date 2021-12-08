@@ -45,36 +45,42 @@ function save(data; filename = "", format = :julia)
     if format == :julia
         @save (filename * ".jld2") data
     elseif format == :matlab
-        file = matopen(filename * ".mat", "w"; compress=true)
-        if isa(data, ScopeData)
-            info = data.info
-            volt = ustrip.(data.volt)
-            time = ustrip.(data.time)
-            write(file, "info", info)
-            write(file, "volt", volt)
-            write(file, "time", time)
-        elseif isa(data, ImpedanceAnalyzerData)
-            info = Dict()
-            for fieldname in fieldnames(typeof(data.info))
-                val = raw(getfield(data.info, fieldname))
-                info[string(fieldname)] = val
-            end
-            frequency = ustrip.(data.frequency)
-            impedance = ustrip.(data.impedance)
-            frequency_unit = string(unit(data.frequency[1]))
-            impedance_unit = string(unit(data.impedance[1]))
-            write(file, "info", info)
-            write(file, "frequency", frequency)
-            write(file, "impedance", impedance)
-            write(file, "frequency_unit", frequency_unit)
-            write(file, "impedance_unit", impedance_unit)
-        else
-            write(file, "data", raw.(data))
-        end
-
-        close(file)
+        matfile = matopen(filename * ".mat", "w"; compress=true)
+        save_to_matfile(matfile, data)
+        close(matfile)
     end
 end
+
+function save_to_matfile(matfile, data::ScopeData)
+    info = data.info
+    volt = ustrip.(data.volt)
+    time = ustrip.(data.time)
+    write(matfile, "info", info)
+    write(matfile, "volt", volt)
+    write(matfile, "time", time)
+end
+
+function save_to_matfile(matfile, data::ImpedanceAnalyzerData)
+    info = Dict()
+    for fieldname in fieldnames(typeof(data.info))
+        val = raw(getfield(data.info, fieldname))
+        info[string(fieldname)] = val
+    end
+    frequency = ustrip.(data.frequency)
+    impedance = ustrip.(data.impedance)
+    frequency_unit = string(unit(data.frequency[1]))
+    impedance_unit = string(unit(data.impedance[1]))
+    write(matfile, "info", info)
+    write(matfile, "frequency", frequency)
+    write(matfile, "impedance", impedance)
+    write(matfile, "frequency_unit", frequency_unit)
+    write(matfile, "impedance_unit", impedance_unit)
+end
+
+function save_to_matfile(matfile, data)
+    write(matfile, "data", raw.(data))
+end
+
 
 """
     data = load("file.jld2")
