@@ -45,9 +45,18 @@ end
 
 
 function get_num_averages(ia::Instr{<:ImpedanceAnalyzer})
-    write(ia, "AVERFACT?")
-    num_averages = parse(Float64, read(ia))
+    if is_average_mode_on(ia)
+        write(ia, "AVERFACT?")
+        num_averages = parse(Float64, read(ia))
+    else
+        num_averages = 1
+    end
     return num_averages
+end
+
+function is_average_mode_on(ia::Instr{<:ImpedanceAnalyzer})
+    write(ia, "AVER?")
+    return parse(Bool, read(ia))
 end
 
 
