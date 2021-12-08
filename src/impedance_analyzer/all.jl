@@ -1,6 +1,24 @@
 include("./Agilent4294A.jl")
 include("./Agilent4395A.jl")
 
+
+struct ImpedanceAnalyzerInfo
+    dc_voltage::Float64
+    ac_voltage::Float64
+    num_averages::Float64
+    bandwidth_level::Float64
+    point_delay_time::Float64
+    sweep_delay_time::Float64
+    sweep_direction::String
+end
+
+struct ImpedanceAnalyzerData
+    info::Union{ImpedanceAnalyzerInfo, Nothing}
+    frequency::Vector{typeof(1.0u"Hz")}
+    impedance::Vector{typeof(1.0u"Ω")}
+end
+
+
 """
     get_frequency_limits(instr)
 
