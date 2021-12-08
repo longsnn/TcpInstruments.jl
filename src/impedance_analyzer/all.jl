@@ -18,6 +18,19 @@ struct ImpedanceAnalyzerData
     impedance::Vector{typeof(1.0u"Ω")}
 end
 
+function Base.show(io::IO, data::ImpedanceAnalyzerData)
+    show(data.info)
+    println(io, "frequency: ", size(data.frequency))
+    println(io, "impedance: ", size(data.impedance))
+end
+
+function Base.show(io::IO, info::ImpedanceAnalyzerInfo)
+    println(io, "ImpedanceAnalyzerInfo: ")
+    for fieldname in fieldnames(typeof(info))
+        println(io, "  " * String(fieldname) * ": ", getfield(info, fieldname))
+    end
+end
+
 
 function get_impedance_analyzer_info(ia::Instr{<:ImpedanceAnalyzer})
     dc_voltage = get_volt_dc(ia)
