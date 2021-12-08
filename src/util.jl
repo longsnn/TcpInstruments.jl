@@ -53,6 +53,21 @@ function save(data; filename = "", format = :julia)
             write(file, "info", info)
             write(file, "volt", volt)
             write(file, "time", time)
+        elseif isa(data, ImpedanceAnalyzerData)
+            info = Dict()
+            for fieldname in fieldnames(typeof(data.info))
+                val = raw(getfield(data.info, fieldname))
+                info[string(fieldname)] = val
+            end
+            frequency = ustrip.(data.frequency)
+            impedance = ustrip.(data.impedance)
+            frequency_unit = string(unit(data.frequency[1]))
+            impedance_unit = string(unit(data.impedance[1]))
+            write(file, "info", info)
+            write(file, "frequency", frequency)
+            write(file, "impedance", impedance)
+            write(file, "frequency_unit", frequency_unit)
+            write(file, "impedance_unit", impedance_unit)
         else
             write(file, "data", raw.(data))
         end
