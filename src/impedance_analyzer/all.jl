@@ -20,8 +20,8 @@ end
 
 function Base.show(io::IO, data::ImpedanceAnalyzerData)
     show(data.info)
-    println(io, "frequency: ", size(data.frequency))
-    println(io, "impedance: ", size(data.impedance))
+    println(io, "frequency: ", size(data.frequency), " ", unit(data.frequency[1]))
+    println(io, "impedance: ", size(data.impedance), " ", unit(data.impedance[1]))
 end
 
 function Base.show(io::IO, info::ImpedanceAnalyzerInfo)
