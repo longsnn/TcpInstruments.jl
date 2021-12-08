@@ -32,22 +32,30 @@ end
 
 
 function get_num_averages(ia::Instr{<:ImpedanceAnalyzer})
-    return -1
+    write(ia, "AVERFACT?")
+    num_averages = parse(Float64, read(ia))
+    return num_averages
 end
 
 
 function get_point_delay_time(ia::Instr{<:ImpedanceAnalyzer})
-    return -1
+    write(ia, "PDELT?")
+    point_delay_time = parse(Float64, read(ia)) * u"s"
+    return point_delay_time
 end
 
 
 function get_sweep_delay_time(ia::Instr{<:ImpedanceAnalyzer})
-    return -1
+    write(ia, "SDELT?")
+    sweep_delay_time = parse(Float64, read(ia)) * u"s"
+    return sweep_delay_time
 end
 
 
 function get_sweep_direction(ia::Instr{<:ImpedanceAnalyzer})
-    return "PLACEHOLDER"
+    write(ia, "SWED?")
+    sweep_direction = read(ia)
+    return sweep_direction
 end
 
 
