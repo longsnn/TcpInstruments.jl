@@ -204,3 +204,54 @@ function split_str_into_host_and_port(str::AbstractString)
     end
     return (host, port)
 end
+
+
+
+
+
+const _time_units = ["s", "ms", "µs", "ns", "ps"]
+const _volt_small_units = ["V","mV", "µV", "nV"]
+const _volt_large_units = ["V", "kV", "MV", "GV"]
+
+
+format_time(seconds) = get_nearest_scale_and_unit(seconds, ["s"], _time_units)
+format_volt(volt)    = get_nearest_scale_and_unit(volt, _volt_large_units, _volt_small_units)
+
+
+function get_nearest_scale_and_unit(value, units_large, units_small)
+    if value == 0 || value == 1
+        return (value, units_large[1])
+    end
+    factor = Int(1000)
+    logval = log(abs(value))
+    scale_up = sign(logval) == 1
+    unit_idx = ceil(Int, abs(logval) / log(factor))
+    unit, unit_idx = get_nearest_unit(unit_idx, scale_up, units_large, units_small)
+    scaled_value, unit_idx = scale(value, unit_idx, scale_up)
+
+    return scaled_value, unit
+end
+
+
+function get_nearest_unit(unit_idx, scale_up, units_large, units_small)
+    if scale_up
+        unit_idx = clamp(unit_idx, 0, length(units_large))
+        unit = units_large[unit_idx]
+    else
+        unit_idx = clamp(unit_idx+1, 1, length(units_small))
+        unit = units_small[unit_idx]
+    end
+
+    return unit, unit_idx
+end
+
+
+function scale(value, unit_idx, scale_up)
+    factor = Int(1000)
+    if scale_up
+        scaled_value = value/factor^(unit_idx-1)
+    else
+        scaled_value = value*factor^(unit_idx-1)
+    end
+    return scaled_value, unit_idx
+end
