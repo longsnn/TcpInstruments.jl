@@ -18,6 +18,22 @@ struct ScopeInfo
     low_pass_filter::String
     channel::Int64
 end
+function show(io::IO, x::ScopeInfo)
+    println(io, "ScopeInfo:")
+    println(io, "format: $(x.format)")
+    println(io, "type: $(x.type)")
+    println(io, "num_points: $(x.num_points)")
+    println(io, "x_increments: $(x.x_increments)")
+    println(io, "x_origin: $(x.x_origin)")
+    println(io, "x_reference: $(x.x_reference)")
+    println(io, "y_increments: $(x.y_increments)")
+    println(io, "y_origin: $(x.y_origin)")
+    println(io, "y_reference: $(x.y_reference)")
+    println(io, "impedance: $(x.impedance)")
+    println(io, "coupling: $(x.coupling)")
+    println(io, "low_pass_filter: $(x.low_pass_filter)")
+    println(io, "channel: $(x.channel)")
+end
 
 struct ScopeData
     info::Union{ScopeInfo, Nothing}
