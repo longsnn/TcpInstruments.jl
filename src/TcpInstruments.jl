@@ -31,7 +31,7 @@ Once you have created a config file you can change it with
 edit_config()
 ```
 
-If the instrument has its address in the config file you can now connect with: 
+If the instrument has its address in the config file you can now connect with:
 ```
 handle = initialize({Instrument-Type})
 ```
@@ -72,7 +72,7 @@ export get_function, set_function
 export get_frequency, set_frequency
 export get_amplitude, set_amplitude
 export get_voltage_offset, set_voltage_offset
-export set_burst_mode_gated, set_burst_mode_triggered, get_burst_mode
+export set_burst_mode_gated, get_burst_mode
 export get_mode, set_mode_burst, set_mode_cw
 
 
@@ -93,13 +93,11 @@ export get_frequency_limits, set_frequency_limits
 export get_num_data_points, set_num_data_points
 export get_volt_dc, set_volt_dc
 export get_volt_ac, set_volt_ac
-export get_volt_limit_dc, set_volt_limit_dc
 
 # Signal Generator
 export get_frequency, set_frequency
 export get_amplitude, set_amplitude
 export get_burst_num_cycles, set_burst_num_cycles
-export get_time_offset, set_time_offset
 export get_voltage_offset, set_voltage_offset
 export get_burst_period, set_burst_period
 export get_mode, set_mode_burst, set_mode_cw
