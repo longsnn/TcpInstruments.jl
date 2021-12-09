@@ -7,7 +7,8 @@ port = 8080
 println("port: ", port)
 server = listen(port)
 
-tcp(msg) = printstyled("[ TCP: " * msg * "\n", color = :blue, bold = true)
+#tcp(msg) = printstyled("[ TCP: " * msg * "\n", color = :blue, bold = true)
+tcp(msg) = []
 
 kill = false
 function close_emulator()

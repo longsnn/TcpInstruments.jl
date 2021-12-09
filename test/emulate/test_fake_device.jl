@@ -8,11 +8,11 @@ catch
 end
 
 function test_initialize(type)
-    @info "Creating fake $type instrument at localhost:8080"
+    #@info "Creating fake $type instrument at localhost:8080"
     handle = initialize(type, "127.0.0.1:8080")
-    @info handle
+    #@info handle
     @test handle.connected
-    @info "Successfully connected"
+    #@info "Successfully connected"
     return handle
 end
 
@@ -20,57 +20,57 @@ end
 @testset "Fake Instruments" begin
 
 
-@testset "FakeDSOX4034A" begin
-    fake_scope = initialize(TcpInstruments.FakeDSOX4034A)
-    channel = 1
-    scope_info = TcpInstruments.scope_waveform_info_get(fake_scope, channel)
-    @test scope_info.num_points == 65104
+    @testset "FakeDSOX4034A" begin
+        fake_scope = initialize(TcpInstruments.FakeDSOX4034A)
+        channel = 1
+        scope_info = TcpInstruments.scope_waveform_info_get(fake_scope, channel)
+        @test scope_info.num_points == 65104
 
-    data = get_data(fake_scope, channel)
-    @test length(data.volt) == scope_info.num_points
-end
-    
+        data = get_data(fake_scope, channel)
+        @test length(data.volt) == scope_info.num_points
+    end
 
-@testset "Scope Interface" begin
-    handle = test_initialize(AgilentDSOX4034A)
 
-    id = info(handle)
-    @test id == "1"
+    @testset "Scope Interface" begin
+        handle = test_initialize(AgilentDSOX4034A)
 
-    lpf_on(handle)
-    lpf_off(handle)
+        id = info(handle)
+        @test id == "1"
 
-    set_impedance_1Mohm(handle)
-    set_impedance_50ohm(handle)
+        lpf_on(handle)
+        lpf_off(handle)
 
-    terminate(handle)
-    @info "Successfully disconnected"
-end
+        set_impedance_1Mohm(handle)
+        set_impedance_50ohm(handle)
 
-@testset "Keysight34465A" begin
-    handle = test_initialize(KeysightDMM34465A)
+        terminate(handle)
+        #@info "Successfully disconnected"
+    end
 
-    id = info(handle)
-    @test id == "1"
+    @testset "Keysight34465A" begin
+        handle = test_initialize(KeysightDMM34465A)
 
-    set_temp_unit_kelvin(handle)
-    set_temp_unit_farenheit(handle)
-    set_temp_unit_celsius(handle)
+        id = info(handle)
+        @test id == "1"
 
-    terminate(handle)
-    @info "Successfully disconnected"
-end
+        set_temp_unit_kelvin(handle)
+        set_temp_unit_farenheit(handle)
+        set_temp_unit_celsius(handle)
 
-@testset "SRSPS310" begin
-    handle = test_initialize(SRSPS310)
-    enable_output(handle)
-    disable_output(handle)
-    set_current_limit(handle, 1A)
-    set_current_limit(handle, 2A)
-    set_current_limit(handle, 5A)
-    terminate(handle)
-    @info "Successfully disconnected"
-end
+        terminate(handle)
+        #@info "Successfully disconnected"
+    end
+
+    @testset "SRSPS310" begin
+        handle = test_initialize(SRSPS310)
+        enable_output(handle)
+        disable_output(handle)
+        set_current_limit(handle, 1A)
+        set_current_limit(handle, 2A)
+        set_current_limit(handle, 5A)
+        terminate(handle)
+        #@info "Successfully disconnected"
+    end
 
 end # End Tests
 
