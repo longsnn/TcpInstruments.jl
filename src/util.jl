@@ -82,12 +82,16 @@ function save_to_matfile(matfile, data::ImpedanceAnalyzerData)
 end
 
 function save_to_matfile(matfile, data)
-    data_unit = string(unit(data))
+    data_unit = string(unit(data[1]))
     if isempty(data_unit)
         data_unit = "no units"
     end
     write(matfile, "data", raw.(data))
     write(matfile, "data_unit", data_unit)
+end
+
+function save_to_matfile(matfile, data::String)
+    write(matfile, "data", data)
 end
 
 

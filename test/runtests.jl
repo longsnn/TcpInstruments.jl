@@ -63,14 +63,14 @@ const A = u"A"
             filename_1 = "./testfile_1"
             save(data, filename=filename_1, format=:matlab)
             data_loaded_1 = load(filename_1 * ".mat")
-            @test data_loaded_1 == data_nounit
+            @test data_loaded_1["data"] == data_nounit
             rm(filename_1 * ".mat")
 
             # save non-unitful input (numbers)
             filename_2 = "./testfile_2"
             save(data_nounit, filename=filename_2, format=:matlab)
             data_loaded_2 = load(filename_2 * ".mat")
-            @test data_loaded_2 == data_nounit
+            @test data_loaded_2["data"] == data_nounit
             rm(filename_2 * ".mat")
 
             # save non-unitful input (string)
@@ -78,7 +78,7 @@ const A = u"A"
             filename_3 = "./testfile_3"
             save(val, filename=filename_3, format=:matlab)
             data_loaded_3 = load(filename_3 * ".mat")
-            @test data_loaded_3 == val
+            @test data_loaded_3["data"] == val
             rm(filename_3 * ".mat")
         end
     end
