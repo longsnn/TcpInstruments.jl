@@ -18,8 +18,21 @@ const A = u"A"
         @test data.volt[1] isa Unitful.Voltage
 
         @testset "Save scope data" begin
+            time_no_units = ustrip.(TcpInstruments.raw.(data.time))
+            volt_no_units = ustrip.(TcpInstruments.raw.(data.volt))
+            time_unit = string(unit(data.time[1]))
+            volt_unit = string(unit(data.volt[1]))
+
             save_filename = "./scope_save_data"
             save(data, filename=save_filename, format=:matlab)
+            data_loaded = load(save_filename * ".mat")
+            for key in keys(data_loaded["info"])
+                @test data_loaded["info"][key] == getproperty(data.info, Symbol(key))
+            end
+            @test data_loaded["time"] == time_no_units
+            @test data_loaded["volt"] == volt_no_units
+            @test string(data_loaded["time_unit"]) == time_unit
+            @test string(data_loaded["volt_unit"]) == volt_unit
             rm(save_filename * ".mat")
         end
 

@@ -101,7 +101,7 @@ function load(filename)
     if ext == "jld2"
         data = jldopen(filename)["data"]
     elseif ext == "mat"
-         data = matread(filename)["data"]
+        data = matread(filename)
     else
         error("unsupported file type: $ext")
     end
