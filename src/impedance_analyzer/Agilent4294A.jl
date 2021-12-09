@@ -65,6 +65,9 @@ Gets the impedance from the impedance analyser. This function doesn't change any
 the device, it only grabs data using the current settings.
 """
 function get_impedance(ia::Instr{Agilent4294A})
+    info = get_impedance_analyzer_info(ia)
+    frequency = get_frequency(ia)
+    
     perform_single_acquisition(ia)
     is_acquisition_complete = get_acquisition_status(ia)
 
@@ -73,9 +76,6 @@ function get_impedance(ia::Instr{Agilent4294A})
     data = read_float32(ia)
     write(ia, "MEAS IMPH")
     impedance = data[1:2:end] .+ (data[2:2:end])im
-
-    info = get_impedance_analyzer_info(ia)
-    frequency = get_frequency(ia)
 
     return ImpedanceAnalyzerData(info, frequency, impedance * R)
 end
