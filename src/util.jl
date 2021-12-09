@@ -217,23 +217,9 @@ const _volt_large_units = ["V", "kV", "MV", "GV"]
 #TODO: rename to autoscale_seconds and refactor the existing function out
 function new_autoscale_seconds(seconds)
     max_val = maximum(abs.(seconds))
-    _, unit = get_nearest_scale_and_time_unit(max_val)
+    _, scaling_factor, unit = get_nearest_scale_and_time_unit(max_val)
 
-    if unit == "ps"
-        factor = 1e12
-    elseif unit == "ns"
-        factor = 1e9
-    elseif unit == "µs"
-        factor = 1e6
-    elseif unit == "ms"
-        factor = 1e3
-    elseif unit == "s"
-        factor = 1
-    else
-        error("unknown unit: $unit")
-    end
-
-    time_scaled = seconds .* factor
+    time_scaled = seconds .* scaling_factor
 
     return time_scaled, unit
 end
@@ -243,22 +229,22 @@ get_nearest_scale_and_volt_unit(volt)    = get_nearest_scale_and_unit(volt, _vol
 
 
 function get_nearest_scale_and_unit(value, units_large, units_small)
-    if value == 0 || value == 1
-        return (value, units_large[1])
+    if value == 0
+        return value, 1, units_large[1]
     end
     factor = Int(1000)
     logval = log(abs(value))
-    scale_up = sign(logval) == 1
-    unit_idx = ceil(Int, abs(logval) / log(factor))
-    unit, unit_idx = get_nearest_unit(unit_idx, scale_up, units_large, units_small)
-    scaled_value, unit_idx = scale(value, unit_idx, scale_up)
+    scale_down = sign(logval) == 1
+    power = ceil(Int, abs(logval) / log(factor))
+    unit, power = get_nearest_unit(power, scale_down, units_large, units_small)
+    scaled_value, scaling_factor = scale(value, power, scale_down)
 
-    return scaled_value, unit
+    return scaled_value, scaling_factor, unit
 end
 
 
-function get_nearest_unit(unit_idx, scale_up, units_large, units_small)
-    if scale_up
+function get_nearest_unit(unit_idx, scale_down, units_large, units_small)
+    if scale_down
         unit_idx = clamp(unit_idx, 0, length(units_large))
         unit = units_large[unit_idx]
     else
@@ -270,12 +256,14 @@ function get_nearest_unit(unit_idx, scale_up, units_large, units_small)
 end
 
 
-function scale(value, unit_idx, scale_up)
-    factor = Int(1000)
-    if scale_up
-        scaled_value = value/factor^(unit_idx-1)
+function scale(value, power, scale_down)
+    factor = 1000.0
+    if scale_down
+        factor = factor^(-(power-1))
+        scaled_value = value*factor
     else
-        scaled_value = value*factor^(unit_idx-1)
+        factor = factor^(power-1)
+        scaled_value = value*factor
     end
-    return scaled_value, unit_idx
+    return scaled_value, factor
 end
