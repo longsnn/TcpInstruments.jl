@@ -79,7 +79,7 @@ abstract type WaveformGenerator <: Instrument end
 abstract type ImpedanceAnalyzer <: Instrument end
 
 mutable struct Instr{ T <: Instrument } <: Instrument
-    model::Union{Type, T}
+    model::T
     address::String
     sock::TCPSocket
     connected::Bool
