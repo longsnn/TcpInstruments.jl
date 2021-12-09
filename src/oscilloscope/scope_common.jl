@@ -45,6 +45,35 @@ struct ScopeData
     time::Vector{typeof(1.0u"s")}
 end
 
+function show(io::IO, x::ScopeData)
+    if isnothing(x.info)
+        println(io, "ScopeData.info: nothing")
+    else
+        println(io, "struct ScopeData has three fields: .info, .volt, and .time")
+        print(io, " .info is a")
+        Base.show(io, x.info)
+    end
+
+
+    seconds = raw.(x.time)
+    volt = raw.(x.volt)
+    scaled_time, time_unit = new_autoscale_seconds(seconds)
+    scaled_volt, volt_unit = new_autoscale_volt(volt)
+
+    println(io, "\n Plot of .volt vs .time:")
+    UnicodePlots.lineplot(collect(1:10), rand(10), title="test")
+    plt = UnicodePlots.lineplot(scaled_time, scaled_volt;
+        title = "Voltage Trace",
+        name="Channel $(x.info.channel)",
+        width = 70,
+        height= 25,
+        margin= 1,
+        xlabel="Time / $(time_unit)",
+        ylabel="Volt / $(volt_unit)")
+    show(io, plt)
+    println("")
+end
+
 
 @recipe function plot(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
     scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
@@ -193,7 +222,7 @@ run(obj::Instr{T}) where T <: Oscilloscope = write(obj, "RUN")
 
 """
     stop(scope)
-    
+
 Stop Oscilloscope
 """
 stop(obj::Instr{T}) where T <: Oscilloscope = write(obj, "STOP")
