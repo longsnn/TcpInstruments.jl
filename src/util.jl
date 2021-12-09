@@ -224,6 +224,15 @@ function new_autoscale_seconds(seconds)
     return time_scaled, unit
 end
 
+function new_autoscale_volt(volt)
+    max_val = maximum(abs.(volt))
+    _, scaling_factor, unit = get_nearest_scale_and_volt_unit(max_val)
+
+    volt_scaled = volt .* scaling_factor
+
+    return volt_scaled, unit
+end
+
 get_nearest_scale_and_time_unit(seconds) = get_nearest_scale_and_unit(seconds, ["s"], _time_units)
 get_nearest_scale_and_volt_unit(volt)    = get_nearest_scale_and_unit(volt, _volt_large_units, _volt_small_units)
 
