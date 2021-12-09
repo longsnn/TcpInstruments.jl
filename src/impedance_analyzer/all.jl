@@ -2,6 +2,18 @@ include("./Agilent4294A.jl")
 include("./Agilent4395A.jl")
 
 
+"""
+    get_impedance_analyzer_info(ia::Instr{<:ImpedanceAnalyzer})
+Get current acquisition parameters from the impedance analyzer
+
+dc_voltage [V]
+ac_voltage [V]
+num_averages
+bandwidth_level [1, 2, 3, 4, 5]
+point_delay_time [s]
+sweep_delay_time [s]
+sweep_direction ["UP", "DOWN"]
+"""
 function get_impedance_analyzer_info(ia::Instr{<:ImpedanceAnalyzer})
     dc_voltage = get_volt_dc(ia)
     ac_voltage = get_volt_ac(ia)
@@ -14,6 +26,10 @@ function get_impedance_analyzer_info(ia::Instr{<:ImpedanceAnalyzer})
 end
 
 
+"""
+    get_num_averages(ia::Instr{<:ImpedanceAnalyzer})
+Get the number of sweep averages being used
+"""
 function get_num_averages(ia::Instr{<:ImpedanceAnalyzer})
     if is_average_mode_on(ia)
         write(ia, "AVERFACT?")
@@ -24,12 +40,23 @@ function get_num_averages(ia::Instr{<:ImpedanceAnalyzer})
     return num_averages
 end
 
+
+"""
+    is_average_mode_on(ia::Instr{<:ImpedanceAnalyzer})
+Get status for whether average mode is on
+Output is [true, false]
+"""
 function is_average_mode_on(ia::Instr{<:ImpedanceAnalyzer})
     write(ia, "AVER?")
     return parse(Bool, read(ia))
 end
 
 
+"""
+    get_point_delay_time(ia::Instr{<:ImpedanceAnalyzer})
+Get time delay value used between data point acquisitions
+Output is in [s]
+"""
 function get_point_delay_time(ia::Instr{<:ImpedanceAnalyzer})
     write(ia, "PDELT?")
     point_delay_time = parse(Float64, read(ia)) * u"s"
@@ -37,6 +64,11 @@ function get_point_delay_time(ia::Instr{<:ImpedanceAnalyzer})
 end
 
 
+"""
+    get_sweep_delay_time(ia::Instr{<:ImpedanceAnalyzer})
+Get time delay value used between sweep acquisitions
+Output is in [s]
+"""
 function get_sweep_delay_time(ia::Instr{<:ImpedanceAnalyzer})
     write(ia, "SDELT?")
     sweep_delay_time = parse(Float64, read(ia)) * u"s"
@@ -44,6 +76,14 @@ function get_sweep_delay_time(ia::Instr{<:ImpedanceAnalyzer})
 end
 
 
+"""
+    get_sweep_direction(ia::Instr{<:ImpedanceAnalyzer})
+Get acquisition sweep direction
+Output is ["UP", "DOWN"]
+
+"UP": sweeps along increasing values (left to right on screen)
+"DOWN": sweeps along decreasing values (right to left on screen)
+"""
 function get_sweep_direction(ia::Instr{<:ImpedanceAnalyzer})
     write(ia, "SWED?")
     sweep_direction = read(ia)
@@ -51,6 +91,11 @@ function get_sweep_direction(ia::Instr{<:ImpedanceAnalyzer})
 end
 
 
+"""
+    get_frequency(ia::Instr{<:ImpedanceAnalyzer})
+Get an array of frequency values with the same number of points as the data trace
+Output is in [MHz]
+"""
 function get_frequency(ia::Instr{<:ImpedanceAnalyzer})
     start_frequency = get_frequency_lower_bound(ia)
     end_frequency = get_frequency_upper_bound(ia)
