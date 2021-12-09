@@ -46,14 +46,13 @@ struct ScopeData
 end
 
 function show(io::IO, x::ScopeData)
+    println(io, "ScopeData has three fields: .info, .volt, and .time.")
     if isnothing(x.info)
         println(io, "ScopeData.info: nothing")
     else
-        println(io, "struct ScopeData has three fields: .info, .volt, and .time")
         print(io, " .info is a")
         Base.show(io, x.info)
     end
-
 
     seconds = raw.(x.time)
     volt = raw.(x.volt)
