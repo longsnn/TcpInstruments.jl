@@ -41,10 +41,6 @@ const A = u"A"
         # TODO: fix bug where saving multichannel scope data fails (output is a vector of ScopeData)
     end
 
-    @testset "TcpInstruments.jl" begin
-        include("./emulate/test_fake_device.jl")
-    end
-
     @testset "Util Functions" begin
         @testset "split_str_into_host_and_port" begin
             host = "192.168.1.1"
@@ -85,7 +81,5 @@ const A = u"A"
             @test data_loaded_3 == val
             rm(filename_3 * ".mat")
         end
-
     end
-
 end
