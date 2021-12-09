@@ -101,7 +101,7 @@ const A = u"A"
             @test expected_number_and_unit(format_volt, 3.3e-3, 3.3, "mV")
             @test expected_number_and_unit(format_volt, 3.3e-6, 3.3, "µV")
             @test expected_number_and_unit(format_volt, 7.6e-9, 7.6, "nV")
-    end
+        end
 
 
 

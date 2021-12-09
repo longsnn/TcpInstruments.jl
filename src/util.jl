@@ -214,8 +214,32 @@ const _volt_small_units = ["V","mV", "µV", "nV"]
 const _volt_large_units = ["V", "kV", "MV", "GV"]
 
 
-format_time(seconds) = get_nearest_scale_and_unit(seconds, ["s"], _time_units)
-format_volt(volt)    = get_nearest_scale_and_unit(volt, _volt_large_units, _volt_small_units)
+#TODO: rename to autoscale_seconds and refactor the existing function out
+function new_autoscale_seconds(seconds)
+    max_val = maximum(abs.(seconds))
+    _, unit = get_nearest_scale_and_time_unit(max_val)
+
+    if unit == "ps"
+        factor = 1e12
+    elseif unit == "ns"
+        factor = 1e9
+    elseif unit == "µs"
+        factor = 1e6
+    elseif unit == "ms"
+        factor = 1e3
+    elseif unit == "s"
+        factor = 1
+    else
+        error("unknown unit: $unit")
+    end
+
+    time_scaled = seconds .* factor
+
+    return time_scaled, unit
+end
+
+get_nearest_scale_and_time_unit(seconds) = get_nearest_scale_and_unit(seconds, ["s"], _time_units)
+get_nearest_scale_and_volt_unit(volt)    = get_nearest_scale_and_unit(volt, _volt_large_units, _volt_small_units)
 
 
 function get_nearest_scale_and_unit(value, units_large, units_small)
