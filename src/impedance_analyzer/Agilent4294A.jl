@@ -71,10 +71,10 @@ function get_impedance(ia::Instr{Agilent4294A})
     perform_single_acquisition(ia)
     is_acquisition_complete = get_acquisition_status(ia)
 
-    write(ia, "MEAS COMP")
+    set_measurement_to_complex(ia)
     set_channel(ia, 1)
     data = read_float32(ia)
-    write(ia, "MEAS IMPH")
+    set_measurement_to_impedance_and_phase(ia)
     impedance = data[1:2:end] .+ (data[2:2:end])im
 
     return ImpedanceAnalyzerData(info, frequency, impedance * R)
@@ -94,6 +94,35 @@ function get_acquisition_status(ia::Instr{Agilent4294A})
     write(ia, "*OPC?")
     output = read(ia)
     return parse(Bool, output)
+end
+
+
+"""
+    set_measurement_to_complex(ia::Instr{Agilent4294A})
+Set Traces A & B to measure Z & Y, respectively
+Z: Impedance (complex number R + jX)
+Y: Admittance (complex number G + jB)
+
+R: Equivalent series resistance
+X: Equivalent series reactance
+G: Equivalent parallel conductance
+B: Equivalent parallel susceptance
+"""
+function set_measurement_to_complex(ia::Instr{Agilent4294A})
+    write(ia, "MEAS COMP")
+    return nothing
+end
+
+
+"""
+    set_measurement_to_impedance_and_phase(ia::Instr{Agilent4294A})
+Set Traces A & B to measure |Z| & θ, respectively
+|Z|: Impedance amplitude (absolute value)
+  θ: Impedance phase
+"""
+function set_measurement_to_impedance_and_phase(ia::Instr{Agilent4294A})
+    write(ia, "MEAS IMPH")
+    return nothing
 end
 
 
