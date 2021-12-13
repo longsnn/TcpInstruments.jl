@@ -65,16 +65,19 @@ Gets the impedance from the impedance analyser. This function doesn't change any
 the device, it only grabs data using the current settings.
 """
 function get_impedance(ia::Instr{Agilent4294A})
+    info = get_impedance_analyzer_info(ia)
+    frequency = get_frequency(ia)
+    
     perform_single_acquisition(ia)
     is_acquisition_complete = get_acquisition_status(ia)
 
-    write(ia, "MEAS COMP")
+    set_measurement_to_complex(ia)
     set_channel(ia, 1)
     data = read_float32(ia)
-    write(ia, "MEAS IMPH")
-
+    set_measurement_to_impedance_and_phase(ia)
     impedance = data[1:2:end] .+ (data[2:2:end])im
-    return impedance * R
+
+    return ImpedanceAnalyzerData(info, frequency, impedance * R)
 end
 
 
@@ -91,6 +94,35 @@ function get_acquisition_status(ia::Instr{Agilent4294A})
     write(ia, "*OPC?")
     output = read(ia)
     return parse(Bool, output)
+end
+
+
+"""
+    set_measurement_to_complex(ia::Instr{Agilent4294A})
+Set Traces A & B to measure Z & Y, respectively
+Z: Impedance (complex number R + jX)
+Y: Admittance (complex number G + jB)
+
+R: Equivalent series resistance
+X: Equivalent series reactance
+G: Equivalent parallel conductance
+B: Equivalent parallel susceptance
+"""
+function set_measurement_to_complex(ia::Instr{Agilent4294A})
+    write(ia, "MEAS COMP")
+    return nothing
+end
+
+
+"""
+    set_measurement_to_impedance_and_phase(ia::Instr{Agilent4294A})
+Set Traces A & B to measure |Z| & θ, respectively
+|Z|: Impedance amplitude (absolute value)
+  θ: Impedance phase
+"""
+function set_measurement_to_impedance_and_phase(ia::Instr{Agilent4294A})
+    write(ia, "MEAS IMPH")
+    return nothing
 end
 
 
@@ -149,8 +181,9 @@ function read_float32(ia::Instr{Agilent4294A})
     # read end of line character
     read(ia)
 
-    if length(data) != num_data_points
-        error("Transferred data did not have the expected number of data points (transferred: $(length(data)), expected: $num_data_points)")
+    num_values = num_data_points * num_values_per_point
+    if length(data) != num_values
+        error("Transferred data did not have the expected number of data points\nTransferred: $(length(data))\nExpected: $num_values ($num_data_points * $num_values_per_point)\n")
     end
 
     return data

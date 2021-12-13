@@ -88,11 +88,17 @@ export set_temp_unit_celsius, set_temp_unit_farenheit, set_temp_unit_kelvin
 export get_temp_unit
 
 # Impedance
-export get_bandwidth, set_bandwidth
-export get_frequency_limits, set_frequency_limits
-export get_num_data_points, set_num_data_points
+export get_impedance
+export get_impedance_analyzer_info
 export get_volt_dc, set_volt_dc
 export get_volt_ac, set_volt_ac
+export get_num_averages, is_average_mode_on
+export get_bandwidth, set_bandwidth
+export get_point_delay_time, get_sweep_delay_time
+export get_sweep_direction
+export get_frequency
+export get_frequency_limits, set_frequency_limits
+export get_num_data_points, set_num_data_points
 export get_volt_limit_dc, set_volt_limit_dc
 
 # Signal Generator
@@ -120,6 +126,7 @@ export Keysight33612A
 
 export scan_network
 
+include("types.jl")
 include("util.jl")
 include("config.jl")
 

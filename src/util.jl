@@ -45,21 +45,55 @@ function save(data; filename = "", format = :julia)
     if format == :julia
         @save (filename * ".jld2") data
     elseif format == :matlab
-        file = matopen(filename * ".mat", "w"; compress=true)
-        if isa(data, ScopeData)
-            info = data.info
-            volt = ustrip.(data.volt)
-            time = ustrip.(data.time)
-            write(file, "info", info)
-            write(file, "volt", volt)
-            write(file, "time", time)
-        else
-            write(file, "data", raw.(data))
-        end
-
-        close(file)
+        matfile = matopen(filename * ".mat", "w"; compress=true)
+        save_to_matfile(matfile, data)
+        close(matfile)
     end
 end
+
+function save_to_matfile(matfile, data::ScopeData)
+    info = data.info
+    volt = ustrip.(data.volt)
+    time = ustrip.(data.time)
+    volt_unit = string(unit(data.volt[1]))
+    time_unit = string(unit(data.time[1]))
+    write(matfile, "info", info)
+    write(matfile, "volt", volt)
+    write(matfile, "time", time)
+    write(matfile, "volt_unit", volt_unit)
+    write(matfile, "time_unit", time_unit)
+end
+
+function save_to_matfile(matfile, data::ImpedanceAnalyzerData)
+    info = Dict()
+    for fieldname in fieldnames(typeof(data.info))
+        val = raw(getfield(data.info, fieldname))
+        info[string(fieldname)] = val
+    end
+    frequency = ustrip.(data.frequency)
+    impedance = ustrip.(data.impedance)
+    frequency_unit = string(unit(data.frequency[1]))
+    impedance_unit = string(unit(data.impedance[1]))
+    write(matfile, "info", info)
+    write(matfile, "frequency", frequency)
+    write(matfile, "impedance", impedance)
+    write(matfile, "frequency_unit", frequency_unit)
+    write(matfile, "impedance_unit", impedance_unit)
+end
+
+function save_to_matfile(matfile, data)
+    data_unit = string(unit(data[1]))
+    if isempty(data_unit)
+        data_unit = "no units"
+    end
+    write(matfile, "data", raw.(data))
+    write(matfile, "data_unit", data_unit)
+end
+
+function save_to_matfile(matfile, data::String)
+    write(matfile, "data", data)
+end
+
 
 """
     data = load("file.jld2")
@@ -71,7 +105,7 @@ function load(filename)
     if ext == "jld2"
         data = jldopen(filename)["data"]
     elseif ext == "mat"
-         data = matread(filename)["data"]
+        data = matread(filename)
     else
         error("unsupported file type: $ext")
     end

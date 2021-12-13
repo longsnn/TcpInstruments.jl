@@ -17,12 +17,28 @@ const A = u"A"
         @test length(data.time) == length(data.volt)
         @test data.volt[1] isa Unitful.Voltage
 
+        @testset "Save scope data" begin
+            time_no_units = ustrip.(TcpInstruments.raw.(data.time))
+            volt_no_units = ustrip.(TcpInstruments.raw.(data.volt))
+            time_unit = string(unit(data.time[1]))
+            volt_unit = string(unit(data.volt[1]))
+
+            save_filename = "./scope_save_data"
+            save(data, filename=save_filename, format=:matlab)
+            data_loaded = load(save_filename * ".mat")
+            for key in keys(data_loaded["info"])
+                @test data_loaded["info"][key] == getproperty(data.info, Symbol(key))
+            end
+            @test data_loaded["time"] == time_no_units
+            @test data_loaded["volt"] == volt_no_units
+            @test string(data_loaded["time_unit"]) == time_unit
+            @test string(data_loaded["volt_unit"]) == volt_unit
+            rm(save_filename * ".mat")
+        end
+
         data = get_data(f, [1,2,3,4])
         @test length(data) == 4
-    end
-
-    @testset "TcpInstruments.jl" begin
-        include("./emulate/test_fake_device.jl")
+        # TODO: fix bug where saving multichannel scope data fails (output is a vector of ScopeData)
     end
 
     @testset "Util Functions" begin
@@ -47,14 +63,14 @@ const A = u"A"
             filename_1 = "./testfile_1"
             save(data, filename=filename_1, format=:matlab)
             data_loaded_1 = load(filename_1 * ".mat")
-            @test data_loaded_1 == data_nounit
+            @test data_loaded_1["data"] == data_nounit
             rm(filename_1 * ".mat")
 
             # save non-unitful input (numbers)
             filename_2 = "./testfile_2"
             save(data_nounit, filename=filename_2, format=:matlab)
             data_loaded_2 = load(filename_2 * ".mat")
-            @test data_loaded_2 == data_nounit
+            @test data_loaded_2["data"] == data_nounit
             rm(filename_2 * ".mat")
 
             # save non-unitful input (string)
@@ -62,10 +78,8 @@ const A = u"A"
             filename_3 = "./testfile_3"
             save(val, filename=filename_3, format=:matlab)
             data_loaded_3 = load(filename_3 * ".mat")
-            @test data_loaded_3 == val
+            @test data_loaded_3["data"] == val
             rm(filename_3 * ".mat")
         end
-
     end
-
 end
