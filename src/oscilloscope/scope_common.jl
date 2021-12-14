@@ -1,7 +1,7 @@
 using RecipesBase
 
 import Base.show
-using UnicodePlots
+import UnicodePlots
 
 
 const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
