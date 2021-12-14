@@ -3,9 +3,9 @@ import Base.Threads.@spawn
 
 println(PROGRAM_FILE)
 println("Instruments Emulator")
-port = 8080
-println("port: ", port)
-const server = listen(port)
+const PORT = 8080
+println("port: ", PORT)
+const SERVER = listen(PORT)
 
 #tcp(msg) = printstyled("[ TCP: " * msg * "\n", color = :blue, bold = true)
 tcp(msg) = []
@@ -20,7 +20,7 @@ close_emulator() = set_connection_open(false)
 function emulator()
     while true
         #@info "Accepting a TCP connection"
-        conn = accept(server)
+        conn = accept(SERVER)
         @async begin
             try
                 while connection_is_open()
