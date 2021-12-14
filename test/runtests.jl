@@ -27,7 +27,7 @@ const A = u"A"
 
 
 
-    #=
+
     @testset "Fake Scope" begin
         f = initialize(TcpInstruments.FakeDSOX4034A)
 
@@ -43,7 +43,7 @@ const A = u"A"
     @testset "FakeDevice" begin
         include("./emulate/test_fake_device.jl")
     end
-    =#
+
 
     @testset "Util Functions" begin
         @testset "split_str_into_host_and_port" begin
