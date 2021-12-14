@@ -115,7 +115,8 @@ const A = u"A"
         @testset "show(ScopeData)" begin
             using TcpInstruments: ScopeInfo, ScopeData
             si = ScopeInfo("8bit", "Normal", 1000, 1/1e3, -5e-4, 0, 1, 0, 0, "50 Ω", "DC", "off", 2)
-            volts = rand(si.num_points)*u"V"
+            amplitude = 100u"mV"
+            volts = amplitude* TcpInstruments.fake_signal(si.num_points; f0=7.5e6)
             mytime = u"s"*((( collect(0:(si.num_points-1))  .- si.x_reference) .* si.x_increment) .+ si.x_origin)
             sd = ScopeData(si, volts, mytime)
             show(sd)
