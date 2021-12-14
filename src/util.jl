@@ -64,19 +64,18 @@ function save_to_matfile(matfile, data::ScopeData)
     write(matfile, "time_unit", time_unit)
 end
 
-function save_to_matfile(matfile, scope_data_array::Array{ScopeData})
-    array_length = length(scope_data_array)
-    data_template = Matrix{Any}(nothing, 1, array_length)
-    data = Dict("info"=>copy(data_template), "volt"=>copy(data_template), "time"=>copy(data_template), "volt_unit"=>copy(data_template), "time_unit"=>copy(data_template))
+function save_to_matfile(matfile, data_array::Array{ScopeData})
+    array_length = length(data_array)
     for idx = 1:array_length
-        scope_data = scope_data_array[idx]
-        data["info"][idx] = scope_data.info
-        data["volt"][idx] = ustrip.(scope_data.volt)
-        data["time"][idx] = ustrip.(scope_data.time)
-        data["volt_unit"][idx] = string(unit(scope_data.volt[1]))
-        data["time_unit"][idx] = string(unit(scope_data.time[1]))
+        data_dict = Dict()
+        scope_data = data_array[idx]
+        data_dict["info"] = scope_data.info
+        data_dict["volt"] = ustrip.(scope_data.volt)
+        data_dict["time"] = ustrip.(scope_data.time)
+        data_dict["volt_unit"] = string(unit(scope_data.volt[1]))
+        data_dict["time_unit"] = string(unit(scope_data.time[1]))
+        write(matfile, "channel_$(scope_data.info.channel)", data_dict)
     end
-    write(matfile, "data", data)
 end
 
 function save_to_matfile(matfile, data::ImpedanceAnalyzerData)
