@@ -3,6 +3,7 @@ using Base.Threads: @spawn
 using Dates
 using MAT
 using JLD2
+import OffsetArrays
 
 const R = u"Ω"
 const V = u"V"
@@ -70,7 +71,7 @@ function load(filename)
     if ext == "jld2"
         data = jldopen(filename)["data"]
     elseif ext == "mat"
-         data = matread(filename)["data"]
+        data = matread(filename)["data"]
     else
         error("unsupported file type: $ext")
     end
@@ -217,62 +218,27 @@ const _volt_large_units = ["V", "kV", "MV", "GV"]
 #TODO: rename to autoscale_seconds and refactor the existing function out
 function new_autoscale_seconds(seconds)
     max_val = maximum(abs.(seconds))
-    _, scaling_factor, unit = get_nearest_scale_and_time_unit(max_val)
-
-    time_scaled = seconds .* scaling_factor
-
-    return time_scaled, unit
+    return convert_to_best_prefix(max_val; base_unit = "s")
 end
 
 function new_autoscale_volt(volt)
     max_val = maximum(abs.(volt))
-    _, scaling_factor, unit = get_nearest_scale_and_volt_unit(max_val)
-
-    volt_scaled = volt .* scaling_factor
-
-    return volt_scaled, unit
+    return convert_to_best_prefix(max_val; base_unit = "V")
 end
 
-get_nearest_scale_and_time_unit(seconds) = get_nearest_scale_and_unit(seconds, ["s"], _time_units)
-get_nearest_scale_and_volt_unit(volt)    = get_nearest_scale_and_unit(volt, _volt_large_units, _volt_small_units)
-
-
-function get_nearest_scale_and_unit(value, units_large, units_small)
-    if value == 0
-        return value, 1, units_large[1]
-    end
-    factor = Int(1000)
-    logval = log(abs(value))
-    scale_down = sign(logval) == 1
-    power = ceil(Int, abs(logval) / log(factor))
-    unit, power = get_nearest_unit(power, scale_down, units_large, units_small)
-    scaled_value, scaling_factor = scale(value, power, scale_down)
-
-    return scaled_value, scaling_factor, unit
+function convert_to_best_prefix(input_value; base_unit::String = "")
+    power_of_1000 = Int(round(log(1000, abs(input_value))))
+    prefixes = OffsetArrays.OffsetArray(["p", "n", "μ", "m", "", "k", "M", "G"], -4:3)
+    unit_prefix = prefixes[power_of_1000]
+    unit = unit_prefix * base_unit
+    value = input_value * 10.0^(-3.0 * power_of_1000)
+    return value, unit
 end
 
-
-function get_nearest_unit(unit_idx, scale_down, units_large, units_small)
-    if scale_down
-        unit_idx = clamp(unit_idx, 0, length(units_large))
-        unit = units_large[unit_idx]
-    else
-        unit_idx = clamp(unit_idx+1, 1, length(units_small))
-        unit = units_small[unit_idx]
-    end
-
-    return unit, unit_idx
-end
-
-
-function scale(value, power, scale_down)
-    factor = 1000.0
-    if scale_down
-        factor = factor^(-(power-1))
-        scaled_value = value*factor
-    else
-        factor = factor^(power-1)
-        scaled_value = value*factor
-    end
-    return scaled_value, factor
+function convert_to_best_prefix(input_value::Unitful.AbstractQuantity)
+    power_of_1000 = Int(round(log(1000, abs(ustrip(input_value)))))
+    unit_prefixes = OffsetArrays.OffsetArray(["p", "n", "μ", "m", "", "k", "M", "G"], -4:3)
+    unit_prefix = unit_prefixes[power_of_1000]
+    prefixed_unit = uparse(unit_prefix * string(unit(input_value)))
+    return uconvert(prefixed_unit, input_value)
 end
