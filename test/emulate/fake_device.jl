@@ -5,7 +5,7 @@ println(PROGRAM_FILE)
 println("Instruments Emulator")
 port = 8080
 println("port: ", port)
-server = listen(port)
+const server = listen(port)
 
 #tcp(msg) = printstyled("[ TCP: " * msg * "\n", color = :blue, bold = true)
 tcp(msg) = []
