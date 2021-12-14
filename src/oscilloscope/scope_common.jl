@@ -365,11 +365,8 @@ function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
 end
 
 
-function fake_signal(n)
-    fs = 2.0e9;
-    f0 = 10.0e6;
+function fake_signal(n; fs = 2.0e9, f0 = 10.0e6, num_cycles = 10)
     dt = 1/fs
-    num_cycles = 10
     t = (0:(num_cycles*fs/f0-1)) .* dt
     s = sin.(2*pi*f0.*t)
 
