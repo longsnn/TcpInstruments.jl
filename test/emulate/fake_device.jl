@@ -19,13 +19,11 @@ close_emulator() = set_connection_open(false)
 
 function emulator()
     while true
+        #@info "Accepting a TCP connection"
         conn = accept(server)
         @async begin
             try
-                while true
-                    if connection_is_closed()
-                        exit()
-                    end
+                while connection_is_open()
                     line = readline(conn)
                     if !isempty(line)
                         if line == "*IDN?"
