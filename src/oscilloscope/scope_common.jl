@@ -23,7 +23,7 @@ struct ScopeInfo
     channel::Int64
 end
 function show(io::IO, x::ScopeInfo)
-    println(io, " struct ScopeInfo:")
+    println(io, "(ScopeInfo:")
     println(io, "          .format:  \"$(x.format)\"")
     println(io, "            .type:  \"$(x.type)\"")
     println(io, "      .num_points:  $(x.num_points)")
@@ -37,6 +37,7 @@ function show(io::IO, x::ScopeInfo)
     println(io, "        .coupling:  \"$(x.coupling)\"")
     println(io, " .low_pass_filter:  \"$(x.low_pass_filter)\"")
     println(io, "         .channel:  $(x.channel)")
+    println(io, ")")
 end
 
 struct ScopeData
@@ -50,7 +51,7 @@ function show(io::IO, x::ScopeData)
     if isnothing(x.info)
         println(io, "ScopeData.info: nothing")
     else
-        print(io, " .info is a")
+        println(io, " ScopeData.info contains:")
         Base.show(io, x.info)
     end
 
@@ -59,7 +60,7 @@ function show(io::IO, x::ScopeData)
     scaled_time, time_unit = new_autoscale_seconds(seconds)
     scaled_volt, volt_unit = new_autoscale_volt(volt)
 
-    println(io, "\n Plot of .volt vs .time:")
+    println(io, "\n Plot of ScopeData.volt vs ScopeData.time:")
     plt = UnicodePlots.lineplot(scaled_time, scaled_volt;
         title = "Voltage Trace",
         name="Channel $(x.info.channel)",
