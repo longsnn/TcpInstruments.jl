@@ -60,7 +60,6 @@ function show(io::IO, x::ScopeData)
     scaled_volt, volt_unit = new_autoscale_volt(volt)
 
     println(io, "\n Plot of .volt vs .time:")
-    UnicodePlots.lineplot(collect(1:10), rand(10), title="test")
     plt = UnicodePlots.lineplot(scaled_time, scaled_volt;
         title = "Voltage Trace",
         name="Channel $(x.info.channel)",
