@@ -10,16 +10,15 @@ const A = u"A"
 
 @testset ExtendedTestSet "TcpInstruments" begin
 
-    function expected_number_and_unit(function_name, val, true_factor, true_val_scaled, true_unit)
-        scaled_val, factor, unit = function_name(val)
+    function expected_number_and_unit(function_name, base_unit, val, true_val_scaled, true_unit; max_power = 3)
+        scaled_val, unit = function_name(val; base_unit = base_unit, max_power = max_power)
 
         same = (scaled_val ≈ true_val_scaled)
         same && (same = unit == true_unit)
-        same && (same = factor == true_factor)
 
         if !same
-            @info "true"   true_val_scaled, true_factor, true_unit
-            @info "scaled"      scaled_val,      factor,      unit
+            @info "value"   true_val_scaled, scaled_val, isapprox(scaled_val, true_val_scaled)
+            @info "scaled"        true_unit,       unit, true_unit == unit
         end
 
         return same
@@ -72,42 +71,32 @@ const A = u"A"
             rm(filename*".mat")
         end
 
-        @testset "get_nearest_scale_and_time_unit" begin
-            using TcpInstruments: get_nearest_scale_and_time_unit
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, 1e3,     1, 1000,   "s")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, 1,       1,    1,   "s")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, 0,       1,    0,   "s")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -1,      1,   -1,   "s")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -2e-2,   1e3,  -20,  "ms")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -3e-3,   1e3,   -3,  "ms")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -4e-4,   1e6, -400,  "µs")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -5e-5,   1e6,  -50,  "µs")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -6e-6,   1e6,   -6,  "µs")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -7e-7,   1e9, -700,  "ns")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -8e-8,   1e9,  -80,  "ns")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -9e-9,   1e9,   -9,  "ns")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -10e-10, 1e9,   -1,  "ns")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -11e-11, 1e12, -110,  "ps")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -12e-12, 1e12,  -12,  "ps")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -13e-13, 1e12, -1.3,  "ps")
-            @test expected_number_and_unit(get_nearest_scale_and_time_unit, -14e-14, 1e12, -0.14, "ps")
+        @testset "convert_to_best_prefix" begin
+            using TcpInstruments: convert_to_best_prefix
+            @test expected_number_and_unit(convert_to_best_prefix, "s", 1e3,     1000,   "s")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", 1,          1,   "s")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", 0,          0,   "s")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -1,        -1,   "s")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -2e-2,     -20,  "ms")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -3e-3,      -3,  "ms")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -4e-4,    -400,  "µs")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -5e-5,     -50,  "µs")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -6e-6,      -6,  "µs")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -7e-7,    -700,  "ns")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -8e-8,     -80,  "ns")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -9e-9,      -9,  "ns")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -10e-10,    -1,  "ns")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -11e-11,  -110,  "ps")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -12e-12,   -12,  "ps")
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -13e-13,  -1.3,  "ps")
+            # test going outside the unit prefix array size
+            @test expected_number_and_unit(convert_to_best_prefix, "s", -14e-14, -0.14,  "ps")
+            @test expected_number_and_unit(convert_to_best_prefix,  "s",  14e14, 1.4e6,  "Gs")
+            @test expected_number_and_unit(convert_to_best_prefix,  "s",  14e14, 14e14,  "s"; max_power=0)
 
-        end
-
-
-        @testset "get_nearest_scale_and_volt_unit" begin
-            using TcpInstruments: get_nearest_scale_and_volt_unit
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 1.1e9, 1e-9, 1.1, "GV")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 1.2e6, 1e-6, 1.2, "MV")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 1001,  1e-3, 1.001, "kV")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 1000,     1, 1000,  "V")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 1.1,      1,  1.1,  "V")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 0,        1,    0,  "V")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 1e-1,   1e3,  100, "mV")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 2.2e-2, 1e3,   22, "mV")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 3.3e-3, 1e3,   3.3, "mV")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 3.3e-6, 1e6,   3.3, "µV")
-            @test expected_number_and_unit(get_nearest_scale_and_volt_unit, 7.6e-9, 1e9,   7.6, "nV")
+            # volt unit
+            @test expected_number_and_unit(convert_to_best_prefix, "V", 1.1e9,   1.1,  "GV")
+            @test expected_number_and_unit(convert_to_best_prefix, "V", 7.6e-9,   7.6, "nV")
         end
 
 
@@ -119,6 +108,7 @@ const A = u"A"
             volts = amplitude* TcpInstruments.fake_signal(si.num_points; f0=7.5e6)
             mytime = u"s"*((( collect(0:(si.num_points-1))  .- si.x_reference) .* si.x_increment) .+ si.x_origin)
             sd = ScopeData(si, volts, mytime)
+            println("")
             show(sd)
 
         end
