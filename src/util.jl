@@ -242,7 +242,7 @@ end
 
 # Inputs
 - base_unit: Usually "v", "s", or "m"
-- max_power: is the maximum power of 10 to convert to. Valid values: -4:3
+- max_power: is the maximum power of 1000 to convert to. Valid values: -4:3
 
 # Examples
 - convert_to_best_prefix(1.7e5; base_unit = "V")
