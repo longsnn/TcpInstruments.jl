@@ -51,7 +51,7 @@ function show(io::IO, x::ScopeData)
     if isnothing(x.info)
         println(io, "ScopeData.info: nothing")
     else
-        println(io, " ScopeData.info contains:")
+        println(io, "ScopeData.info contains:")
         Base.show(io, x.info)
     end
 
@@ -60,7 +60,7 @@ function show(io::IO, x::ScopeData)
     scaled_time, time_unit = new_autoscale_seconds(seconds)
     scaled_volt, volt_unit = new_autoscale_volt(volt)
 
-    println(io, "\n Plot of ScopeData.volt vs ScopeData.time:")
+    println(io, "\nPlot of ScopeData.volt vs ScopeData.time:")
     plt = UnicodePlots.lineplot(scaled_time, scaled_volt;
         title = "Voltage Trace",
         name="Channel $(x.info.channel)",
