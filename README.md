@@ -7,7 +7,7 @@
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE)
-[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/Orchard-Ultrasound-Innovation/TcpInstruments.jl/v0.8.3.svg)](https://github.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl)
+[![GitHub commits since tagged version](https://img.shields.io/github/commits-since/Orchard-Ultrasound-Innovation/TcpInstruments.jl/v0.8.8.svg)](https://github.com/Orchard-Ultrasound-Innovation/TcpInstruments.jl)
 
 Control common lab equipment via SCPI over Ethernet and specifically not be dependent on the NIVISA library that other similar packages often have depended on.
 
