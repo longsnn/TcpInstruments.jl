@@ -55,13 +55,16 @@ function show(io::IO, x::ScopeData)
         Base.show(io, x.info)
     end
 
-    seconds = raw.(x.time)
-    volt = raw.(x.volt)
-    scaled_time, time_unit = new_autoscale_seconds(seconds)
-    scaled_volt, volt_unit = new_autoscale_volt(volt)
+    seconds = new_autoscale_unit(x.time)
+    volt    = new_autoscale_unit(x.volt)
+
+    time_unit = unit(seconds[1])
+    volt_unit = unit(volt[1])
+    seconds = raw.(seconds)
+    volt    = raw.(volt)
 
     println(io, "\nPlot of ScopeData.volt vs ScopeData.time:")
-    plt = UnicodePlots.lineplot(scaled_time, scaled_volt;
+    plt = UnicodePlots.lineplot(seconds, volt;
         title = "Voltage Trace",
         name="Channel $(x.info.channel)",
         width = 70,
