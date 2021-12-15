@@ -236,22 +236,18 @@ end
 """
 function convert_to_best_prefix(input_value; base_unit::String = "", max_power = 3)
     if input_value == 0 || input_value == 1000
+        factor = 1
         value = input_value
         unit = base_unit
-        factor = 1
     else
-        array_indices = -4:3
-        min_power = minimum(array_indices)
-        prefixes = OffsetArrays.OffsetArray(["p", "n", "µ", "m", "", "k", "M", "G"], array_indices)
-        power_of_1000 = Int(floor(log(1000, abs(input_value))))
-        power_of_1000 = clamp(power_of_1000, min_power, max_power)
-        unit_prefix = prefixes[power_of_1000]
-        unit = unit_prefix * base_unit
+        power_of_1000, unit_prefix = get_power_of_1000(input_value; max_power=max_power)
         factor = 1000.0^(-power_of_1000)
         value = input_value * factor
+        unit = unit_prefix * base_unit
     end
     return factor, value, unit
 end
+
 
 
 """
@@ -268,14 +264,25 @@ function convert_to_best_prefix(input_value::Unitful.AbstractQuantity; max_power
     if ustrip(input_value) == 0 || ustrip(input_value) == 1000
         scaled_value = input_value
     else
-        array_indices = -4:3
-        min_power = minimum(array_indices)
-        unit_prefixes = OffsetArrays.OffsetArray(["p", "n", "µ", "m", "", "k", "M", "G"], array_indices)
-        power_of_1000 = Int(ceil(log(1000, abs(ustrip(input_value)))))
-        power_of_1000 = clamp(power_of_1000, min_power, max_power)
-        unit_prefix   = unit_prefixes[power_of_1000]
+        _, unit_prefix = get_power_of_1000(input_value; max_power=max_power)
         prefixed_unit = uparse(unit_prefix * string(unit(input_value)))
         scaled_value  = uconvert(prefixed_unit, input_value)
     end
     return scaled_value
+end
+
+
+function get_power_of_1000(input_value; max_power = 3)
+    if input_value == 0 || input_value == 1000
+        power_of_1000 = 0;
+        unit_prefix = "";
+    else
+        array_indices = -4:3
+        min_power = minimum(array_indices)
+        prefixes = OffsetArrays.OffsetArray(["p", "n", "µ", "m", "", "k", "M", "G"], array_indices)
+        power_of_1000 = Int(floor(log(1000, abs(input_value))))
+        power_of_1000 = clamp(power_of_1000, min_power, max_power)
+        unit_prefix = prefixes[power_of_1000]
+    end
+    return power_of_1000, unit_prefix
 end
