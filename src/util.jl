@@ -267,7 +267,7 @@ end
     convert_to_best_prefix(input_value::Unitful.AbstractQuantity; max_power = 3)
 
 # Inputs
-- max_power: is the maximum power of 10 to convert to. Valid values: -4:3
+- max_power: is the maximum power of 1000 to convert to. Valid values: -4:3
 
 # Examples
 - convert_to_best_prefix(1.7e5u"V")
