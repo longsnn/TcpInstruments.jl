@@ -11,7 +11,7 @@ const A = u"A"
 @testset ExtendedTestSet "TcpInstruments" begin
 
     function expected_number_and_unit(function_name, base_unit, val, true_val_scaled, true_unit; max_power = 3)
-        factor, scaled_val, unit = function_name(val; base_unit = base_unit, max_power = max_power)
+        scaled_val, unit = function_name(val; base_unit = base_unit, max_power = max_power)
 
         same = (scaled_val ≈ true_val_scaled)
         same && (same = unit == true_unit)
@@ -113,6 +113,17 @@ const A = u"A"
             @test convert_to_best_prefix(-13e-13u"V") ≈ -1.3u"pV"
         end
 
+
+        @testset "new_autoscale_unit" begin
+            using TcpInstruments: new_autoscale_unit
+            no_unit = rand(100)
+            before = 2001u"V"*no_unit
+            true_scale = 2.001u"kV"*no_unit
+            after = new_autoscale_unit(before)
+            @test after ≈ true_scale
+
+
+        end
 
 
         @testset "show(ScopeData)" begin

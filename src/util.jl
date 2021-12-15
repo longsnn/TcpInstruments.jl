@@ -211,17 +211,31 @@ end
 #TODO: rename to autoscale_seconds and refactor the existing function out
 function new_autoscale_seconds(seconds)
     max_val = maximum(abs.(seconds))
-    factor, _, unit = convert_to_best_prefix(max_val; base_unit = "s")
+    _, unit = convert_to_best_prefix(max_val; base_unit = "s")
+    power_of_1000, _, factor = get_power_of_1000(max_val; max_power = 0)
+    factor = 1000.0^power_of_1000
     seconds_scaled = seconds .* factor
     return seconds_scaled, unit
 end
 
 function new_autoscale_volt(volt)
     max_val = maximum(abs.(volt))
-    factor, _, unit = convert_to_best_prefix(max_val; base_unit = "V")
+    _, unit = convert_to_best_prefix(max_val; base_unit = "V")
+    power_of_1000, _, factor = get_power_of_1000(max_val)
+    factor = 1000.0^power_of_1000
     volt_scaled = volt .* factor
     return volt_scaled, unit
 end
+
+function new_autoscale_unit(value_in::Vector{<:Unitful.AbstractQuantity})
+    max_val = maximum(abs.(value_in))
+    scaled_value = convert_to_best_prefix(max_val)
+    best_unit = unit(scaled_value)
+    scaled_values  = uconvert.(best_unit, value_in)
+
+    return scaled_values
+end
+
 
 """
     convert_to_best_prefix(input_value; base_unit::String = "", max_power = 3)
@@ -240,12 +254,11 @@ function convert_to_best_prefix(input_value; base_unit::String = "", max_power =
         value = input_value
         unit = base_unit
     else
-        power_of_1000, unit_prefix = get_power_of_1000(input_value; max_power=max_power)
-        factor = 1000.0^(-power_of_1000)
+        power_of_1000, unit_prefix, factor = get_power_of_1000(input_value; max_power=max_power)
         value = input_value * factor
         unit = unit_prefix * base_unit
     end
-    return factor, value, unit
+    return value, unit
 end
 
 
@@ -260,10 +273,11 @@ end
 - convert_to_best_prefix(1.7e5u"V")
 - convert_to_best_prefix(1.7e5u"s", max_power=0)
 """
-function convert_to_best_prefix(input_value::Unitful.AbstractQuantity; max_power = 3)
+function convert_to_best_prefix(input_value::Unitful.AbstractQuantity)
     if ustrip(input_value) == 0 || ustrip(input_value) == 1000
         scaled_value = input_value
     else
+        isa(input_value, Unitful.Time) ? max_power = 0 : max_power = 3
         _, unit_prefix = get_power_of_1000(ustrip(input_value); max_power=max_power)
         prefixed_unit = uparse(unit_prefix * string(unit(input_value)))
         scaled_value  = uconvert(prefixed_unit, input_value)
@@ -283,6 +297,7 @@ function get_power_of_1000(input_value; max_power = 3)
         power_of_1000 = Int(floor(log(1000, abs(input_value))))
         power_of_1000 = clamp(power_of_1000, min_power, max_power)
         unit_prefix = prefixes[power_of_1000]
+        factor = 1000.0^(-power_of_1000)
     end
-    return power_of_1000, unit_prefix
+    return power_of_1000, unit_prefix, factor
 end
