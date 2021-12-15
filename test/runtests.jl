@@ -11,7 +11,7 @@ const A = u"A"
 @testset ExtendedTestSet "TcpInstruments" begin
 
     function expected_number_and_unit(function_name, base_unit, val, true_val_scaled, true_unit; max_power = 3)
-        scaled_val, unit = function_name(val; base_unit = base_unit, max_power = max_power)
+        factor, scaled_val, unit = function_name(val; base_unit = base_unit, max_power = max_power)
 
         same = (scaled_val ≈ true_val_scaled)
         same && (same = unit == true_unit)

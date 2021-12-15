@@ -208,37 +208,74 @@ end
 
 
 
-
-
-const _time_units = ["s", "ms", "µs", "ns", "ps"]
-const _volt_small_units = ["V","mV", "µV", "nV"]
-const _volt_large_units = ["V", "kV", "MV", "GV"]
-
-
 #TODO: rename to autoscale_seconds and refactor the existing function out
 function new_autoscale_seconds(seconds)
     max_val = maximum(abs.(seconds))
-    return convert_to_best_prefix(max_val; base_unit = "s")
+    factor, _, unit = convert_to_best_prefix(max_val; base_unit = "s")
+    seconds_scaled = seconds .* factor
+    return seconds_scaled, unit
 end
 
 function new_autoscale_volt(volt)
     max_val = maximum(abs.(volt))
-    return convert_to_best_prefix(max_val; base_unit = "V")
+    factor, _, unit = convert_to_best_prefix(max_val; base_unit = "V")
+    volt_scaled = volt .* factor
+    return volt_scaled, unit
 end
 
-function convert_to_best_prefix(input_value; base_unit::String = "")
-    power_of_1000 = Int(round(log(1000, abs(input_value))))
-    prefixes = OffsetArrays.OffsetArray(["p", "n", "μ", "m", "", "k", "M", "G"], -4:3)
-    unit_prefix = prefixes[power_of_1000]
-    unit = unit_prefix * base_unit
-    value = input_value * 10.0^(-3.0 * power_of_1000)
-    return value, unit
+"""
+    convert_to_best_prefix(input_value; base_unit::String = "", max_power = 3)
+
+# Inputs
+- base_unit: Usually "v", "s", or "m"
+- max_power: is the maximum power of 10 to convert to. Valid values: -4:3
+
+# Examples
+- convert_to_best_prefix(1.7e5; base_unit = "V")
+- convert_to_best_prefix(1.7e5; base_unit = "s", max_power=0)
+"""
+function convert_to_best_prefix(input_value; base_unit::String = "", max_power = 3)
+    if input_value == 0 || input_value == 1000
+        value = input_value
+        unit = base_unit
+        factor = 1
+    else
+        array_indices = -4:3
+        min_power = minimum(array_indices)
+        prefixes = OffsetArrays.OffsetArray(["p", "n", "µ", "m", "", "k", "M", "G"], array_indices)
+        power_of_1000 = Int(floor(log(1000, abs(input_value))))
+        power_of_1000 = clamp(power_of_1000, min_power, max_power)
+        unit_prefix = prefixes[power_of_1000]
+        unit = unit_prefix * base_unit
+        factor = 1000.0^(-power_of_1000)
+        value = input_value * factor
+    end
+    return factor, value, unit
 end
 
-function convert_to_best_prefix(input_value::Unitful.AbstractQuantity)
-    power_of_1000 = Int(round(log(1000, abs(ustrip(input_value)))))
-    unit_prefixes = OffsetArrays.OffsetArray(["p", "n", "μ", "m", "", "k", "M", "G"], -4:3)
-    unit_prefix = unit_prefixes[power_of_1000]
-    prefixed_unit = uparse(unit_prefix * string(unit(input_value)))
-    return uconvert(prefixed_unit, input_value)
+
+"""
+    convert_to_best_prefix(input_value::Unitful.AbstractQuantity; max_power = 3)
+
+# Inputs
+- max_power: is the maximum power of 10 to convert to. Valid values: -4:3
+
+# Examples
+- convert_to_best_prefix(1.7e5u"V")
+- convert_to_best_prefix(1.7e5u"s", max_power=0)
+"""
+function convert_to_best_prefix(input_value::Unitful.AbstractQuantity; max_power = 3)
+    if ustrip(input_value) == 0 || ustrip(input_value) == 1000
+        scaled_value = input_value
+    else
+        array_indices = -4:3
+        min_power = minimum(array_indices)
+        unit_prefixes = OffsetArrays.OffsetArray(["p", "n", "µ", "m", "", "k", "M", "G"], array_indices)
+        power_of_1000 = Int(ceil(log(1000, abs(ustrip(input_value)))))
+        power_of_1000 = clamp(power_of_1000, min_power, max_power)
+        unit_prefix   = unit_prefixes[power_of_1000]
+        prefixed_unit = uparse(unit_prefix * string(unit(input_value)))
+        scaled_value  = uconvert(prefixed_unit, input_value)
+    end
+    return scaled_value
 end
