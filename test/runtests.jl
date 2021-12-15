@@ -97,6 +97,20 @@ const A = u"A"
             # volt unit
             @test expected_number_and_unit(convert_to_best_prefix, "V", 1.1e9,   1.1,  "GV")
             @test expected_number_and_unit(convert_to_best_prefix, "V", 7.6e-9,   7.6, "nV")
+
+            # with units
+            @test convert_to_best_prefix(1100u"V") ≈ 1.1u"kV"
+            @test convert_to_best_prefix(0u"V") ≈ 0u"V"
+            @test convert_to_best_prefix(1u"V") ≈ 1u"V"
+            @test convert_to_best_prefix(1000u"V") ≈ 1000u"V"
+            @test convert_to_best_prefix(11e-11u"s") ≈ 110u"ps"
+            @test convert_to_best_prefix(12e-12u"V") ≈ 12u"pV"
+            @test convert_to_best_prefix(13e-13u"V") ≈ 1.3u"pV"
+
+            @test convert_to_best_prefix(-1000u"V")   ≈ -1000u"V"
+            @test convert_to_best_prefix(-11e-11u"s") ≈ -110u"ps"
+            @test convert_to_best_prefix(-12e-12u"V") ≈ -12u"pV"
+            @test convert_to_best_prefix(-13e-13u"V") ≈ -1.3u"pV"
         end
 
 

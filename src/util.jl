@@ -264,7 +264,7 @@ function convert_to_best_prefix(input_value::Unitful.AbstractQuantity; max_power
     if ustrip(input_value) == 0 || ustrip(input_value) == 1000
         scaled_value = input_value
     else
-        _, unit_prefix = get_power_of_1000(input_value; max_power=max_power)
+        _, unit_prefix = get_power_of_1000(ustrip(input_value); max_power=max_power)
         prefixed_unit = uparse(unit_prefix * string(unit(input_value)))
         scaled_value  = uconvert(prefixed_unit, input_value)
     end
