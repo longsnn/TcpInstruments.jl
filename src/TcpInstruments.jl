@@ -42,6 +42,7 @@ use `help>Instrument`.
 module TcpInstruments
 
 using Sockets
+using RecipesBase
 using Unitful
 using Unitful: s, ms, μs, ns, ps
 
@@ -136,6 +137,7 @@ include("common_commands.jl")
 
 # instruments
 include("oscilloscope/all.jl")
+include("oscilloscope/recipes.jl")
 include("power_supply/all.jl")
 include("signal_generator/all.jl")
 include("impedance_analyzer/all.jl")
