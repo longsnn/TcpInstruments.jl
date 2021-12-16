@@ -12,18 +12,18 @@ const A = u"A"
     @testset "Fake Scope" begin
         f = initialize(TcpInstruments.FakeDSOX4034A)
 
-        data = get_data(f, 1)
-        @test data isa TcpInstruments.ScopeData
-        @test length(data.time) == length(data.volt)
-        @test data.volt[1] isa Unitful.Voltage
+        @testset "Save single ch data" begin
+            data = get_data(f, 1)
+            @test data isa TcpInstruments.ScopeData
+            @test length(data.time) == length(data.volt)
+            @test data.volt[1] isa Unitful.Voltage
 
-        @testset "Save scope data" begin
-            time_no_units = ustrip.(TcpInstruments.raw.(data.time))
-            volt_no_units = ustrip.(TcpInstruments.raw.(data.volt))
+            time_no_units = TcpInstruments.raw.(data.time)
+            volt_no_units = TcpInstruments.raw.(data.volt)
             time_unit = string(unit(data.time[1]))
             volt_unit = string(unit(data.volt[1]))
 
-            save_filename = "./scope_save_data"
+            save_filename = "./single_ch_scope_data"
             save(data, filename=save_filename, format=:matlab)
             data_loaded = load(save_filename * ".mat")
             for key in keys(data_loaded["info"])
@@ -36,9 +36,27 @@ const A = u"A"
             rm(save_filename * ".mat")
         end
 
-        data = get_data(f, [1,2,3,4])
-        @test length(data) == 4
-        # TODO: fix bug where saving multichannel scope data fails (output is a vector of ScopeData)
+        @testset "Save multi ch data" begin
+            data = get_data(f, [1,2,3,4])
+            @test length(data) == 4
+            
+            save_filename = "./multi_ch_scope_data"
+            save(data, filename=save_filename, format=:matlab)
+            
+            data_loaded = load(save_filename * ".mat")
+            for idx = 1:length(data)
+                pre_save_data = data[idx]
+                post_save_data = data_loaded["channel_$(idx)"]
+                for key in keys(post_save_data["info"])
+                    @test post_save_data["info"][key] == getproperty(pre_save_data.info, Symbol(key))
+                end
+                @test post_save_data["time"] == ustrip.(pre_save_data.time)
+                @test post_save_data["volt"] == ustrip.(pre_save_data.volt)
+                @test string(post_save_data["time_unit"]) == string(unit(pre_save_data.time[1]))
+                @test string(post_save_data["volt_unit"]) == string(unit(pre_save_data.volt[1]))
+            end
+            rm(save_filename * ".mat")
+        end
     end
 
     @testset "Util Functions" begin
