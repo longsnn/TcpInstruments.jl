@@ -140,6 +140,12 @@ function scope_speed_mode(instr::Instrument, speed::Integer)
 end
 
 
+"""
+    get_data(scope, channel_vector; inbounds=false, scope_stats=false)
+    get_data(scope, channel; scope_stats=false)
+
+Grab data from the specified channel(s)
+"""
 function get_data(
     instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
     inbounds=false, scope_stats=false
@@ -177,6 +183,11 @@ function get_data(instr::Instrument, ch::Integer; scope_stats=false)
 end
 
 
+"""
+    scope_waveform_info_get(scope, channel; scope_stats=false)
+
+Grab channel information and return it in a `ScopeInfo`(@ref) struct
+"""
 function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=false)
     str = scope_waveform_preamble_get(instr)
     str_array = split(str, ",")
