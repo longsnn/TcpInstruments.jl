@@ -30,7 +30,7 @@ end
 
 
 """
-    get_coupling(scope, chan=1)
+    get_coupling(scope; chan=1)
 
 returns "AC" or "DC"
 """
@@ -55,7 +55,7 @@ lpf_off(instr::Instrument, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
 
 
 """
-    get_lpf_state(scope, chan=1)
+    get_lpf_state(scope; chan=1)
 
 See state the internal low-pass filter:
 
@@ -65,7 +65,7 @@ get_lpf_state(instr::Instrument; chan=1) = query(instr, "CHANNEL$chan:BWLIMIT?")
 
 
 """
-    set_impedance_1Mohm(scope, chan=1)
+    set_impedance_1Mohm(scope; chan=1)
 
 Set impedance to 1MΩ
 """
@@ -73,8 +73,7 @@ set_impedance_1Mohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMP
 
 
 """
-    set_impedance_50ohm(scope)
-    set_impedance_50ohm(scope, chan=2)
+    set_impedance_50ohm(scope; chan=1)
 
 # Keywords
 - `chan`: Specify channel: Default is 1
@@ -86,7 +85,6 @@ set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMP
 
 """
     get_impedance(scope)
-    set_impedance(scope, chan=2)
 
 # Keywords
 - `chan`: Specify channel: Default is 1
