@@ -18,8 +18,8 @@ const A = u"A"
             @test length(data.time) == length(data.volt)
             @test data.volt[1] isa Unitful.Voltage
 
-            time_no_units = ustrip.(TcpInstruments.raw.(data.time))
-            volt_no_units = ustrip.(TcpInstruments.raw.(data.volt))
+            time_no_units = TcpInstruments.raw.(data.time)
+            volt_no_units = TcpInstruments.raw.(data.volt)
             time_unit = string(unit(data.time[1]))
             volt_unit = string(unit(data.volt[1]))
 
