@@ -40,7 +40,7 @@ function get_data(instr::Instr{<:Oscilloscope}, ch::Integer)
 end
 
 
-scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
+scope_waveform_source_set(instr::Instr{<:Oscilloscope}, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
 
 
 """
