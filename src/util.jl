@@ -245,3 +245,47 @@ function split_str_into_host_and_port(str::AbstractString)
     end
     return (host, port)
 end
+
+
+function autoscale_seconds(time_data)
+    unit = "seconds"
+    time_array = time_data
+    m = abs(min(time_data...))
+    m = ustrip(m)
+
+    if m >= 1
+    elseif 1 > m && m >= 1e-3
+        unit = "ms" # miliseconds
+        time_array = ms.(time_data)
+    elseif 1e-3 > m && m >= 1e-6
+        unit = "μs" # microseconds
+        time_array = μs.(time_data)
+    elseif 1e-6 > m && m >= 1e-9
+        unit = "ns" # nanoseconds
+        time_array = ns.(time_data)
+    else
+        unit = "ps" # picoseconds
+        time_array = ps.(time_data)
+    end
+    return unit, time_array
+end
+
+
+function fake_signal(n)
+    fs = 2.0e9;
+    f0 = 10.0e6;
+    dt = 1/fs
+    num_cycles = 10
+    t = (0:(num_cycles*fs/f0-1)) .* dt
+    s = sin.(2*pi*f0.*t)
+
+    if n >= length(s)
+        n_zeros = n-length(s)
+        n_pre  = Int(floor(n_zeros/2))
+        n_post = Int(ceil(n_zeros/2))
+        out = [zeros(n_pre); s; zeros(n_post)]
+    else
+        out = s[1:n]
+    end
+    return out
+end
