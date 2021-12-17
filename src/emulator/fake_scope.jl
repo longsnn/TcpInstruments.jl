@@ -22,7 +22,7 @@ end
 num_samples(i::Instr{FakeDSOX4034A}) = i.model.num_samples
 
 
-function get_data(instr::Instr{FakeDSOX4034A}, ch::Int; scope_stats=false)
+function get_data(instr::Instr{FakeDSOX4034A}, ch::Int)
     info = get_default_scope_info(instr, ch)
     samples = info.num_points
 

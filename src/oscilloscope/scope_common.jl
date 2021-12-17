@@ -1,12 +1,12 @@
 """
-    get_data(scope, channel_vector; inbounds=false, scope_stats=false)
-    get_data(scope, channel; scope_stats=false)
+    get_data(scope, channel_vector; inbounds=false)
+    get_data(scope, channel)
 
 Grab data from the specified channel(s)
 """
 function get_data(
     instr::Instr{<:Oscilloscope}, ch_vec::Union{Vector{Int}, Nothing} = nothing;
-    inbounds=false, scope_stats=false
+    inbounds=false
 )
     if ch_vec === nothing || !inbounds
         statuses = asyncmap(x->(x, status(instr, x)), 1:4)
@@ -27,14 +27,14 @@ function get_data(
         end
     end
     stop(instr) # Makes sure the data from each channel is from the same trigger event
-    wfm_data = [get_data(instr, ch; scope_stats=scope_stats) for ch in ch_vec]
+    wfm_data = [get_data(instr, ch) for ch in ch_vec]
     run(instr)
     return wfm_data
 end
 
-function get_data(instr::Instr{<:Oscilloscope}, ch::Integer; scope_stats=false)
+function get_data(instr::Instr{<:Oscilloscope}, ch::Integer)
     scope_waveform_source_set(instr, ch)
-    wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
+    wfm_info = scope_waveform_info_get(instr, ch)
     raw_data = scope_read_raw_waveform(instr);
     return scope_parse_raw_waveform(raw_data, wfm_info)
 end
@@ -44,11 +44,11 @@ scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$c
 
 
 """
-    scope_waveform_info_get(scope, channel; scope_stats=false)
+    scope_waveform_info_get(scope, channel)
 
 Grab channel information and return it in a `ScopeInfo`(@ref) struct
 """
-function scope_waveform_info_get(instr::Instr{<:Oscilloscope}, ch::Integer; scope_stats=false)
+function scope_waveform_info_get(instr::Instr{<:Oscilloscope}, ch::Integer)
     str = scope_waveform_preamble_get(instr)
     str_array = split(str, ",")
     format      = RESOLUTION_MODE[str_array[1]]
@@ -61,16 +61,10 @@ function scope_waveform_info_get(instr::Instr{<:Oscilloscope}, ch::Integer; scop
     y_increment = parse(Float64, str_array[8])
     y_origin    = parse(Float64, str_array[9])
     y_reference = parse(Float64, str_array[10])
-    if scope_stats
-        imp = get_impedance(instr; chan=ch)
-        coupling =  get_coupling(instr; chan=ch)
-        low_pass_filter =  get_lpf_state(instr; chan=ch)
-    else
-        imp = ""
-        coupling = ""
-        low_pass_filter = ""
-    end
-    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
+    impedance = get_impedance(instr; chan=ch)
+    coupling =  get_coupling(instr; chan=ch)
+    low_pass_filter =  get_lpf_state(instr; chan=ch)
+    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, impedance, coupling, low_pass_filter, ch)
 end
 
 const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
