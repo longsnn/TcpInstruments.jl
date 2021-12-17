@@ -1,5 +1,10 @@
-abstract type AgilentScope <: Oscilloscope end
+"""
+- [`AgilentDSOX4024A`](@ref)
+- [`AgilentDSOX4034A`](@ref)
+"""
+abstract type Oscilloscope <: Instrument end
 
+abstract type AgilentScope <: Oscilloscope end
 struct AgilentDSOX4024A <: AgilentScope end
 struct AgilentDSOX4034A <: AgilentScope end
 
