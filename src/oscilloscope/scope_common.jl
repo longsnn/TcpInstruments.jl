@@ -215,8 +215,26 @@ set_waveform_num_points(instr::Instr{<:Oscilloscope}, num_points::Integer) = wri
 set_waveform_num_points(instr::Instr{<:Oscilloscope}, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
 
 get_waveform_points_mode(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:POINTS:MODE?")
-set_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode_idx::Integer) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
-const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
+
+"""
+    set_waveform_points_mode(scope, mode)
+
+Set which data to transfer when using `get_data`(@ref)
+
+Inputs:
+`scope`: handle to the connected oscilloscope
+`mode`: 
+- `:NORMAL`: transfer the measurement data
+- `:RAW`: transfer the raw acquisition data
+"""
+function set_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode::Symbol)
+    if mode ∈ [:NORMAL, :RAW]
+        write(instr, "WAVEFORM:POINTS:MODE $(mode)")
+    else
+        error("Mode $mode not recognized. Specify :NORMAL or :RAW instead")
+    end
+    return nothing
+end
 
 
 function set_speed_mode(instr::Instr{<:Oscilloscope}, speed::Integer)
