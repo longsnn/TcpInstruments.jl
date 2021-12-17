@@ -1,28 +1,21 @@
 """
-    get_data(scope, channel_vector; inbounds=false)
+    get_data(scope, channel_vector)
     get_data(scope, channel)
+    get_data(scope)
 
-Grab data from the specified channel(s)
+Grab data from the specified channel(s). If no channels are specified, data will be grabbed
+from all available channels
 """
-function get_data(
-    instr::Instr{<:Oscilloscope}, ch_vec::Union{Vector{Int}, Nothing} = nothing;
-    inbounds=false
-)
-    if ch_vec === nothing || !inbounds
-        statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
-        filter!(x -> x[2], statuses)
-        valid_channels = map(x -> x[begin], statuses)
-    end
+function get_data(instr::Instr{<:Oscilloscope}, ch_vec::Union{Vector{Int}, Nothing} = nothing)
+    valid_channels = get_valid_channels(instr)
     if ch_vec === nothing
         ch_vec = valid_channels
-        !inbounds && @info "Loading channels: $ch_vec"
+        @info "Loading channels: $ch_vec"
     else
         unique!(ch_vec)
-        if !inbounds
-            for ch in ch_vec
-                if !(ch in valid_channels)
-                    error("Channel $ch is offline, data cannot be read")
-                end
+        for ch in ch_vec
+            if !(ch in valid_channels)
+                error("Channel $ch is offline, data cannot be read")
             end
         end
     end
@@ -37,6 +30,14 @@ function get_data(instr::Instr{<:Oscilloscope}, ch::Integer)
     wfm_info = scope_waveform_info_get(instr, ch)
     raw_data = scope_read_raw_waveform(instr);
     return scope_parse_raw_waveform(raw_data, wfm_info)
+end
+
+
+function get_valid_channels(instr::Instr{<:Oscilloscope})
+    statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
+    filter!(x -> x[2], statuses)
+    valid_channels = map(x -> x[begin], statuses)
+    return valid_channels
 end
 
 
