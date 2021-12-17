@@ -11,7 +11,8 @@ makedocs(
         "Home" => "index.md",
         "Manual" => Any[
             "Supported Instruments" => "instruments.md",
-            "Instrument-specific Functions" => "functions.md",
+            "General Functions" => "general_functions.md",
+            "Instrument-specific Functions" => "instrument_functions.md",
         ]
     ],
     modules = [TcpInstruments]
