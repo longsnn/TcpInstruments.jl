@@ -191,7 +191,7 @@ get_impedance(instr::Instr{<:Oscilloscope}; chan::Integer=1) = query(instr, ":CH
 
 Run Oscilloscope
 """
-run(obj::Instr{<:Oscilloscope}) = write(obj, "RUN")
+run(instr::Instr{<:Oscilloscope}) = write(instr, "RUN")
 
 
 """
@@ -199,10 +199,10 @@ run(obj::Instr{<:Oscilloscope}) = write(obj, "RUN")
     
 Stop Oscilloscope
 """
-stop(obj::Instr{<:Oscilloscope}) = write(obj, "STOP")
+stop(instr::Instr{<:Oscilloscope}) = write(instr, "STOP")
 
 
-channel_is_displayed(obj::Instr{<:Oscilloscope}, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
+channel_is_displayed(instr::Instr{<:Oscilloscope}, chan) = query(instr, "STAT? CHAN$chan") == "1" ? true : false
 get_waveform_preamble(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:PREAMBLE?")
 get_waveform_source(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:SOURCE?")
 set_waveform_mode_8bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT BYTE")
