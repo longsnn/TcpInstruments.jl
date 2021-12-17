@@ -205,10 +205,16 @@ stop(instr::Instr{<:Oscilloscope}) = write(instr, "STOP")
 channel_is_displayed(instr::Instr{<:Oscilloscope}, chan) = query(instr, "STAT? CHAN$chan") == "1" ? true : false
 get_waveform_preamble(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:PREAMBLE?")
 get_waveform_source(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:SOURCE?")
+
+get_waveform_mode(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:FORMAT?")
 set_waveform_mode_8bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT BYTE")
 set_waveform_mode_16bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT WORD")
+
+get_waveform_num_points(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:POINTS?")
 set_waveform_num_points(instr::Instr{<:Oscilloscope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
 set_waveform_num_points(instr::Instr{<:Oscilloscope}, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
+
+get_waveform_points_mode(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:POINTS:MODE?")
 set_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode_idx::Integer) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
