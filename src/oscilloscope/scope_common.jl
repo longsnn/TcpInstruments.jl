@@ -29,10 +29,10 @@ function get_data(instr::Instr{<:Oscilloscope}, ch_vec::Vector{Int}; check_chann
 end
 
 function get_data(instr::Instr{<:Oscilloscope}, ch::Integer)
-    scope_waveform_source_set(instr, ch)
-    wfm_info = scope_waveform_info_get(instr, ch)
-    raw_data = scope_read_raw_waveform(instr);
-    return scope_parse_raw_waveform(raw_data, wfm_info)
+    set_waveform_source(instr, ch)
+    wfm_info = get_waveform_info(instr, ch)
+    raw_data = read_raw_waveform(instr);
+    return parse_raw_waveform(raw_data, wfm_info)
 end
 
 
@@ -44,7 +44,7 @@ function get_valid_channels(instr::Instr{<:Oscilloscope})
 end
 
 
-scope_waveform_source_set(instr::Instr{<:Oscilloscope}, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
+set_waveform_source(instr::Instr{<:Oscilloscope}, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
 
 
 """
@@ -52,8 +52,8 @@ scope_waveform_source_set(instr::Instr{<:Oscilloscope}, ch::Int) = write(instr, 
 
 Grab channel information and return it in a `ScopeInfo`(@ref) struct
 """
-function scope_waveform_info_get(instr::Instr{<:Oscilloscope}, ch::Integer)
-    str = scope_waveform_preamble_get(instr)
+function get_waveform_info(instr::Instr{<:Oscilloscope}, ch::Integer)
+    str = get_waveform_preamble(instr)
     str_array = split(str, ",")
     format      = RESOLUTION_MODE[str_array[1]]
     type        = TYPE[str_array[2]]
@@ -75,7 +75,7 @@ const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
 
-function scope_read_raw_waveform(instr::Instr{<:Oscilloscope})
+function read_raw_waveform(instr::Instr{<:Oscilloscope})
     write(instr, "WAV:DATA?")
     num_waveform_samples = get_num_waveform_samples(instr)
     raw_data = read(instr.sock, num_waveform_samples);
@@ -110,7 +110,7 @@ function get_data_header(instr::Instr{<:Oscilloscope})
 end
 
 
-function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
+function parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
     # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
 
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
@@ -203,29 +203,29 @@ stop(obj::Instr{<:Oscilloscope}) = write(obj, "STOP")
 
 
 channel_is_displayed(obj::Instr{<:Oscilloscope}, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
-scope_waveform_preamble_get(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:PREAMBLE?")
-scope_waveform_source_get(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:SOURCE?")
-scope_waveform_mode_8bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT BYTE")
-scope_waveform_mode_16bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT WORD")
-scope_waveform_num_points(instr::Instr{<:Oscilloscope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
-scope_waveform_num_points(instr::Instr{<:Oscilloscope}, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
-scope_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode_idx::Integer) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
+get_waveform_preamble(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:PREAMBLE?")
+get_waveform_source(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:SOURCE?")
+set_waveform_mode_8bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT BYTE")
+set_waveform_mode_16bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT WORD")
+set_waveform_num_points(instr::Instr{<:Oscilloscope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
+set_waveform_num_points(instr::Instr{<:Oscilloscope}, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
+set_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode_idx::Integer) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
 function scope_speed_mode(instr::Instr{<:Oscilloscope}, speed::Integer)
     if speed == 1
-        scope_waveform_mode_16bit(instr)
-        scope_waveform_points_mode(instr, 1)
+        set_waveform_mode_16bit(instr)
+        set_waveform_points_mode(instr, 1)
     elseif speed == 3
-        scope_waveform_mode_16bit(instr)
-        scope_waveform_points_mode(instr, 0)
+        set_waveform_mode_16bit(instr)
+        set_waveform_points_mode(instr, 0)
     elseif speed == 5
-        scope_waveform_mode_8bit(instr)
-        scope_waveform_points_mode(instr, 1)
+        set_waveform_mode_8bit(instr)
+        set_waveform_points_mode(instr, 1)
     elseif speed == 6
-        scope_waveform_mode_8bit(instr)
-        scope_waveform_points_mode(instr, 0)
+        set_waveform_mode_8bit(instr)
+        set_waveform_points_mode(instr, 0)
     end
 end
 
