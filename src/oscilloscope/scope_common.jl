@@ -1,18 +1,21 @@
 """
-    get_data(scope, channel_vector)
+    get_data(scope, channel_vector; check_channels=true)
     get_data(scope, channel)
     get_data(scope)
 
 Grab data from the specified channel(s). If no channels are specified, data will be grabbed
 from all available channels
 """
-function get_data(instr::Instr{<:Oscilloscope}, ch_vec::Union{Vector{Int}, Nothing} = nothing)
-    valid_channels = get_valid_channels(instr)
-    if ch_vec === nothing
-        ch_vec = valid_channels
-        @info "Loading channels: $ch_vec"
-    else
+function get_data(instr::Instr{<:Oscilloscope})
+    ch_vec = get_valid_channels(instr)
+    @info "Loading channels: $ch_vec"
+    return get_data(instr, ch_vec; check_channels=false)
+end 
+
+function get_data(instr::Instr{<:Oscilloscope}, ch_vec::Vector{Int}; check_channels=true)
+    if check_channels
         unique!(ch_vec)
+        valid_channels = get_valid_channels(instr)
         for ch in ch_vec
             if !(ch in valid_channels)
                 error("Channel $ch is offline, data cannot be read")
