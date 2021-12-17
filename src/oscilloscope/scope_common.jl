@@ -204,9 +204,9 @@ Stop Oscilloscope
 stop(obj::Instr{<:Oscilloscope}) = write(obj, "STOP")
 
 
-status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
-scope_waveform_preamble_get(instr) = query(instr, "WAVEFORM:PREAMBLE?")
-scope_waveform_source_get(instr) = query(instr, "WAVEFORM:SOURCE?")
+status(obj::Instr{<:Oscilloscope}, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
+scope_waveform_preamble_get(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:PREAMBLE?")
+scope_waveform_source_get(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:SOURCE?")
 scope_waveform_mode_8bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT BYTE")
 scope_waveform_mode_16bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT WORD")
 scope_waveform_num_points(instr::Instr{<:Oscilloscope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
