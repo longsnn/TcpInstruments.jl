@@ -9,7 +9,7 @@ function get_data(
     inbounds=false
 )
     if ch_vec === nothing || !inbounds
-        statuses = asyncmap(x->(x, status(instr, x)), 1:4)
+        statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
         filter!(x -> x[2], statuses)
         valid_channels = map(x -> x[begin], statuses)
     end
@@ -198,7 +198,7 @@ Stop Oscilloscope
 stop(obj::Instr{<:Oscilloscope}) = write(obj, "STOP")
 
 
-status(obj::Instr{<:Oscilloscope}, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
+channel_is_displayed(obj::Instr{<:Oscilloscope}, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 scope_waveform_preamble_get(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:PREAMBLE?")
 scope_waveform_source_get(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:SOURCE?")
 scope_waveform_mode_8bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT BYTE")
