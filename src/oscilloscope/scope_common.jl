@@ -201,7 +201,7 @@ run(obj::Instr{<:Oscilloscope}) = write(obj, "RUN")
     
 Stop Oscilloscope
 """
-stop(obj::Instr{T}) where T <: Oscilloscope = write(obj, "STOP")
+stop(obj::Instr{<:Oscilloscope}) = write(obj, "STOP")
 
 
 status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
