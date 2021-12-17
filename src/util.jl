@@ -1,15 +1,7 @@
-using Sockets
-using Base.Threads: @spawn
-using Dates
-using MAT
-using JLD2
-
 const R = u"Ω"
 const V = u"V"
 const A = u"A"
 const Hz = u"Hz"
-
-using Unitful: Current, Voltage, Frequency, Time
 
 raw(a::Current)   = Float64(ustrip(uconvert(A, a)))
 raw(a::Voltage)   = Float64(ustrip(uconvert(V, a)))

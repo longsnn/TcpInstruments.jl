@@ -42,9 +42,14 @@ use `help>Instrument`.
 module TcpInstruments
 
 using Sockets
+using Base.Threads: @spawn
+using Dates
+using MAT
+using JLD2
 using RecipesBase
 using Unitful
 using Unitful: s, ms, μs, ns, ps
+using Unitful: Current, Voltage, Frequency, Time
 
 import InstrumentConfig: initialize, terminate
 
@@ -127,13 +132,13 @@ export Keysight33612A
 
 export scan_network
 
-include("types.jl")
-include("util.jl")
-include("config.jl")
 
-# common instrument containers
+include("config.jl")
 include("instrument.jl")
 include("common_commands.jl")
+
+include("types.jl")
+include("util.jl")
 
 # instruments
 include("oscilloscope/all.jl")
