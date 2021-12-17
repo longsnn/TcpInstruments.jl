@@ -130,20 +130,20 @@ get_coupling(instr::Instr{<:Oscilloscope}; chan=1) = query(instr, "CHANNEL$chan:
 
 
 """
-    lpf_on(scope, chan=1)
+    lpf_on(scope; chan=1)
 
 Turn on an internal low-pass filter. When the filter is on, the bandwidth of
 the specified channel is limited to approximately 25 MHz.
 """
-lpf_on(instr::Instr{<:Oscilloscope}, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
+lpf_on(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
 
 
 """
-    lpf_off(scope, chan=1)
+    lpf_off(scope; chan=1)
 
 Turn off an internal low-pass filter.
 """
-lpf_off(instr::Instr{<:Oscilloscope}, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
+lpf_off(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
 
 
 """
