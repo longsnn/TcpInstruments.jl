@@ -69,11 +69,12 @@ export set_voltage, get_voltage
 export set_voltage_limit, get_voltage_limit
 export set_channel, get_channel
 
-    # Scope
-export get_data
+# Scope
+export get_data, get_waveform_info
 export lpf_on, lpf_off, get_lpf_state
 export set_impedance_1Mohm, set_impedance_50ohm, get_impedance
 export get_coupling
+
 export get_function, set_function
 export get_frequency, set_frequency
 export get_amplitude, set_amplitude

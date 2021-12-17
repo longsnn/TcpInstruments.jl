@@ -48,7 +48,7 @@ set_waveform_source(instr::Instr{<:Oscilloscope}, ch::Int) = write(instr, "WAVEF
 
 
 """
-    scope_waveform_info_get(scope, channel)
+    get_waveform_info(scope, channel)
 
 Grab channel information and return it in a `ScopeInfo`(@ref) struct
 """
