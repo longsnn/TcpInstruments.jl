@@ -213,7 +213,7 @@ set_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode_idx::Integer) = writ
 const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
 
 
-function scope_speed_mode(instr::Instr{<:Oscilloscope}, speed::Integer)
+function set_speed_mode(instr::Instr{<:Oscilloscope}, speed::Integer)
     if speed == 1
         set_waveform_mode_16bit(instr)
         set_waveform_points_mode(instr, 1)
