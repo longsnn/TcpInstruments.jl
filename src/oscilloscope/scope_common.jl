@@ -1,31 +1,123 @@
+"""
+    get_data(scope, channel_vector; inbounds=false, scope_stats=false)
+    get_data(scope, channel; scope_stats=false)
+
+Grab data from the specified channel(s)
+"""
+function get_data(
+    instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
+    inbounds=false, scope_stats=false
+)
+    if ch_vec === nothing || !inbounds
+        statuses = asyncmap(x->(x, status(instr, x)), 1:4)
+        filter!(x -> x[2], statuses)
+        valid_channels = map(x -> x[begin], statuses)
+    end
+    if ch_vec === nothing
+        ch_vec = valid_channels
+        !inbounds && @info "Loading channels: $ch_vec"
+    else
+        unique!(ch_vec)
+        if !inbounds
+            for ch in ch_vec
+                if !(ch in valid_channels)
+                    error("Channel $ch is offline, data cannot be read")
+                end
+            end
+        end
+    end
+    stop(instr) # Makes sure the data from each channel is from the same trigger event
+    wfm_data = [get_data(instr, ch; scope_stats=scope_stats) for ch in ch_vec]
+    run(instr)
+    return wfm_data
+end
+
+function get_data(instr::Instrument, ch::Integer; scope_stats=false)
+    scope_waveform_source_set(instr, ch)
+    wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
+    raw_data = scope_read_raw_waveform(instr);
+    return scope_parse_raw_waveform(raw_data, wfm_info)
+end
+
+
+scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
+
+
+"""
+    scope_waveform_info_get(scope, channel; scope_stats=false)
+
+Grab channel information and return it in a `ScopeInfo`(@ref) struct
+"""
+function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=false)
+    str = scope_waveform_preamble_get(instr)
+    str_array = split(str, ",")
+    format      = RESOLUTION_MODE[str_array[1]]
+    type        = TYPE[str_array[2]]
+    num_points  = parse(Int64,   str_array[3])
+    count       = parse(Int64,   str_array[4]) # is always one
+    x_increment = parse(Float64, str_array[5])
+    x_origin    = parse(Float64, str_array[6])
+    x_reference = parse(Float64, str_array[7])
+    y_increment = parse(Float64, str_array[8])
+    y_origin    = parse(Float64, str_array[9])
+    y_reference = parse(Float64, str_array[10])
+    if scope_stats
+        imp = get_impedance(instr; chan=ch)
+        coupling =  get_coupling(instr; chan=ch)
+        low_pass_filter =  get_lpf_state(instr; chan=ch)
+    else
+        imp = ""
+        coupling = ""
+        low_pass_filter = ""
+    end
+    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
+end
+
 const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
 
-status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
+function scope_read_raw_waveform(instr::Instrument)
+    write(instr, "WAV:DATA?")
+    num_waveform_samples = get_num_waveform_samples(instr)
+    raw_data = read(instr.sock, num_waveform_samples);
+    # read end of line character
+    dummy = readline(instr.sock)
+    return raw_data
+end
 
 
-function autoscale_seconds(time_data)
-    unit = "seconds"
-    time_array = time_data
-    m = abs(min(time_data...))
-    m = ustrip(m)
+function get_num_waveform_samples(instr::Instrument)
+    header = get_data_header(instr)
+    num_header_description_bytes = 2
+    num_waveform_samples = parse(Int, header[num_header_description_bytes+1:end])
+    return num_waveform_samples
+end
 
-    if m >= 1
-    elseif 1 > m && m >= 1e-3
-        unit = "ms" # miliseconds
-        time_array = ms.(time_data)
-    elseif 1e-3 > m && m >= 1e-6
-        unit = "μs" # microseconds
-        time_array = μs.(time_data)
-    elseif 1e-6 > m && m >= 1e-9
-        unit = "ns" # nanoseconds
-        time_array = ns.(time_data)
-    else
-        unit = "ps" # picoseconds
-        time_array = ps.(time_data)
+
+function get_data_header(instr::Instrument)
+    # data header is an ASCII character string "#8DDDDDDDD", where the Ds indicate how many
+    # bytes follow (p.1433 of Keysight InfiniiVision 4000 X-Series Oscilloscopes
+    # Programmer's Guide)
+    num_header_description_bytes = 2
+    header_description_uint8 = read(instr.sock, num_header_description_bytes)
+    if header_description_uint8[1] != UInt8('#')
+        error("The waveform data format is not formatted as expected")
     end
-    return unit, time_array
+    header_block_length = parse(Int, convert(Char, header_description_uint8[2]))
+    header_block_uint8 = read(instr.sock, header_block_length)
+    header = vcat(header_description_uint8, header_block_uint8)
+    header = String(convert.(Char, header))
+    return header
+end
+
+
+function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
+    # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
+
+    volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
+    time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
+    return ScopeData(wfm_info, V .* volt, u"s" .* time)
 end
 
 
@@ -112,8 +204,8 @@ Stop Oscilloscope
 stop(obj::Instr{T}) where T <: Oscilloscope = write(obj, "STOP")
 
 
+status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
 scope_waveform_preamble_get(instr) = query(instr, "WAVEFORM:PREAMBLE?")
-scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
 scope_waveform_source_get(instr) = query(instr, "WAVEFORM:SOURCE?")
 scope_waveform_mode_8bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT BYTE")
 scope_waveform_mode_16bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT WORD")
@@ -140,125 +232,27 @@ function scope_speed_mode(instr::Instrument, speed::Integer)
 end
 
 
-"""
-    get_data(scope, channel_vector; inbounds=false, scope_stats=false)
-    get_data(scope, channel; scope_stats=false)
+function autoscale_seconds(time_data)
+    unit = "seconds"
+    time_array = time_data
+    m = abs(min(time_data...))
+    m = ustrip(m)
 
-Grab data from the specified channel(s)
-"""
-function get_data(
-    instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
-    inbounds=false, scope_stats=false
-)
-    if ch_vec === nothing || !inbounds
-        statuses = asyncmap(x->(x, status(instr, x)), 1:4)
-        filter!(x -> x[2], statuses)
-        valid_channels = map(x -> x[begin], statuses)
-    end
-    if ch_vec === nothing
-        ch_vec = valid_channels
-        !inbounds && @info "Loading channels: $ch_vec"
+    if m >= 1
+    elseif 1 > m && m >= 1e-3
+        unit = "ms" # miliseconds
+        time_array = ms.(time_data)
+    elseif 1e-3 > m && m >= 1e-6
+        unit = "μs" # microseconds
+        time_array = μs.(time_data)
+    elseif 1e-6 > m && m >= 1e-9
+        unit = "ns" # nanoseconds
+        time_array = ns.(time_data)
     else
-        unique!(ch_vec)
-        if !inbounds
-            for ch in ch_vec
-                if !(ch in valid_channels)
-                    error("Channel $ch is offline, data cannot be read")
-                end
-            end
-        end
+        unit = "ps" # picoseconds
+        time_array = ps.(time_data)
     end
-    stop(instr) # Makes sure the data from each channel is from the same trigger event
-    wfm_data = [get_data(instr, ch; scope_stats=scope_stats) for ch in ch_vec]
-    run(instr)
-    return wfm_data
-end
-
-
-function get_data(instr::Instrument, ch::Integer; scope_stats=false)
-    scope_waveform_source_set(instr, ch)
-    wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
-    raw_data = scope_read_raw_waveform(instr);
-    return scope_parse_raw_waveform(raw_data, wfm_info)
-end
-
-
-"""
-    scope_waveform_info_get(scope, channel; scope_stats=false)
-
-Grab channel information and return it in a `ScopeInfo`(@ref) struct
-"""
-function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=false)
-    str = scope_waveform_preamble_get(instr)
-    str_array = split(str, ",")
-    format      = RESOLUTION_MODE[str_array[1]]
-    type        = TYPE[str_array[2]]
-    num_points  = parse(Int64,   str_array[3])
-    count       = parse(Int64,   str_array[4]) # is always one
-    x_increment = parse(Float64, str_array[5])
-    x_origin    = parse(Float64, str_array[6])
-    x_reference = parse(Float64, str_array[7])
-    y_increment = parse(Float64, str_array[8])
-    y_origin    = parse(Float64, str_array[9])
-    y_reference = parse(Float64, str_array[10])
-    if scope_stats
-        imp = get_impedance(instr; chan=ch)
-        coupling =  get_coupling(instr; chan=ch)
-        low_pass_filter =  get_lpf_state(instr; chan=ch)
-    else
-        imp = ""
-        coupling = ""
-        low_pass_filter = ""
-    end
-    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
-end
-
-
-function scope_read_raw_waveform(instr::Instrument, ch; scope_stats=0)
-    scope_read_raw_waveform(instr)
-end
-
-function scope_read_raw_waveform(instr::Instrument)
-    write(instr, "WAV:DATA?")
-    num_waveform_samples = get_num_waveform_samples(instr)
-    raw_data = read(instr.sock, num_waveform_samples);
-    # read end of line character
-    dummy = readline(instr.sock)
-    return raw_data
-end
-
-
-function get_num_waveform_samples(instr::Instrument)
-    header = get_data_header(instr)
-    num_header_description_bytes = 2
-    num_waveform_samples = parse(Int, header[num_header_description_bytes+1:end])
-    return num_waveform_samples
-end
-
-
-function get_data_header(instr::Instrument)
-    # data header is an ASCII character string "#8DDDDDDDD", where the Ds indicate how many
-    # bytes follow (p.1433 of Keysight InfiniiVision 4000 X-Series Oscilloscopes
-    # Programmer's Guide)
-    num_header_description_bytes = 2
-    header_description_uint8 = read(instr.sock, num_header_description_bytes)
-    if header_description_uint8[1] != UInt8('#')
-        error("The waveform data format is not formatted as expected")
-    end
-    header_block_length = parse(Int, convert(Char, header_description_uint8[2]))
-    header_block_uint8 = read(instr.sock, header_block_length)
-    header = vcat(header_description_uint8, header_block_uint8)
-    header = String(convert.(Char, header))
-    return header
-end
-
-
-function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
-    # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
-
-    volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
-    time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
-    return ScopeData(wfm_info, V .* volt, u"s" .* time)
+    return unit, time_array
 end
 
 
