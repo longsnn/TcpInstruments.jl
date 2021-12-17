@@ -8,10 +8,12 @@ makedocs(
         prettyurls = get(ENV, "CI", nothing) == "true"
     ),
     pages = [
-             "Home" => "index.md",
-             "Supported Instruments" => "instruments.md",
-             "Functions" => "functions.md",
-            ],
+        "Home" => "index.md",
+        "Manual" => Any[
+            "Supported Instruments" => "instruments.md",
+            "Instrument-specific Functions" => "functions.md",
+        ]
+    ],
     modules = [TcpInstruments]
 )
 
