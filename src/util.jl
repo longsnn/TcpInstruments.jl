@@ -1,8 +1,3 @@
-const R = u"Ω"
-const V = u"V"
-const A = u"A"
-const Hz = u"Hz"
-
 raw(a::Current)   = Float64(ustrip(uconvert(A, a)))
 raw(a::Voltage)   = Float64(ustrip(uconvert(V, a)))
 raw(a::Frequency) = Float64(ustrip(uconvert(Hz, a)))

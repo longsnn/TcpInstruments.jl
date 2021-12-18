@@ -47,11 +47,15 @@ using Dates
 using MAT
 using JLD2
 using RecipesBase
+import InstrumentConfig: initialize, terminate
+
 using Unitful
 using Unitful: s, ms, μs, ns, ps
 using Unitful: Current, Voltage, Frequency, Time
-
-import InstrumentConfig: initialize, terminate
+const R = u"Ω"
+const V = u"V"
+const A = u"A"
+const Hz = u"Hz"
 
 export Instrument
 export Oscilloscope, MultiMeter, PowerSupply, WaveformGenerator, ImpedanceAnalyzer
