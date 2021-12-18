@@ -1,229 +1,59 @@
-using RecipesBase
-
-const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
-const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
-
-
-@recipe function plot(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
-    scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
-    title := t
-    label := l
-    xguide := x
-    yguide := y
-    return scaled_time, volts
-end
-
-
-@recipe function plot(data_array::Array{ScopeData, 1}; label="", xguide="0", yguide="Voltage / V")
-    for data in data_array
-        @series begin
-            scaled_time, volts, t, l, x, y= plot_helper(data; label=label, xguide=xguide, yguide=yguide)
-            title := t
-            label := l
-            xguide := x
-            yguide := y
-            return scaled_time, volts
-        end
-    end
-end
-
-
-status(obj, chan) = query(obj, "STAT? CHAN$chan") == "1" ? true : false
-
-
-function plot_helper(data::ScopeData; label="", xguide="0", yguide="Voltage / V")
-    time_unit, scaled_time = autoscale_seconds(data.time)
-    title = "Oscilloscope ~ Voltage Vs. Time (" * time_unit * ")"
-    if isempty(label)
-        label = "Channel $(data.info.channel)"
-    else
-        label = label
-    end
-    if xguide == "0"
-        xguide = "Time / " * time_unit
-    else
-        xguide = xguide
-    end
-    return ustrip(scaled_time), ustrip(data.volt), title, label, xguide, yguide
-end
-
-
-function autoscale_seconds(time_data)
-    unit = "seconds"
-    time_array = time_data
-    m = abs(min(time_data...))
-    m = ustrip(m)
-
-    if m >= 1
-    elseif 1 > m && m >= 1e-3
-        unit = "ms" # miliseconds
-        time_array = ms.(time_data)
-    elseif 1e-3 > m && m >= 1e-6
-        unit = "μs" # microseconds
-        time_array = μs.(time_data)
-    elseif 1e-6 > m && m >= 1e-9
-        unit = "ns" # nanoseconds
-        time_array = ns.(time_data)
-    else
-        unit = "ps" # picoseconds
-        time_array = ps.(time_data)
-    end
-    return unit, time_array
-end
-
-
 """
-    get_coupling(scope, chan=1)
+    get_data(scope, channel_vector; check_channels=true)
+    get_data(scope, channel)
+    get_data(scope)
 
-returns "AC" or "DC"
+Grab data from the specified channel(s). If no channels are specified, data will be grabbed
+from all available channels
 """
-get_coupling(instr::Instrument; chan=1) = query(instr, "CHANNEL$chan:COUPLING?")
+function get_data(instr::Instr{<:Oscilloscope})
+    ch_vec = get_valid_channels(instr)
+    @info "Loading channels: $ch_vec"
+    return get_data(instr, ch_vec; check_channels=false)
+end 
 
-
-"""
-    lpf_on(scope, chan=1)
-
-Turn on an internal low-pass filter. When the filter is on, the bandwidth of
-the specified channel is limited to approximately 25 MHz.
-"""
-lpf_on(instr::Instrument, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
-
-
-"""
-    lpf_off(scope, chan=1)
-
-Turn off an internal low-pass filter.
-"""
-lpf_off(instr::Instrument, chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
-
-
-"""
-    get_lpf_state(scope, chan=1)
-
-See state the internal low-pass filter:
-
-returns "0" or "1"
-"""
-get_lpf_state(instr::Instrument; chan=1) = query(instr, "CHANNEL$chan:BWLIMIT?")
-
-
-"""
-    set_impedance_1Mohm(scope, chan=1)
-
-Set impedance to 1MΩ
-"""
-set_impedance_1Mohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE ONEMEG")
-
-
-"""
-    set_impedance_50ohm(scope)
-    set_impedance_50ohm(scope, chan=2)
-
-# Keywords
-- `chan`: Specify channel: Default is 1
-
-Set impedance to 50Ω
-"""
-set_impedance_50ohm(instr::Instrument; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE FIFTY")
-
-
-"""
-    get_impedance(scope)
-    set_impedance(scope, chan=2)
-
-# Keywords
-- `chan`: Specify channel: Default is 1
-
-# Returns
-- `"FIFT"`: 50Ω
-- `"ONEM"`: 1MΩ
-"""
-get_impedance(instr::Instrument; chan::Integer=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
-
-
-"""
-    run(scope)
-
-Run Oscilloscope
-"""
-run(obj::Instr{T}) where T <: Oscilloscope = write(obj, "RUN")
-
-
-"""
-    stop(scope)
-    
-Stop Oscilloscope
-"""
-stop(obj::Instr{T}) where T <: Oscilloscope = write(obj, "STOP")
-
-
-scope_waveform_preamble_get(instr) = query(instr, "WAVEFORM:PREAMBLE?")
-scope_waveform_source_set(instr, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
-scope_waveform_source_get(instr) = query(instr, "WAVEFORM:SOURCE?")
-scope_waveform_mode_8bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT BYTE")
-scope_waveform_mode_16bit(instr::Instrument) = write(instr, "WAVEFORM:FORMAT WORD")
-scope_waveform_num_points(instr::Instrument, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
-scope_waveform_num_points(instr::Instrument, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
-scope_waveform_points_mode(instr::Instrument, mode_idx::Integer) = write(instr, "WAVEFORM:POINTS:MODE $(WAVEFORM_POINTS_MODE[mode_idx])") #norm, max, raw
-const WAVEFORM_POINTS_MODE = Dict(0=>"norm", 1=>"max")
-
-
-function scope_speed_mode(instr::Instrument, speed::Integer)
-    if speed == 1
-        scope_waveform_mode_16bit(instr)
-        scope_waveform_points_mode(instr, 1)
-    elseif speed == 3
-        scope_waveform_mode_16bit(instr)
-        scope_waveform_points_mode(instr, 0)
-    elseif speed == 5
-        scope_waveform_mode_8bit(instr)
-        scope_waveform_points_mode(instr, 1)
-    elseif speed == 6
-        scope_waveform_mode_8bit(instr)
-        scope_waveform_points_mode(instr, 0)
-    end
-end
-
-
-function get_data(
-    instr::Instrument, ch_vec::Union{Vector{Int}, Nothing} = nothing;
-    inbounds=false, scope_stats=false
-)
-    if ch_vec === nothing || !inbounds
-        statuses = asyncmap(x->(x, status(instr, x)), 1:4)
-        filter!(x -> x[2], statuses)
-        valid_channels = map(x -> x[begin], statuses)
-    end
-    if ch_vec === nothing
-        ch_vec = valid_channels
-        !inbounds && @info "Loading channels: $ch_vec"
-    else
+function get_data(instr::Instr{<:Oscilloscope}, ch_vec::Vector{Int}; check_channels=true)
+    if check_channels
         unique!(ch_vec)
-        if !inbounds
-            for ch in ch_vec
-                if !(ch in valid_channels)
-                    error("Channel $ch is offline, data cannot be read")
-                end
+        valid_channels = get_valid_channels(instr)
+        for ch in ch_vec
+            if !(ch in valid_channels)
+                error("Channel $ch is offline, data cannot be read")
             end
         end
     end
     stop(instr) # Makes sure the data from each channel is from the same trigger event
-    wfm_data = [get_data(instr, ch; scope_stats=scope_stats) for ch in ch_vec]
+    wfm_data = [get_data(instr, ch) for ch in ch_vec]
     run(instr)
     return wfm_data
 end
 
-
-function get_data(instr::Instrument, ch::Integer; scope_stats=false)
-    scope_waveform_source_set(instr, ch)
-    wfm_info = scope_waveform_info_get(instr, ch; scope_stats=scope_stats)
-    raw_data = scope_read_raw_waveform(instr);
-    return scope_parse_raw_waveform(raw_data, wfm_info)
+function get_data(instr::Instr{<:Oscilloscope}, ch::Integer)
+    set_waveform_source(instr, ch)
+    wfm_info = get_waveform_info(instr, ch)
+    raw_data = read_raw_waveform(instr);
+    return parse_raw_waveform(raw_data, wfm_info)
 end
 
 
-function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=false)
-    str = scope_waveform_preamble_get(instr)
+function get_valid_channels(instr::Instr{<:Oscilloscope})
+    statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
+    filter!(x -> x[2], statuses)
+    valid_channels = map(x -> x[begin], statuses)
+    return valid_channels
+end
+
+
+set_waveform_source(instr::Instr{<:Oscilloscope}, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
+
+
+"""
+    get_waveform_info(scope, channel)
+
+Grab channel information and return it in a `ScopeInfo`(@ref) struct
+"""
+function get_waveform_info(instr::Instr{<:Oscilloscope}, ch::Integer)
+    str = get_waveform_preamble(instr)
     str_array = split(str, ",")
     format      = RESOLUTION_MODE[str_array[1]]
     type        = TYPE[str_array[2]]
@@ -235,24 +65,17 @@ function scope_waveform_info_get(instr::Instrument, ch::Integer; scope_stats=fal
     y_increment = parse(Float64, str_array[8])
     y_origin    = parse(Float64, str_array[9])
     y_reference = parse(Float64, str_array[10])
-    if scope_stats
-        imp = get_impedance(instr; chan=ch)
-        coupling =  get_coupling(instr; chan=ch)
-        low_pass_filter =  get_lpf_state(instr; chan=ch)
-    else
-        imp = ""
-        coupling = ""
-        low_pass_filter = ""
-    end
-    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, imp, coupling, low_pass_filter, ch)
+    impedance = get_impedance(instr; chan=ch)
+    coupling =  get_coupling(instr; chan=ch)
+    low_pass_filter =  get_lpf_state(instr; chan=ch)
+    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, impedance, coupling, low_pass_filter, ch)
 end
 
+const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
+const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
-function scope_read_raw_waveform(instr::Instrument, ch; scope_stats=0)
-    scope_read_raw_waveform(instr)
-end
 
-function scope_read_raw_waveform(instr::Instrument)
+function read_raw_waveform(instr::Instr{<:Oscilloscope})
     write(instr, "WAV:DATA?")
     num_waveform_samples = get_num_waveform_samples(instr)
     raw_data = read(instr.sock, num_waveform_samples);
@@ -262,7 +85,7 @@ function scope_read_raw_waveform(instr::Instrument)
 end
 
 
-function get_num_waveform_samples(instr::Instrument)
+function get_num_waveform_samples(instr::Instr{<:Oscilloscope})
     header = get_data_header(instr)
     num_header_description_bytes = 2
     num_waveform_samples = parse(Int, header[num_header_description_bytes+1:end])
@@ -270,7 +93,7 @@ function get_num_waveform_samples(instr::Instrument)
 end
 
 
-function get_data_header(instr::Instrument)
+function get_data_header(instr::Instr{<:Oscilloscope})
     # data header is an ASCII character string "#8DDDDDDDD", where the Ds indicate how many
     # bytes follow (p.1433 of Keysight InfiniiVision 4000 X-Series Oscilloscopes
     # Programmer's Guide)
@@ -287,7 +110,7 @@ function get_data_header(instr::Instrument)
 end
 
 
-function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
+function parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
     # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
 
     volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
@@ -296,21 +119,136 @@ function scope_parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
 end
 
 
-function fake_signal(n)
-    fs = 2.0e9;
-    f0 = 10.0e6;
-    dt = 1/fs
-    num_cycles = 10
-    t = (0:(num_cycles*fs/f0-1)) .* dt
-    s = sin.(2*pi*f0.*t)
+"""
+    get_coupling(scope; chan=1)
 
-    if n >= length(s)
-        n_zeros = n-length(s)
-        n_pre  = Int(floor(n_zeros/2))
-        n_post = Int(ceil(n_zeros/2))
-        out = [zeros(n_pre); s; zeros(n_post)]
+returns "AC" or "DC"
+"""
+get_coupling(instr::Instr{<:Oscilloscope}; chan=1) = query(instr, "CHANNEL$chan:COUPLING?")
+
+
+"""
+    lpf_on(scope; chan=1)
+
+Turn on an internal low-pass filter. When the filter is on, the bandwidth of
+the specified channel is limited to approximately 25 MHz.
+"""
+lpf_on(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
+
+
+"""
+    lpf_off(scope; chan=1)
+
+Turn off an internal low-pass filter.
+"""
+lpf_off(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
+
+
+"""
+    get_lpf_state(scope; chan=1)
+
+See state the internal low-pass filter:
+
+returns "0" or "1"
+"""
+get_lpf_state(instr::Instr{<:Oscilloscope}; chan=1) = query(instr, "CHANNEL$chan:BWLIMIT?")
+
+
+"""
+    set_impedance_1Mohm(scope; chan=1)
+
+Set impedance to 1MΩ
+"""
+set_impedance_1Mohm(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE ONEMEG")
+
+
+"""
+    set_impedance_50ohm(scope; chan=1)
+
+# Keywords
+- `chan`: Specify channel: Default is 1
+
+Set impedance to 50Ω
+"""
+set_impedance_50ohm(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE FIFTY")
+
+
+"""
+    get_impedance(scope)
+
+# Keywords
+- `chan`: Specify channel: Default is 1
+
+# Returns
+- `"FIFT"`: 50Ω
+- `"ONEM"`: 1MΩ
+"""
+get_impedance(instr::Instr{<:Oscilloscope}; chan::Integer=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
+
+
+"""
+    run(scope)
+
+Run Oscilloscope
+"""
+run(instr::Instr{<:Oscilloscope}) = write(instr, "RUN")
+
+
+"""
+    stop(scope)
+    
+Stop Oscilloscope
+"""
+stop(instr::Instr{<:Oscilloscope}) = write(instr, "STOP")
+
+
+channel_is_displayed(instr::Instr{<:Oscilloscope}, chan) = query(instr, "STAT? CHAN$chan") == "1" ? true : false
+get_waveform_preamble(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:PREAMBLE?")
+get_waveform_source(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:SOURCE?")
+
+get_waveform_mode(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:FORMAT?")
+set_waveform_mode_8bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT BYTE")
+set_waveform_mode_16bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT WORD")
+
+get_waveform_num_points(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:POINTS?")
+set_waveform_num_points(instr::Instr{<:Oscilloscope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
+set_waveform_num_points(instr::Instr{<:Oscilloscope}, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
+
+get_waveform_points_mode(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:POINTS:MODE?")
+
+"""
+    set_waveform_points_mode(scope, mode)
+
+Set which data to transfer when using `get_data`(@ref)
+
+Inputs:
+`scope`: handle to the connected oscilloscope
+`mode`: 
+- `:NORMAL`: transfer the measurement data
+- `:RAW`: transfer the raw acquisition data
+"""
+function set_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode::Symbol)
+    if mode ∈ [:NORMAL, :RAW]
+        write(instr, "WAVEFORM:POINTS:MODE $(mode)")
     else
-        out = s[1:n]
+        error("Mode $mode not recognized. Specify :NORMAL or :RAW instead")
     end
-    return out
+    return nothing
+end
+
+
+function set_speed_mode(instr::Instr{<:Oscilloscope}, speed::Integer)
+    if speed == 1
+        set_waveform_mode_16bit(instr)
+        set_waveform_points_mode(instr, 1)
+    elseif speed == 3
+        set_waveform_mode_16bit(instr)
+        set_waveform_points_mode(instr, 0)
+    elseif speed == 5
+        set_waveform_mode_8bit(instr)
+        set_waveform_points_mode(instr, 1)
+    elseif speed == 6
+        set_waveform_mode_8bit(instr)
+        set_waveform_points_mode(instr, 0)
+    end
 end

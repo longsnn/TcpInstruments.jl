@@ -42,10 +42,20 @@ use `help>Instrument`.
 module TcpInstruments
 
 using Sockets
+using Base.Threads: @spawn
+using Dates
+using MAT
+using JLD2
+using RecipesBase
+import InstrumentConfig: initialize, terminate
+
 using Unitful
 using Unitful: s, ms, μs, ns, ps
-
-import InstrumentConfig: initialize, terminate
+using Unitful: Current, Voltage, Frequency, Time
+const R = u"Ω"
+const V = u"V"
+const A = u"A"
+const Hz = u"Hz"
 
 export Instrument
 export Oscilloscope, MultiMeter, PowerSupply, WaveformGenerator, ImpedanceAnalyzer
@@ -63,11 +73,12 @@ export set_voltage, get_voltage
 export set_voltage_limit, get_voltage_limit
 export set_channel, get_channel
 
-    # Scope
-export get_data
+# Scope
+export get_data, get_waveform_info
 export lpf_on, lpf_off, get_lpf_state
 export set_impedance_1Mohm, set_impedance_50ohm, get_impedance
 export get_coupling
+
 export get_function, set_function
 export get_frequency, set_frequency
 export get_amplitude, set_amplitude
@@ -126,16 +137,17 @@ export Keysight33612A
 
 export scan_network
 
-include("types.jl")
-include("util.jl")
-include("config.jl")
 
-# common instrument containers
+include("config.jl")
 include("instrument.jl")
 include("common_commands.jl")
 
+include("types.jl")
+include("util.jl")
+
 # instruments
-include("oscilloscope/all.jl")
+include("oscilloscope/scope_common.jl")
+include("oscilloscope/recipes.jl")
 include("power_supply/all.jl")
 include("signal_generator/all.jl")
 include("impedance_analyzer/all.jl")
