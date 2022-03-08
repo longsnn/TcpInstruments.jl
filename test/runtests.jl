@@ -12,6 +12,11 @@ const A = u"A"
     @testset "Fake Scope" begin
         f = initialize(TcpInstruments.FakeDSOX4034A)
 
+        @testset "Test waveform info" begin
+            waveform_info = get_waveform_info(f, 1)
+            @test waveform_info.num_points == f.model.num_samples
+        end
+
         @testset "Save single ch data" begin
             data = get_data(f, 1)
             @test data isa TcpInstruments.ScopeData

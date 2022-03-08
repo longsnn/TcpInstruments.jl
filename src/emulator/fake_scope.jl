@@ -50,8 +50,8 @@ function get_default_scope_info(scope::Instr{FakeDSOX4034A}, channel::Int)
     y_increment = 0.0167364
     y_origin = 1.28425
     y_reference = 128.0
-    impedance = ""
-    coupling = ""
+    impedance = "ONEM"
+    coupling = "DC"
     low_pass_filter = ""
     return ScopeInfo(format, type, num_points, 
                      x_increment, x_origin, x_reference,
@@ -60,6 +60,6 @@ function get_default_scope_info(scope::Instr{FakeDSOX4034A}, channel::Int)
 end
 
 
-function scope_waveform_info_get(scope::Instr{FakeDSOX4034A}, channel::Int)
+function get_waveform_info(scope::Instr{FakeDSOX4034A}, channel::Int)
     return get_default_scope_info(scope, channel)
 end
