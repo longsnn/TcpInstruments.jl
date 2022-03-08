@@ -60,6 +60,6 @@ function get_default_scope_info(scope::Instr{FakeDSOX4034A}, channel::Int)
 end
 
 
-function scope_waveform_info_get(scope::Instr{FakeDSOX4034A}, channel::Int)
+function get_waveform_info(scope::Instr{FakeDSOX4034A}, channel::Int)
     return get_default_scope_info(scope, channel)
 end
