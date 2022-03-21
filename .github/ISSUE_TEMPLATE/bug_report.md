@@ -10,10 +10,11 @@ assignees: ''
 ### Bug description
 A clear and concise description of the bug
 
-### Steps or code to reproduce the behavior
+### Steps to reproduce the behavior along with the error stacktrace
 ```
 using TcpInstruments
-...
+
+[add additional steps in this space]
 ```
 
 ### Versions
