@@ -3,8 +3,8 @@ Device has two channels: 1 & 2
 # Supported functions
 - `initialize()`
 - `terminate()`
-- `enable_output()`
-- `disable_output()`
+- `set_output_on()`
+- `set_output_off()`
 - `get_output_status()`
 - `get_frequency()`
 - `set_frequency()`
@@ -34,8 +34,8 @@ enable_output(wave) # Starts wave
 ```
 """
 
-enable_output(obj::Instr{Keysight33612A}; chan=1)  = write(obj, "OUTPUT$chan ON")
-disable_output(obj::Instr{Keysight33612A}; chan=1) = write(obj, "OUTPUT$chan OFF")
+set_output_on(obj::Instr{Keysight33612A}; chan=1) = write(obj, "OUTPUT$chan ON")
+set_output_off(obj::Instr{Keysight33612A}; chan=1) = write(obj, "OUTPUT$chan OFF")
 function get_output_status(obj::Instr{Keysight33612A}; chan=1) 
     return query(obj, "OUTPUT$chan?") == "1" ? "ON" : "OFF"
 end
