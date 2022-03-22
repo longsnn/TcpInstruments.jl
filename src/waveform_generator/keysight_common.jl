@@ -34,28 +34,87 @@ enable_output(wave) # Starts wave
 ```
 """
 
+"""
+    set_output_on(wave_gen; chan=1)
+
+Activate the front panel output connector
+"""
 set_output_on(obj::Instr{<:KeysightWaveGen}; chan=1) = write(obj, "OUTPUT$chan ON")
+
+
+"""
+    set_output_off(wave_gen; chan=1)
+
+Deactivate the front panel output connector
+"""
 set_output_off(obj::Instr{<:KeysightWaveGen}; chan=1) = write(obj, "OUTPUT$chan OFF")
+
+
+"""
+    get_output_status(wave_gen; chan=1)
+
+Get the status of the front panel output connector
+
+Returns "ON" or "OFF"
+"""
 function get_output_status(obj::Instr{<:KeysightWaveGen}; chan=1) 
     return query(obj, "OUTPUT$chan?") == "1" ? "ON" : "OFF"
 end
 
 
+"""
+    get_voltage_offset(wave_gen; chan=1)
+
+Returns the voltage offset for the channel [V]
+"""
 get_voltage_offset(obj::Instr{<:KeysightWaveGen}; chan=1) =
     f_query(obj, "SOURCE$chan:VOLTAGE:OFFSET?") * V
+
+
+"""
+    set_voltage_offset(wave_gen; chan=1)
+
+Set the voltage offset for the channel [V]
+"""
 set_voltage_offset(obj::Instr{<:KeysightWaveGen}, num::Voltage; chan=1) =
     write(obj, "SOURCE$chan:VOLTAGE:OFFSET $(raw(num))")
 
+
+"""
+    get_amplitude(wave_gen; chan=1)
+
+Returns the peak to peak voltage for the channel [Vpp]
+"""
 get_amplitude(obj::Instr{<:KeysightWaveGen}; chan=1) =
     f_query(obj, "SOURCE$chan:VOLTAGE?") * V
+
+
+"""
+    set_amplitude(wave_gen; chan=1)
+
+Set the peak to peak voltage for the channel [Vpp]
+"""
 set_amplitude(obj::Instr{<:KeysightWaveGen}, num::Voltage; chan=1) =
     write(obj, "SOURCE$chan:VOLTAGE $(raw(num))")
 
 
+"""
+    get_frequency(wave_gen; chan=1)
+
+Returns the signal frequency for the channel [Hz]
+"""
 get_frequency(obj::Instr{<:KeysightWaveGen}; chan=1) =
     f_query(obj, "SOURCE$chan:FREQUENCY?") * Hz
+
+
+"""
+    set_frequency(wave_gen; chan=1)
+
+Set the signal frequency for the channel [Hz]
+"""
 set_frequency(obj::Instr{<:KeysightWaveGen}, num::Frequency; chan=1) =
     write(obj, "SOURCE$chan:FREQUENCY $(raw(num))")
+
 
 """
     get_function(instr)
@@ -69,8 +128,9 @@ set_frequency(obj::Instr{<:KeysightWaveGen}, num::Frequency; chan=1) =
 """
 get_function(obj::Instr{<:KeysightWaveGen}; chan=1) = query(obj, "SOURCE$chan:FUNCTION?") # +4.0E+05
 
+
 """
-set_function(instr, func; chan=1)
+    set_function(instr, func; chan=1)
 
 # Arguments
 - `func::String`: Acceptable inputs:
@@ -81,15 +141,22 @@ set_function(instr, func; chan=1)
 """
 set_function(obj::Instr{<:KeysightWaveGen}, func; chan=1) = write(obj, "SOURCE$chan:FUNCTION $func") # +4.0E+05
 
-"""
-    Sets the burst mode of a device to Triggered Mode
 
 """
-set_burst_mode_trigger(obj::Instr{<:KeysightWaveGen}; chan=1) = write(obj, "SOURCE$chan:BURST:MODE TRIG")
+    set_burst_mode_trigger(wave_gen; chan=1)
+
+Set the burst mode of a device to Triggered Mode
 """
-Sets the burst mode of a device to Gated Mode
+set_burst_mode_trigger(obj::Instr{<:KeysightWaveGen}; chan=1) = write(obj, "SOURCE$chan:BURST:MODE TRIG")
+
+
+"""
+    set_burst_mode_gated(wave_gen; chan=1)
+
+Set the burst mode of a device to Gated Mode
 """
 set_burst_mode_gated(obj::Instr{<:KeysightWaveGen}; chan=1) = write(obj, "SOURCE$chan:BURST:MODE GATED")
+
 
 """
     get_burst_mode(instr)
@@ -100,6 +167,7 @@ Returns the burst mode of a device:
     "GAT" ~ If the device is in Gated Mode
 """
 get_burst_mode(obj::Instr{<:KeysightWaveGen}; chan=1) = query(obj, "SOURCE$chan:BURST:MODE?")
+
 
 """
 ```
@@ -140,9 +208,10 @@ function set_mode_burst(obj::Instr{<:KeysightWaveGen};
     write(obj, "SOURCE$chan:BURST:STATE ON")
 end
 
+
 """
-set_mode_cw(instr)
-set_mode_cw(instr; chan=2)
+    set_mode_cw(instr)
+    set_mode_cw(instr; chan=1)
 
 Puts the device in continuous waveform/turns off burst mode
 
@@ -151,9 +220,10 @@ Puts the device in continuous waveform/turns off burst mode
 """
 set_mode_cw(obj::Instr{<:KeysightWaveGen}; chan=1) = write(obj, "SOURCE$chan:BURST:STATE OFF")
 
+
 """
     get_mode(instr)
-    get_mode(instr; chan=2)
+    get_mode(instr; chan=1)
 
 # Keywords
 - `chan`: Specify channel: Default is 1
@@ -162,6 +232,7 @@ Returns:
     "BURST" ~ if device is in BURST mode
 """
 get_mode(obj::Instr{<:KeysightWaveGen}; chan=1) = query(obj, "SOURCE$chan:BURST:STATE?") == "1" ? "BURST" : "CW"
+
 
 """
     get_burst_num_of_cycles(instr)
@@ -174,6 +245,7 @@ get_mode(obj::Instr{<:KeysightWaveGen}; chan=1) = query(obj, "SOURCE$chan:BURST:
 - `Float64`: number of cycles burst mode is set to
 """
 get_burst_num_cycles(obj::Instr{<:KeysightWaveGen}; chan=1) = f_query(obj, "SOURCE$chan:BURST:NCYCLES?")
+
 
 """
     set_burst_num_of_cycles(instr, cycles)
@@ -188,6 +260,7 @@ Sets the number of cycles for burst mode
 """
 set_burst_num_cycles(obj::Instr{<:KeysightWaveGen}, num; chan=1) = write(obj, "SOURCE$chan:BURST:NCYCLES $(Float64(num))")
 
+
 """
     set_burst_period(obj, num; chan=1)
 
@@ -197,6 +270,7 @@ set_burst_num_cycles(obj::Instr{<:KeysightWaveGen}, num; chan=1) = write(obj, "S
 - `chan`: Specify channel: Default is 1
 """
 set_burst_period(obj::Instr{<:KeysightWaveGen}, num; chan::Integer=1) = write(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD $(Float64(num))")
+
 
 """
     get_burst_period(instr)
