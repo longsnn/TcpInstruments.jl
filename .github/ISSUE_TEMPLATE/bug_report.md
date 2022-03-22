@@ -20,3 +20,6 @@ using TcpInstruments
 ### Versions
 TcpInstruments.jl version/commit:
 Julia version:
+
+### Priority level (optional)
+What is the priority level or desired timeframe for resolving this bug?
