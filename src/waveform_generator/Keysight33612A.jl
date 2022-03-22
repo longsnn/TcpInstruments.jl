@@ -33,7 +33,6 @@ set_voltage_offset(wave, 0)
 enable_output(wave) # Starts wave
 ```
 """
-struct Keysight33612A <: WaveformGenerator end
 
 enable_output(obj::Instr{Keysight33612A}; chan=1)  = write(obj, "OUTPUT$chan ON")
 disable_output(obj::Instr{Keysight33612A}; chan=1) = write(obj, "OUTPUT$chan OFF")
