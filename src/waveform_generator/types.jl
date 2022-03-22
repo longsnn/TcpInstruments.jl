@@ -3,5 +3,5 @@
 """
 abstract type WaveformGenerator <: Instrument end
 
-abstract type KeysightWaveformGenerator <: WaveformGenerator end
-struct Keysight33612A <: KeysightWaveformGenerator end
+abstract type KeysightWaveGen <: WaveformGenerator end
+struct Keysight33612A <: KeysightWaveGen end
