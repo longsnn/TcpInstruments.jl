@@ -204,7 +204,7 @@ set_burst_period(obj::Instr{Keysight33612A}, num; chan::Integer=1) = write(obj, 
 # Returns
 - `Float64`: number of cycles burst mode is set to
 """
-get_burst_period(obj::Instr{Keysight33612A}; chan::Integer=1) = f_query(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD?")
+get_burst_period(obj::Instr{Keysight33612A}; chan::Integer=1) = f_query(obj, "SOURCE$chan:BURST:INTERNAL:PERIOD?") * s
 
 set_trigger_source_timer(obj::Instr{Keysight33612A}; chan::Integer=1) = write(obj, "TRIGGER$chan:SOURCE TIMER")
 
