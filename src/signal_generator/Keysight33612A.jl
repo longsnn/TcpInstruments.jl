@@ -51,9 +51,9 @@ set_amplitude(obj::Instr{Keysight33612A}, num::Voltage; chan=1) =
 
 
 get_frequency(obj::Instr{Keysight33612A}; chan=1) =
-    f_query(obj, "SOURCE$chan:FREQUENCY?") # +4.0E+05
+    f_query(obj, "SOURCE$chan:FREQUENCY?")
 set_frequency(obj::Instr{Keysight33612A}, num::Frequency; chan=1) =
-    write(obj, "SOURCE$chan:FREQUENCY $(raw(num)))") # +4.0E+05
+    write(obj, "SOURCE$chan:FREQUENCY $(raw(num))")
 
 """
     get_function(instr)
