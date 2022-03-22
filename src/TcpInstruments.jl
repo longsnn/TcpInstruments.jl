@@ -112,7 +112,8 @@ export get_frequency_limits, set_frequency_limits
 export get_num_data_points, set_num_data_points
 export get_volt_limit_dc, set_volt_limit_dc
 
-# Signal Generator
+# Waveform Generator
+export set_output_on, set_output_off, get_output_status
 export get_frequency, set_frequency
 export get_amplitude, set_amplitude
 export get_burst_num_cycles, set_burst_num_cycles
@@ -149,7 +150,7 @@ include("util.jl")
 include("oscilloscope/scope_common.jl")
 include("oscilloscope/recipes.jl")
 include("power_supply/all.jl")
-include("signal_generator/all.jl")
+include("waveform_generator/all.jl")
 include("impedance_analyzer/all.jl")
 include("multimeter/all.jl")
 

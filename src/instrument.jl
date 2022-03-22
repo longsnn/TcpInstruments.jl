@@ -58,13 +58,6 @@ abstract type MultiMeter <: Instrument end
 abstract type PowerSupply <: Instrument end
 
 
-# Maybe store ips in a config file and it dynamically shows you address?
-"""
-- [`Keysight33612A`](@ref)
-"""
-abstract type WaveformGenerator <: Instrument end
-
-
 """
 - [`Agilent4294A`](@ref)
 - [`Agilent4395A`](@ref)

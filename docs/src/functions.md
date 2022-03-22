@@ -127,12 +127,12 @@ Pages = ["src/power_supply/VersatilePower.jl"]
 ## Waveform Generator
 ```@autodocs
 Modules = [TcpInstruments]
-Pages = ["src/signal_generator/all.jl"]
+Pages = ["src/waveform_generator/all.jl"]
 ```
 
 ### Keysight33612A
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/signal_generator/Keysight33612A.jl"]
+Pages = ["src/waveform_generator/Keysight33612A.jl"]
 ```
