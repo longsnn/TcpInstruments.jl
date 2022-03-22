@@ -149,7 +149,7 @@ include("util.jl")
 include("oscilloscope/scope_common.jl")
 include("oscilloscope/recipes.jl")
 include("power_supply/all.jl")
-include("signal_generator/all.jl")
+include("waveform_generator/all.jl")
 include("impedance_analyzer/all.jl")
 include("multimeter/all.jl")
 
