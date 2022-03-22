@@ -135,7 +135,7 @@ set_voltage_offset(obj::Instr{<:KeysightWaveGen}, num::Voltage; chan=1) =
 - `String`: Will return one of these shortened forms:
 {SINusoid|SQUare|TRIangle|RAMP|PULSe|PRBS|NOISe|ARB|DC}
 """
-get_function(obj::Instr{<:KeysightWaveGen}; chan=1) = query(obj, "SOURCE$chan:FUNCTION?") # +4.0E+05
+get_function(obj::Instr{<:KeysightWaveGen}; chan=1) = query(obj, "SOURCE$chan:FUNCTION?")
 
 
 """
@@ -148,7 +148,7 @@ get_function(obj::Instr{<:KeysightWaveGen}; chan=1) = query(obj, "SOURCE$chan:FU
 # Keywords
 - `chan`: Specify channel: Default is 1
 """
-set_function(obj::Instr{<:KeysightWaveGen}, func; chan=1) = write(obj, "SOURCE$chan:FUNCTION $func") # +4.0E+05
+set_function(obj::Instr{<:KeysightWaveGen}, func; chan=1) = write(obj, "SOURCE$chan:FUNCTION $func")
 
 
 """
