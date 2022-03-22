@@ -24,8 +24,7 @@ SRSPS310:
     address: "10.1.30.37:1234"
 
 # Waveform Generator
-
-Keysight33612A: "10.1.30.36"
+Keysight33612A: "10.1.30.47"
 
 # Impedance Analyzer
 
