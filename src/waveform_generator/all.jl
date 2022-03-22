@@ -1,1 +1,1 @@
-include("Keysight33612A.jl")
+include("keysight_common.jl")
