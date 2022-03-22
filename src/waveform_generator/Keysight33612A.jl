@@ -5,7 +5,7 @@ Device has two channels: 1 & 2
 - `terminate()`
 - `enable_output()`
 - `disable_output()`
-- `get_output()`
+- `get_output_status()`
 - `get_frequency()`
 - `set_frequency()`
 - `get_amplitude()`
@@ -36,7 +36,10 @@ enable_output(wave) # Starts wave
 
 enable_output(obj::Instr{Keysight33612A}; chan=1)  = write(obj, "OUTPUT$chan ON")
 disable_output(obj::Instr{Keysight33612A}; chan=1) = write(obj, "OUTPUT$chan OFF")
-get_output(obj::Instr{Keysight33612A}; chan=1)     = write(obj, "OUTPUT$chan?")
+function get_output_status(obj::Instr{Keysight33612A}; chan=1) 
+    return query(obj, "OUTPUT$chan?") == "1" ? "ON" : "OFF"
+end
+
 
 get_voltage_offset(obj::Instr{Keysight33612A}; chan=1) =
     f_query(obj, "SOURCE$chan:VOLTAGE:OFFSET?") * V

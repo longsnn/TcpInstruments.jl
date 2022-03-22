@@ -112,7 +112,8 @@ export get_frequency_limits, set_frequency_limits
 export get_num_data_points, set_num_data_points
 export get_volt_limit_dc, set_volt_limit_dc
 
-# Signal Generator
+# Waveform Generator
+export get_output_status
 export get_frequency, set_frequency
 export get_amplitude, set_amplitude
 export get_burst_num_cycles, set_burst_num_cycles
