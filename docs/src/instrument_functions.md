@@ -41,22 +41,14 @@ Pages = ["src/multimeter/KeysightDMM34465A.jl"]
 ## Oscilloscope
 ```@autodocs
 Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: Oscilloscope && t != Oscilloscope
+```
+
+### Agilent Oscilloscope
+```@autodocs
+Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
 Pages = ["src/oscilloscope/scope_common.jl"]
-```
-
-### AgilentDSOX4024A
-```@autodocs
-Modules = [TcpInstruments]
-Filter = t -> typeof(t) !== DataType
-Pages = ["src/oscilloscope/AgilentDSOX4024A.jl"]
-```
-
-### AgilentDSOX4034A
-```@autodocs
-Modules = [TcpInstruments]
-Filter = t -> typeof(t) !== DataType
-Pages = ["src/oscilloscope/AgilentDSOX4034A.jl"]
 ```
 
 
