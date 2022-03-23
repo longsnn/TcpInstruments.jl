@@ -108,9 +108,9 @@ Modules = [TcpInstruments]
 Pages = ["src/waveform_generator/all.jl"]
 ```
 
-### Keysight33612A
+### Keysight 33600A Series
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/waveform_generator/Keysight33612A.jl"]
+Pages = ["src/waveform_generator/keysight_common.jl"]
 ```
