@@ -105,10 +105,10 @@ Pages = ["src/power_supply/VersatilePower.jl"]
 ## Waveform Generator
 ```@autodocs
 Modules = [TcpInstruments]
-Pages = ["src/waveform_generator/all.jl"]
+Filter = t -> typeof(t) === DataType && t <: WaveformGenerator && t != WaveformGenerator
 ```
 
-### Keysight 33600A Series
+### Keysight Waveform Generator
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
