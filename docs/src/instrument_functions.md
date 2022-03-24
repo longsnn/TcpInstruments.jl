@@ -2,28 +2,6 @@
 CurrentModule = TcpInstruments
 ```
 
-## General functions
-```@meta
-CurrentModule = TcpInstruments
-```
-
-- [`initialize`](@ref)
-- [`terminate`](@ref)
-- [`info`](@ref)
-- [`scan_network`](@ref)
-- [`save`](@ref)
-- [`load`](@ref)
-
-```@docs
-initialize
-terminate
-info
-scan_network
-save
-load
-```
-
-
 ## Impedance Analyzer
 ```@autodocs
 Modules = [TcpInstruments]
@@ -63,22 +41,14 @@ Pages = ["src/multimeter/KeysightDMM34465A.jl"]
 ## Oscilloscope
 ```@autodocs
 Modules = [TcpInstruments]
+Filter = t -> typeof(t) === DataType && t <: Oscilloscope && t != Oscilloscope
+```
+
+### Agilent Oscilloscope
+```@autodocs
+Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
 Pages = ["src/oscilloscope/scope_common.jl"]
-```
-
-### AgilentDSOX4024A
-```@autodocs
-Modules = [TcpInstruments]
-Filter = t -> typeof(t) !== DataType
-Pages = ["src/oscilloscope/AgilentDSOX4024A.jl"]
-```
-
-### AgilentDSOX4034A
-```@autodocs
-Modules = [TcpInstruments]
-Filter = t -> typeof(t) !== DataType
-Pages = ["src/oscilloscope/AgilentDSOX4034A.jl"]
 ```
 
 
@@ -127,12 +97,12 @@ Pages = ["src/power_supply/VersatilePower.jl"]
 ## Waveform Generator
 ```@autodocs
 Modules = [TcpInstruments]
-Pages = ["src/waveform_generator/all.jl"]
+Filter = t -> typeof(t) === DataType && t <: WaveformGenerator && t != WaveformGenerator
 ```
 
-### Keysight33612A
+### Keysight Waveform Generator
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/waveform_generator/Keysight33612A.jl"]
+Pages = ["src/waveform_generator/keysight_common.jl"]
 ```

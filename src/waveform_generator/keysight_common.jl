@@ -1,49 +1,4 @@
 """
-Device has two channels: 1 & 2
-# Supported functions
-- `initialize()`
-- `terminate()`
-
-- `get_output_status()`
-- `set_output_on()`
-- `set_output_off()`
-- `get_frequency()`
-- `set_frequency()`
-- `get_amplitude()`
-- `set_amplitude()`
-- `get_voltage_offset()`
-- `set_voltage_offset()`
-
-- `get_function()`
-- `set_function()`
-
-- `get_mode()`
-- `set_mode_cw()`
-- `set_mode_burst()`
-- `get_burst_mode()`
-- `set_burst_mode_trigger()`
-- `set_burst_mode_gated()`
-- `get_burst_num_cycles()`
-- `set_burst_num_cycles()`
-- `get_burst_period()`
-- `set_burst_period()`
-
-- `get_time_offset()`: Not implemented
-- `set_time_offset()`: Not implemented
-
-Creating a Sin Wave Example:
-```
-wave = initialize(Keysight33612A, "10.1.30.36")
-set_mode_cw(wave) # Set to continuous waveform mode
-set_function(wave, "SIN")
-set_frequency(wave, "1e3") # Frequency val can be string or number
-set_amplitude(wave, 0.1)
-set_voltage_offset(wave, 0)
-enable_output(wave) # Starts wave
-```
-"""
-
-"""
     get_output_status(wave_gen; chan=1)
 
 Get the status of the front panel output connector

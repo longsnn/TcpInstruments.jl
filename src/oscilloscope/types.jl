@@ -1,9 +1,33 @@
 """
-- [`AgilentDSOX4024A`](@ref)
-- [`AgilentDSOX4034A`](@ref)
+- [`AgilentScope`](@ref)
 """
 abstract type Oscilloscope <: Instrument end
 
+
+"""
+Supported models
+- `AgilentDSOX4024A`
+- `AgilentDSOX4034A`
+
+Supported functions
+- [`initialize`](@ref)
+- [`terminate`](@ref)
+
+
+- [`run`](@ref)
+- [`stop`](@ref)
+- [`get_data`](@ref)
+- [`get_waveform_info`](@ref)
+
+
+- [`get_impedance`](@ref)
+- [`set_impedance_1Mohm`](@ref)
+- [`set_impedance_50ohm`](@ref)
+- [`get_lpf_state`](@ref)
+- [`lpf_on`](@ref)
+- [`lpf_off`](@ref)
+- [`get_coupling`](@ref)
+"""
 abstract type AgilentScope <: Oscilloscope end
 struct AgilentDSOX4024A <: AgilentScope end
 struct AgilentDSOX4034A <: AgilentScope end
