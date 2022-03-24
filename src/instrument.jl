@@ -58,12 +58,6 @@ abstract type MultiMeter <: Instrument end
 abstract type PowerSupply <: Instrument end
 
 
-"""
-- [`Agilent4294A`](@ref)
-- [`Agilent4395A`](@ref)
-"""
-abstract type ImpedanceAnalyzer <: Instrument end
-
 mutable struct Instr{ T <: Instrument } <: Instrument
     model::Union{Type, T}
     address::String

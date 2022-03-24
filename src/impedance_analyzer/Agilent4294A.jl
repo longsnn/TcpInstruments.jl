@@ -1,19 +1,4 @@
 """
-http://literature.cdn.keysight.com/litweb/pdf/04294-90061.pdf
-# Available functions
-- `initialize()`
-- `terminate()`
-- [`get_impedance`](@ref)
-- [`get_bandwidth`](@ref)
-- [`set_bandwidth`](@ref)
-- [`get_volt_ac`](@ref)
-- [`set_volt_ac`](@ref)
-- [`get_channel`](@ref)
-- [`set_channel`](@ref)
-"""
-struct Agilent4294A <: ImpedanceAnalyzer end
-
-"""
     get_bandwidth(instr)
 
 Returns bandwidth level (1-5)
