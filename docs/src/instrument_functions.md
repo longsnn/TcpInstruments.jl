@@ -30,7 +30,7 @@ Pages = ["src/impedance_analyzer/Agilent4395A.jl"]
 ## Multimeter
 ```@autodocs
 Modules = [TcpInstruments]
-Filter = t -> typeof(t) === DataType && t <: MultiMeter && t != MultiMeter
+Filter = t -> typeof(t) === DataType && t <: Multimeter && t != Multimeter
 ```
 
 ### Keysight Multimeter

@@ -1,7 +1,7 @@
 """
 - [`KeysightMultimeter`](@ref)
 """
-abstract type MultiMeter <: Instrument end
+abstract type Multimeter <: Instrument end
 
 """
 Supported models
@@ -23,5 +23,5 @@ Supported functions
 - [`set_temp_unit_farenheit`](@ref)
 - [`set_temp_unit_kelvin`](@ref)
 """
-abstract type KeysightMultimeter <: MultiMeter end
+abstract type KeysightMultimeter <: Multimeter end
 struct KeysightDMM34465A <: KeysightMultimeter end
