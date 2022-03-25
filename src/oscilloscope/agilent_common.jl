@@ -75,38 +75,74 @@ const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
 
-function read_raw_waveform(instr::Instr{<:AgilentScope})
-    write(instr, "WAV:DATA?")
-    num_waveform_samples = get_num_waveform_samples(instr)
-    raw_data = read(instr.sock, num_waveform_samples);
-    # read end of line character
-    dummy = readline(instr.sock)
+function read_raw_waveform(scope::Instr{<:AgilentScope})
+    data_transfer_format = get_data_transfer_format(scope)
+    if data_transfer_format == "BYTE"
+        raw_data = read_uint8(scope)
+    else
+        error("Data transfer format $data_transfer_format not yet supported")
+    end
     return raw_data
 end
 
 
-function get_num_waveform_samples(instr::Instr{<:AgilentScope})
-    header = get_data_header(instr)
-    num_header_description_bytes = 2
-    num_waveform_samples = parse(Int, header[num_header_description_bytes+1:end])
-    return num_waveform_samples
+function read_uint8(scope::Instr{<:AgilentScope})
+    request_waveform_data(scope)
+    num_data_points = get_num_data_points(scope)
+    num_bytes_per_point = 1
+    num_data_bytes = num_data_points * num_bytes_per_point
+
+    data = read_num_bytes(scope, num_data_points);
+    read_end_of_line_character(scope)
+
+    if length(data) != num_data_points
+        error("Transferred data did not have the expected number of data points\nTransferred: $(length(data))\nExpected: $num_values ($num_data_points * $num_values_per_point)\n")
+    end
+
+    return data
 end
 
 
-function get_data_header(instr::Instr{<:AgilentScope})
+function request_waveform_data(scope::Instr{<:AgilentScope})
+    write(scope, "WAV:DATA?")
+    return nothing
+end
+
+
+function get_num_data_points(scope::Instr{<:AgilentScope})
+    header = get_data_header(scope)
+    num_header_description_bytes = 2
+    num_data_points = parse(Int, header[num_header_description_bytes+1:end])
+    return num_data_points
+end
+
+
+function get_data_header(scope::Instr{<:AgilentScope})
     # data header is an ASCII character string "#8DDDDDDDD", where the Ds indicate how many
     # bytes follow (p.1433 of Keysight InfiniiVision 4000 X-Series Oscilloscopes
     # Programmer's Guide)
     num_header_description_bytes = 2
-    header_description_uint8 = read(instr.sock, num_header_description_bytes)
+    header_description_uint8 = read(scope.sock, num_header_description_bytes)
     if header_description_uint8[1] != UInt8('#')
         error("The waveform data format is not formatted as expected")
     end
     header_block_length = parse(Int, convert(Char, header_description_uint8[2]))
-    header_block_uint8 = read(instr.sock, header_block_length)
+    header_block_uint8 = read(scope.sock, header_block_length)
     header = vcat(header_description_uint8, header_block_uint8)
     header = String(convert.(Char, header))
     return header
+end
+
+
+function read_num_bytes(scope::Instr{<:AgilentScope}, num_bytes)
+    output = read(scope.sock, num_bytes)
+    return output
+end
+
+
+function read_end_of_line_character(scope::Instr{<:AgilentScope})
+    read(scope)
+    return nothing
 end
 
 
