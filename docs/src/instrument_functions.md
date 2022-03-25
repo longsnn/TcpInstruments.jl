@@ -58,14 +58,14 @@ Pages = ["src/oscilloscope/agilent_common.jl"]
 ## Power Supply
 ```@autodocs
 Modules = [TcpInstruments]
-Pages = ["src/power_supply/all.jl"]
+Filter = t -> typeof(t) === DataType && t <: PowerSupply && t != PowerSupply
 ```
 
-### AgilentE36312A
+### Agilent Power Supply
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/power_supply/AgilentE36312A.jl"]
+Pages = ["src/power_supply/agilent_common.jl"]
 ```
 
 ### SRSPS310
