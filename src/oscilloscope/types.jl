@@ -32,6 +32,7 @@ abstract type AgilentScope <: Oscilloscope end
 struct AgilentDSOX4024A <: AgilentScope end
 struct AgilentDSOX4034A <: AgilentScope end
 
+
 struct ScopeInfo
     format::String
     type::String
@@ -48,8 +49,32 @@ struct ScopeInfo
     channel::Int64
 end
 
+function Base.show(io::IO, info::ScopeInfo)
+    println(io, "scope_info: ")
+    for fieldname in fieldnames(typeof(info))
+        println(io, "  " * String(fieldname) * ": ", getfield(info, fieldname))
+    end
+end
+
+
 struct ScopeData
     info::Union{ScopeInfo, Nothing}
     volt::Vector{typeof(1.0u"V")}
     time::Vector{typeof(1.0u"s")}
+end
+
+function Base.show(io::IO, ::MIME"text/plain", data_array::AbstractArray{ScopeData})
+    for idx in 1:length(data_array)
+        data = data_array[idx]
+        println(io, "channel ", data.info.channel)
+        println(io, "volt: ", size(data.volt), " ", unit(data.volt[1]))
+        println(io, "time: ", size(data.time), " ", unit(data.time[1]))
+        println(io)
+    end
+end
+
+function Base.show(io::IO, data::ScopeData)
+    show(data.info)
+    println(io, "volt: ", size(data.volt), " ", unit(data.volt[1]))
+    println(io, "time: ", size(data.time), " ", unit(data.time[1]))
 end
