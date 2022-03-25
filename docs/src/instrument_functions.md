@@ -51,7 +51,7 @@ Filter = t -> typeof(t) === DataType && t <: Oscilloscope && t != Oscilloscope
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/oscilloscope/scope_common.jl"]
+Pages = ["src/oscilloscope/agilent_common.jl"]
 ```
 
 
