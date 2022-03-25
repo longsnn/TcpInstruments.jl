@@ -45,12 +45,6 @@ abstract type Instrument end
 
 
 """
-- [`KeysightDMM34465A`](@ref)
-"""
-abstract type MultiMeter <: Instrument end
-
-
-"""
 - [`AgilentE36312A`](@ref)
 - [`SRSPS310`](@ref)
 - [`VersatilePower`](@ref)
