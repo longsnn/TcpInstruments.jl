@@ -61,13 +61,12 @@ end
 
 function read_uint8(scope::Instr{<:AgilentScope})
     request_waveform_data(scope)
-    num_data_points = get_num_data_points(scope)
-    num_bytes_per_point = 1
-    num_data_bytes = num_data_points * num_bytes_per_point
+    num_data_bytes = get_num_data_bytes(scope)
 
-    data = read_num_bytes(scope, num_data_points);
+    data = read_num_bytes(scope, num_data_bytes)
     read_end_of_line_character(scope)
 
+    num_data_points = get_num_data_points(scope)
     if length(data) != num_data_points
         error("Transferred data did not have the expected number of data points\nTransferred: $(length(data))\nExpected: $num_values ($num_data_points * $num_values_per_point)\n")
     end
