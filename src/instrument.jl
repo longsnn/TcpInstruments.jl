@@ -44,14 +44,6 @@ help> AgilentDSOX4034A
 abstract type Instrument end
 
 
-"""
-- [`AgilentE36312A`](@ref)
-- [`SRSPS310`](@ref)
-- [`VersatilePower`](@ref)
-"""
-abstract type PowerSupply <: Instrument end
-
-
 mutable struct Instr{ T <: Instrument } <: Instrument
     model::Union{Type, T}
     address::String

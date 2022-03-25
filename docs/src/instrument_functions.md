@@ -58,17 +58,17 @@ Pages = ["src/oscilloscope/agilent_common.jl"]
 ## Power Supply
 ```@autodocs
 Modules = [TcpInstruments]
-Pages = ["src/power_supply/all.jl"]
+Filter = t -> typeof(t) === DataType && t <: PowerSupply && t != PowerSupply
 ```
 
-### AgilentE36312A
+### Agilent Power Supply
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/power_supply/AgilentE36312A.jl"]
+Pages = ["src/power_supply/agilent_common.jl"]
 ```
 
-### SRSPS310
+### SRS Power Supply
 This device needs a gpib adapter
 
 As of right now the prologix adapter interface is the only
@@ -86,14 +86,14 @@ set the channel.
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/power_supply/SRSPS310.jl"]
+Pages = ["src/power_supply/srs_common.jl"]
 ```
 
-### VersatilePower
+### Versatile Power Supply
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/power_supply/VersatilePower.jl"]
+Pages = ["src/power_supply/versatile_common.jl"]
 ```
 
 
