@@ -145,12 +145,22 @@ const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
 
-function parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
-    # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
+function parse_raw_waveform(data, scope_info::ScopeInfo)
+    voltage_trace = create_voltage_trace(data, scope_info)
+    time_trace = create_time_trace(data, scope_info)
+    return ScopeData(scope_info, voltage_trace, time_trace)
+end
 
-    volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
-    time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
-    return ScopeData(wfm_info, V .* volt, u"s" .* time)
+
+function create_voltage_trace(data, scope_info::ScopeInfo)
+    voltage_trace = ((convert.(Float64, data) .- scope_info.y_reference) .* scope_info.y_increment) .+ scope_info.y_origin
+    return voltage_trace .* u"V"
+end
+
+
+function create_time_trace(data, scope_info::ScopeInfo)
+    time_trace = ((collect(0:scope_info.num_points-1) .- scope_info.x_reference) .* scope_info.x_increment) .+ scope_info.x_origin
+    return time_trace * u"s"
 end
 
 
