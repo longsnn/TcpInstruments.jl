@@ -30,14 +30,14 @@ Pages = ["src/impedance_analyzer/Agilent4395A.jl"]
 ## Multimeter
 ```@autodocs
 Modules = [TcpInstruments]
-Pages = ["src/multimeter/all.jl"]
+Filter = t -> typeof(t) === DataType && t <: MultiMeter && t != MultiMeter
 ```
 
-### KeysightDMM34465A
+### Keysight Multimeter
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/multimeter/KeysightDMM34465A.jl"]
+Pages = ["src/multimeter/keysight_common.jl"]
 ```
 
 
