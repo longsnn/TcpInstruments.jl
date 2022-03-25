@@ -51,9 +51,13 @@ end
 
 function Base.show(io::IO, info::ScopeInfo)
     println(io, "scope_info: ")
-    for fieldname in fieldnames(typeof(info))
-        println(io, "  " * String(fieldname) * ": ", getfield(info, fieldname))
-    end
+    println(io, "        channel: ", info.channel)
+    println(io, "         format: ", info.format)
+    println(io, "       acq_type: ", info.type)
+    println(io, "     num_points: ", info.num_points)
+    println(io, "      impedance: ", info.impedance)
+    println(io, "       coupling: ", info.coupling)
+    println(io, "low_pass_filter: ", info.low_pass_filter)
 end
 
 
