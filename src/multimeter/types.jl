@@ -3,7 +3,6 @@
 """
 abstract type MultiMeter <: Instrument end
 
-abstract type KeysightMultimeter <: MultiMeter end
 """
 # Available functions
 - `initialize`
@@ -14,4 +13,5 @@ abstract type KeysightMultimeter <: MultiMeter end
 - `get_resistance(;wire)` # wire must be set to 2 or 4
 - `get_channel` # (some kind of input detection not selection)
 """
+abstract type KeysightMultimeter <: MultiMeter end
 struct KeysightDMM34465A <: KeysightMultimeter end

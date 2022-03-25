@@ -3,7 +3,7 @@
 
 Perform take a measurement with the probe mode set to thermocouple
 """
-function get_tc_temperature(obj::Instr{KeysightDMM34465A})
+function get_tc_temperature(obj::Instr{<:KeysightMultimeter})
     units = get_temp_unit(obj)
     return f_query(obj, "MEASURE:TEMPERATURE? TC"; timeout=0) * units
 end
@@ -14,7 +14,7 @@ end
 # Keywords
 - `type`: Can be E, J, K, N, R, T (Defaults to K)
 """
-function set_tc_type(obj::Instr{KeysightDMM34465A}; type="K")
+function set_tc_type(obj::Instr{<:KeysightMultimeter}; type="K")
     if !(string(type) in ["E", "J", "K", "N", "R", "T"])
         error("$type must be one of [E, J, K, N, R, T]")
     end
@@ -28,14 +28,14 @@ Returns voltage
 - `type`: "DC" | "AC" (Default DC)
 
 """
-function get_voltage(obj::Instr{KeysightDMM34465A}; type="DC")
+function get_voltage(obj::Instr{<:KeysightMultimeter}; type="DC")
     !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
     f_query(obj, "MEASURE:VOLTAGE:$type?"; timeout=0) * V
 end
 
 
 """
-    get_current(obj::Instr{KeysightDMM34465A}; type="DC")
+    get_current(obj::Instr{<:KeysightMultimeter}; type="DC")
 
 Returns current
 
@@ -43,7 +43,7 @@ Returns current
 - `type`: "DC" | "AC" (Default DC)
 
 """
-function get_current(obj::Instr{KeysightDMM34465A}; type="DC")
+function get_current(obj::Instr{<:KeysightMultimeter}; type="DC")
     !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
     f_query(obj, "MEASURE:CURRENT:$type?"; timeout=0) * A
 end
@@ -57,7 +57,7 @@ Returns resistance
 - `wire`: 2 | 4 (Required)
 
 """
-function get_resistance(obj::Instr{KeysightDMM34465A}; wire)
+function get_resistance(obj::Instr{<:KeysightMultimeter}; wire)
     if wire == 2
         f_query(obj, "MEASURE:RESISTANCE?"; timeout=0) * R
     elseif wire == 4
@@ -72,7 +72,7 @@ end
 
 Sets the temperature unit to celcius
 """
-set_temp_unit_celsius(obj::Instr{KeysightDMM34465A}) =
+set_temp_unit_celsius(obj::Instr{<:KeysightMultimeter}) =
     write(obj, "UNIT:TEMPERATURE C")
 
 """
@@ -80,7 +80,7 @@ set_temp_unit_celsius(obj::Instr{KeysightDMM34465A}) =
 
 Sets the temperature unit to farenheit
 """
-set_temp_unit_farenheit(obj::Instr{KeysightDMM34465A}) =
+set_temp_unit_farenheit(obj::Instr{<:KeysightMultimeter}) =
     write(obj, "UNIT:TEMPERATURE F")
 
 """
@@ -88,7 +88,7 @@ set_temp_unit_farenheit(obj::Instr{KeysightDMM34465A}) =
 
 Sets the temperature unit to kelvin
 """
-set_temp_unit_kelvin(obj::Instr{KeysightDMM34465A}) =
+set_temp_unit_kelvin(obj::Instr{<:KeysightMultimeter}) =
     write(obj, "UNIT:TEMPERATURE K")
 
 """
@@ -96,7 +96,7 @@ set_temp_unit_kelvin(obj::Instr{KeysightDMM34465A}) =
 
 Returns C, F or K depending on the set temperature unit
 """
-function get_temp_unit(obj::Instr{KeysightDMM34465A})
+function get_temp_unit(obj::Instr{<:KeysightMultimeter})
    units = query(obj, "UNIT:TEMPERATURE?")
    return if units == "C"
        u"C"
@@ -111,7 +111,7 @@ end
 
 
 """
-    get_channel(obj::Instr{KeysightDMM34465A})
+    get_channel(obj::Instr{<:KeysightMultimeter})
 Indicates which input terminals are selected on the front panel
 Front/Rear switch. This switch is not programmable; this query reports
 the position of the switch, but cannot change it.
@@ -123,5 +123,5 @@ instrument's safety features.
 # Returns
 - "FRON" or "REAR"
 """
-get_channel(obj::Instr{KeysightDMM34465A}) =
+get_channel(obj::Instr{<:KeysightMultimeter}) =
     query(obj, "ROUTE:TERMINALS?")
