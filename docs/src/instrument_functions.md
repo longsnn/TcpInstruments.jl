@@ -5,18 +5,21 @@ CurrentModule = TcpInstruments
 ## Impedance Analyzer
 ```@autodocs
 Modules = [TcpInstruments]
-Pages = ["src/impedance_analyzer/all.jl"]
+Filter = t -> typeof(t) === DataType && t <: ImpedanceAnalyzer && t != ImpedanceAnalyzer
 ```
 
-### Agilent4294A
+
+### Agilent Impedance Analyzer
+```@autodocs
+Modules = [TcpInstruments]
+Filter = t -> typeof(t) !== DataType
+Pages = ["src/impedance_analyzer/agilent_common.jl"]
+```
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
 Pages = ["src/impedance_analyzer/Agilent4294A.jl"]
 ```
-
-### Agilent4395A
-#### WIP
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
@@ -48,7 +51,7 @@ Filter = t -> typeof(t) === DataType && t <: Oscilloscope && t != Oscilloscope
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/oscilloscope/scope_common.jl"]
+Pages = ["src/oscilloscope/agilent_common.jl"]
 ```
 
 

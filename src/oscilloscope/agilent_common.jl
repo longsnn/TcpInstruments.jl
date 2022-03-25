@@ -6,13 +6,13 @@
 Grab data from the specified channel(s). If no channels are specified, data will be grabbed
 from all available channels
 """
-function get_data(instr::Instr{<:Oscilloscope})
+function get_data(instr::Instr{<:AgilentScope})
     ch_vec = get_valid_channels(instr)
     @info "Loading channels: $ch_vec"
     return get_data(instr, ch_vec; check_channels=false)
 end 
 
-function get_data(instr::Instr{<:Oscilloscope}, ch_vec::Vector{Int}; check_channels=true)
+function get_data(instr::Instr{<:AgilentScope}, ch_vec::Vector{Int}; check_channels=true)
     if check_channels
         unique!(ch_vec)
         valid_channels = get_valid_channels(instr)
@@ -28,7 +28,7 @@ function get_data(instr::Instr{<:Oscilloscope}, ch_vec::Vector{Int}; check_chann
     return wfm_data
 end
 
-function get_data(instr::Instr{<:Oscilloscope}, ch::Integer)
+function get_data(instr::Instr{<:AgilentScope}, ch::Integer)
     set_waveform_source(instr, ch)
     wfm_info = get_waveform_info(instr, ch)
     raw_data = read_raw_waveform(instr);
@@ -36,7 +36,7 @@ function get_data(instr::Instr{<:Oscilloscope}, ch::Integer)
 end
 
 
-function get_valid_channels(instr::Instr{<:Oscilloscope})
+function get_valid_channels(instr::Instr{<:AgilentScope})
     statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
     filter!(x -> x[2], statuses)
     valid_channels = map(x -> x[begin], statuses)
@@ -44,7 +44,7 @@ function get_valid_channels(instr::Instr{<:Oscilloscope})
 end
 
 
-set_waveform_source(instr::Instr{<:Oscilloscope}, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
+set_waveform_source(instr::Instr{<:AgilentScope}, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
 
 
 """
@@ -52,7 +52,7 @@ set_waveform_source(instr::Instr{<:Oscilloscope}, ch::Int) = write(instr, "WAVEF
 
 Grab channel information and return it in a `ScopeInfo`(@ref) struct
 """
-function get_waveform_info(instr::Instr{<:Oscilloscope}, ch::Integer)
+function get_waveform_info(instr::Instr{<:AgilentScope}, ch::Integer)
     str = get_waveform_preamble(instr)
     str_array = split(str, ",")
     format      = RESOLUTION_MODE[str_array[1]]
@@ -75,7 +75,7 @@ const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
 
-function read_raw_waveform(instr::Instr{<:Oscilloscope})
+function read_raw_waveform(instr::Instr{<:AgilentScope})
     write(instr, "WAV:DATA?")
     num_waveform_samples = get_num_waveform_samples(instr)
     raw_data = read(instr.sock, num_waveform_samples);
@@ -85,7 +85,7 @@ function read_raw_waveform(instr::Instr{<:Oscilloscope})
 end
 
 
-function get_num_waveform_samples(instr::Instr{<:Oscilloscope})
+function get_num_waveform_samples(instr::Instr{<:AgilentScope})
     header = get_data_header(instr)
     num_header_description_bytes = 2
     num_waveform_samples = parse(Int, header[num_header_description_bytes+1:end])
@@ -93,7 +93,7 @@ function get_num_waveform_samples(instr::Instr{<:Oscilloscope})
 end
 
 
-function get_data_header(instr::Instr{<:Oscilloscope})
+function get_data_header(instr::Instr{<:AgilentScope})
     # data header is an ASCII character string "#8DDDDDDDD", where the Ds indicate how many
     # bytes follow (p.1433 of Keysight InfiniiVision 4000 X-Series Oscilloscopes
     # Programmer's Guide)
@@ -124,7 +124,7 @@ end
 
 returns "AC" or "DC"
 """
-get_coupling(instr::Instr{<:Oscilloscope}; chan=1) = query(instr, "CHANNEL$chan:COUPLING?")
+get_coupling(instr::Instr{<:AgilentScope}; chan=1) = query(instr, "CHANNEL$chan:COUPLING?")
 
 
 """
@@ -133,7 +133,7 @@ get_coupling(instr::Instr{<:Oscilloscope}; chan=1) = query(instr, "CHANNEL$chan:
 Turn on an internal low-pass filter. When the filter is on, the bandwidth of
 the specified channel is limited to approximately 25 MHz.
 """
-lpf_on(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
+lpf_on(instr::Instr{<:AgilentScope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMIT ON")
 
 
 """
@@ -141,7 +141,7 @@ lpf_on(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMI
 
 Turn off an internal low-pass filter.
 """
-lpf_off(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
+lpf_off(instr::Instr{<:AgilentScope}; chan=1) = write(instr, "CHANNEL$chan:BWLIMIT OFF")
 
 
 """
@@ -151,7 +151,7 @@ See state the internal low-pass filter:
 
 returns "0" or "1"
 """
-get_lpf_state(instr::Instr{<:Oscilloscope}; chan=1) = query(instr, "CHANNEL$chan:BWLIMIT?")
+get_lpf_state(instr::Instr{<:AgilentScope}; chan=1) = query(instr, "CHANNEL$chan:BWLIMIT?")
 
 
 """
@@ -159,7 +159,7 @@ get_lpf_state(instr::Instr{<:Oscilloscope}; chan=1) = query(instr, "CHANNEL$chan
 
 Set impedance to 1MΩ
 """
-set_impedance_1Mohm(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE ONEMEG")
+set_impedance_1Mohm(instr::Instr{<:AgilentScope}; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE ONEMEG")
 
 
 """
@@ -170,7 +170,7 @@ set_impedance_1Mohm(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, ":CHANN
 
 Set impedance to 50Ω
 """
-set_impedance_50ohm(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE FIFTY")
+set_impedance_50ohm(instr::Instr{<:AgilentScope}; chan=1) = write(instr, ":CHANNEL$chan:IMPEDANCE FIFTY")
 
 
 """
@@ -183,7 +183,7 @@ set_impedance_50ohm(instr::Instr{<:Oscilloscope}; chan=1) = write(instr, ":CHANN
 - `"FIFT"`: 50Ω
 - `"ONEM"`: 1MΩ
 """
-get_impedance(instr::Instr{<:Oscilloscope}; chan::Integer=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
+get_impedance(instr::Instr{<:AgilentScope}; chan::Integer=1) = query(instr, ":CHANNEL$chan:IMPEDANCE?")
 
 
 """
@@ -191,7 +191,7 @@ get_impedance(instr::Instr{<:Oscilloscope}; chan::Integer=1) = query(instr, ":CH
 
 Run Oscilloscope
 """
-run(instr::Instr{<:Oscilloscope}) = write(instr, "RUN")
+run(instr::Instr{<:AgilentScope}) = write(instr, "RUN")
 
 
 """
@@ -199,22 +199,22 @@ run(instr::Instr{<:Oscilloscope}) = write(instr, "RUN")
     
 Stop Oscilloscope
 """
-stop(instr::Instr{<:Oscilloscope}) = write(instr, "STOP")
+stop(instr::Instr{<:AgilentScope}) = write(instr, "STOP")
 
 
-channel_is_displayed(instr::Instr{<:Oscilloscope}, chan) = query(instr, "STAT? CHAN$chan") == "1" ? true : false
-get_waveform_preamble(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:PREAMBLE?")
-get_waveform_source(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:SOURCE?")
+channel_is_displayed(instr::Instr{<:AgilentScope}, chan) = query(instr, "STAT? CHAN$chan") == "1" ? true : false
+get_waveform_preamble(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:PREAMBLE?")
+get_waveform_source(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:SOURCE?")
 
-get_waveform_mode(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:FORMAT?")
-set_waveform_mode_8bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT BYTE")
-set_waveform_mode_16bit(instr::Instr{<:Oscilloscope}) = write(instr, "WAVEFORM:FORMAT WORD")
+get_waveform_mode(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:FORMAT?")
+set_waveform_mode_8bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT BYTE")
+set_waveform_mode_16bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT WORD")
 
-get_waveform_num_points(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:POINTS?")
-set_waveform_num_points(instr::Instr{<:Oscilloscope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
-set_waveform_num_points(instr::Instr{<:Oscilloscope}, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
+get_waveform_num_points(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:POINTS?")
+set_waveform_num_points(instr::Instr{<:AgilentScope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
+set_waveform_num_points(instr::Instr{<:AgilentScope}, mode::String) = write(instr, "WAVEFORM:POINTS $mode")
 
-get_waveform_points_mode(instr::Instr{<:Oscilloscope}) = query(instr, "WAVEFORM:POINTS:MODE?")
+get_waveform_points_mode(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:POINTS:MODE?")
 
 """
     set_waveform_points_mode(scope, mode)
@@ -227,7 +227,7 @@ Inputs:
 - `:NORMAL`: transfer the measurement data
 - `:RAW`: transfer the raw acquisition data
 """
-function set_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode::Symbol)
+function set_waveform_points_mode(instr::Instr{<:AgilentScope}, mode::Symbol)
     if mode ∈ [:NORMAL, :RAW]
         write(instr, "WAVEFORM:POINTS:MODE $(mode)")
     else
@@ -237,7 +237,7 @@ function set_waveform_points_mode(instr::Instr{<:Oscilloscope}, mode::Symbol)
 end
 
 
-function set_speed_mode(instr::Instr{<:Oscilloscope}, speed::Integer)
+function set_speed_mode(instr::Instr{<:AgilentScope}, speed::Integer)
     if speed == 1
         set_waveform_mode_16bit(instr)
         set_waveform_points_mode(instr, 1)

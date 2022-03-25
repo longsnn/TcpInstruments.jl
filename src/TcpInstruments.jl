@@ -147,7 +147,7 @@ include("types.jl")
 include("util.jl")
 
 # instruments
-include("oscilloscope/scope_common.jl")
+include("oscilloscope/all.jl")
 include("oscilloscope/recipes.jl")
 include("power_supply/all.jl")
 include("waveform_generator/all.jl")

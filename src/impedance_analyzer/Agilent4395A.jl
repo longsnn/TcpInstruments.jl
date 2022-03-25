@@ -1,24 +1,4 @@
 """
-http://literature.cdn.keysight.com/litweb/pdf/04395-90031.pdf
-# Available functions
-- `initialize()`
-- `terminate()`
-- `get_frequency_range()`
-- `set_frequency_range([start, stop]) # in hertz)
-- `get_num_data_points(x)`
-    - number of points on x-axis / number of samples
-- `set_num_data_points(x)`
-- `get_impedance()` # get the data
-- `set_volt_ac`
-- `get_volt_ac`
-- `get_volt_dc`
-- `set_volt_dc`
-- `bandwidth ({1,2,3,4,5})`
-    - 1 -> lowest bandwidth, 35 -> highest bandwidth
-"""
-struct Agilent4395A <: ImpedanceAnalyzer end
-
-"""
 Returns device bandwidth
 """
 get_bandwith(i::Instr{Agilent4395A}) = query(i, "BW?")
