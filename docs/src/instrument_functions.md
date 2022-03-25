@@ -13,7 +13,7 @@ Filter = t -> typeof(t) === DataType && t <: ImpedanceAnalyzer && t != Impedance
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/impedance_analyzer/all.jl"]
+Pages = ["src/impedance_analyzer/agilent_common.jl"]
 ```
 ```@autodocs
 Modules = [TcpInstruments]
