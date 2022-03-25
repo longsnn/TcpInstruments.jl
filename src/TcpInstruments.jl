@@ -73,8 +73,9 @@ export set_voltage, get_voltage
 export set_voltage_limit, get_voltage_limit
 export set_channel, get_channel
 
-# Scope
+# Oscilloscope
 export get_data, get_waveform_info
+export get_data_transfer_format, set_data_transfer_format_8bit, set_data_transfer_format_16bit
 export lpf_on, lpf_off, get_lpf_state
 export set_impedance_1Mohm, set_impedance_50ohm, get_impedance
 export get_coupling
