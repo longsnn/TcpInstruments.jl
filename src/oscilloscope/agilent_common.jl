@@ -50,6 +50,8 @@ function read_raw_waveform(scope::Instr{<:AgilentScope})
     data_transfer_format = get_data_transfer_format(scope)
     if data_transfer_format == "BYTE"
         raw_data = read_uint8(scope)
+    elseif data_transfer_format == "WORD"
+        raw_data = read_uint16(scope)
     else
         error("Data transfer format $data_transfer_format not yet supported")
     end
@@ -74,13 +76,29 @@ function read_uint8(scope::Instr{<:AgilentScope})
 end
 
 
+function read_uint16(scope::Instr{<:AgilentScope})
+    request_waveform_data(scope)
+    num_data_bytes = get_num_data_bytes(scope)
+
+    data = reinterpret(UInt16, read_num_bytes(scope, num_data_bytes))
+    read_end_of_line_character(scope)
+
+    num_data_points = get_num_data_points(scope)
+    if length(data) != num_data_points
+        error("Transferred data did not have the expected number of data points\nTransferred: $(length(data))\nExpected: $num_values ($num_data_points * $num_values_per_point)\n")
+    end
+
+    return data
+end
+
+
 function request_waveform_data(scope::Instr{<:AgilentScope})
     write(scope, "WAV:DATA?")
     return nothing
 end
 
 
-function get_num_data_points(scope::Instr{<:AgilentScope})
+function get_num_data_bytes(scope::Instr{<:AgilentScope})
     header = get_data_header(scope)
     num_header_description_bytes = 2
     num_data_points = parse(Int, header[num_header_description_bytes+1:end])
@@ -114,6 +132,11 @@ end
 function read_end_of_line_character(scope::Instr{<:AgilentScope})
     read(scope)
     return nothing
+end
+
+
+function get_num_data_points(scope::Instr{<:AgilentScope})
+    return f_query(scope, "WAVEFORM:POINTS?")
 end
 
 
