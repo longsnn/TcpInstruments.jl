@@ -206,9 +206,9 @@ channel_is_displayed(instr::Instr{<:AgilentScope}, chan) = query(instr, "STAT? C
 get_waveform_preamble(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:PREAMBLE?")
 get_waveform_source(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:SOURCE?")
 
-get_waveform_mode(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:FORMAT?")
-set_waveform_mode_8bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT BYTE")
-set_waveform_mode_16bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT WORD")
+get_data_transfer_format(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:FORMAT?")
+set_data_transfer_format_8bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT BYTE")
+set_data_transfer_format_16bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT WORD")
 
 get_waveform_num_points(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:POINTS?")
 set_waveform_num_points(instr::Instr{<:AgilentScope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
@@ -239,16 +239,16 @@ end
 
 function set_speed_mode(instr::Instr{<:AgilentScope}, speed::Integer)
     if speed == 1
-        set_waveform_mode_16bit(instr)
+        set_data_transfer_format_16bit(instr)
         set_waveform_points_mode(instr, 1)
     elseif speed == 3
-        set_waveform_mode_16bit(instr)
+        set_data_transfer_format_16bit(instr)
         set_waveform_points_mode(instr, 0)
     elseif speed == 5
-        set_waveform_mode_8bit(instr)
+        set_data_transfer_format_8bit(instr)
         set_waveform_points_mode(instr, 1)
     elseif speed == 6
-        set_waveform_mode_8bit(instr)
+        set_data_transfer_format_8bit(instr)
         set_waveform_points_mode(instr, 0)
     end
 end
