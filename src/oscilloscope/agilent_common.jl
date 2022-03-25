@@ -319,3 +319,14 @@ function set_speed_mode(instr::Instr{<:AgilentScope}, speed::Integer)
         set_waveform_points_mode(instr, 0)
     end
 end
+
+
+function get_acquisition_type(scope::Instr{<:AgilentScope})
+    return query(scope, "ACQUIRE:TYPE?")
+end
+
+
+set_acquisition_type_normal(scope::Instr{<:AgilentScope}) = write(scope, "ACQUIRE:TYPE NORM")
+set_acquisition_type_average(scope::Instr{<:AgilentScope}) = write(scope, "ACQUIRE:TYPE AVER")
+set_acquisition_type_high_res(scope::Instr{<:AgilentScope}) = write(scope, "ACQUIRE:TYPE HRES")
+set_acquisition_type_peak(scope::Instr{<:AgilentScope}) = write(scope, "ACQUIRE:TYPE PEAK")
