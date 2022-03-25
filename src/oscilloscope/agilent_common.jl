@@ -12,6 +12,13 @@ function get_data(instr::Instr{<:AgilentScope})
     return get_data(instr, ch_vec; check_channels=false)
 end 
 
+function get_valid_channels(instr::Instr{<:AgilentScope})
+    statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
+    filter!(x -> x[2], statuses)
+    valid_channels = map(x -> x[begin], statuses)
+    return valid_channels
+end
+
 function get_data(instr::Instr{<:AgilentScope}, ch_vec::Vector{Int}; check_channels=true)
     if check_channels
         unique!(ch_vec)
@@ -30,49 +37,13 @@ end
 
 function get_data(instr::Instr{<:AgilentScope}, ch::Integer)
     set_waveform_source(instr, ch)
-    wfm_info = get_waveform_info(instr, ch)
     raw_data = read_raw_waveform(instr);
-    return parse_raw_waveform(raw_data, wfm_info)
-end
-
-
-function get_valid_channels(instr::Instr{<:AgilentScope})
-    statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
-    filter!(x -> x[2], statuses)
-    valid_channels = map(x -> x[begin], statuses)
-    return valid_channels
+    info = get_waveform_info(instr, ch)
+    return parse_raw_waveform(raw_data, info)
 end
 
 
 set_waveform_source(instr::Instr{<:AgilentScope}, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
-
-
-"""
-    get_waveform_info(scope, channel)
-
-Grab channel information and return it in a `ScopeInfo`(@ref) struct
-"""
-function get_waveform_info(instr::Instr{<:AgilentScope}, ch::Integer)
-    str = get_waveform_preamble(instr)
-    str_array = split(str, ",")
-    format      = RESOLUTION_MODE[str_array[1]]
-    type        = TYPE[str_array[2]]
-    num_points  = parse(Int64,   str_array[3])
-    count       = parse(Int64,   str_array[4]) # is always one
-    x_increment = parse(Float64, str_array[5])
-    x_origin    = parse(Float64, str_array[6])
-    x_reference = parse(Float64, str_array[7])
-    y_increment = parse(Float64, str_array[8])
-    y_origin    = parse(Float64, str_array[9])
-    y_reference = parse(Float64, str_array[10])
-    impedance = get_impedance(instr; chan=ch)
-    coupling =  get_coupling(instr; chan=ch)
-    low_pass_filter =  get_lpf_state(instr; chan=ch)
-    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, impedance, coupling, low_pass_filter, ch)
-end
-
-const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
-const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
 
 function read_raw_waveform(scope::Instr{<:AgilentScope})
@@ -144,6 +115,34 @@ function read_end_of_line_character(scope::Instr{<:AgilentScope})
     read(scope)
     return nothing
 end
+
+
+"""
+    get_waveform_info(scope, channel)
+
+Grab channel information and return it in a `ScopeInfo`(@ref) struct
+"""
+function get_waveform_info(instr::Instr{<:AgilentScope}, ch::Integer)
+    str = get_waveform_preamble(instr)
+    str_array = split(str, ",")
+    format      = RESOLUTION_MODE[str_array[1]]
+    type        = TYPE[str_array[2]]
+    num_points  = parse(Int64,   str_array[3])
+    count       = parse(Int64,   str_array[4]) # is always one
+    x_increment = parse(Float64, str_array[5])
+    x_origin    = parse(Float64, str_array[6])
+    x_reference = parse(Float64, str_array[7])
+    y_increment = parse(Float64, str_array[8])
+    y_origin    = parse(Float64, str_array[9])
+    y_reference = parse(Float64, str_array[10])
+    impedance = get_impedance(instr; chan=ch)
+    coupling =  get_coupling(instr; chan=ch)
+    low_pass_filter =  get_lpf_state(instr; chan=ch)
+    return ScopeInfo(format, type, num_points, x_increment, x_origin, x_reference, y_increment, y_origin, y_reference, impedance, coupling, low_pass_filter, ch)
+end
+
+const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
+const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
 
 function parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
