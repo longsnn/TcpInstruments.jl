@@ -58,7 +58,7 @@ const A = u"A"
 const Hz = u"Hz"
 
 export Instrument
-export Oscilloscope, MultiMeter, PowerSupply, WaveformGenerator, ImpedanceAnalyzer
+export Oscilloscope, Multimeter, PowerSupply, WaveformGenerator, ImpedanceAnalyzer
 
 export save, load
 

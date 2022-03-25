@@ -33,7 +33,7 @@ help> AgilentDSOX4034A
 
 # Supported Instrument Groups
 - `Oscilloscope`
-- `MultiMeter`
+- `Multimeter`
 - `PowerSupply`
 - `WaveformGenerator`
 - `ImpedanceAnalyzer`
