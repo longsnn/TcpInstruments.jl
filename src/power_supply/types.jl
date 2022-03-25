@@ -52,32 +52,38 @@ abstract type SRSPowerSupply <: PowerSupply end
 struct SRSPS310 <: SRSPowerSupply end
 
 
-abstract type VersatilePowerSupply <: PowerSupply end
 """
-This device only has one channel so channel specific functions
-and optional arguments are not available.
+Supported models
+- `Versatile2005XRLXI` (single channel)
+- `Versatile10010XRLXI` (single channel)
 
-# Available functions
-- [`enable_output(obj::Instr{VersatilePower})`](@ref)
-- [`disable_output(obj::Instr{VersatilePower})`](@ref)
-- [`set_voltage(obj::Instr{VersatilePower})`](@ref)
-- [`get_voltage(obj::Instr{VersatilePower})`](@ref)
-- [`set_current_limit(obj::Instr{VersatilePower}, current)`](@ref)
-- [`get_current_limit(obj::Instr{VersatilePower})`](@ref)
+Supported functions
+- [`initialize`](@ref)
+- [`terminate`](@ref)
 
-# Helpers
-- `remote_mode()`: sets the device to remote mode. Automatically called on initialize
-- `local_mode()`: sets the device to local mode. Automatically called on terminate
 
-This instrument has a remote and local mode. Some commands do not
-work while the device is in local mode, thus when initializing this
-device `remote_mode` is called automatically and the device is always in
-remote mode by default.
+- [`get_output`](@ref)
+- [`enable_output`](@ref)
+- [`disable_output`](@ref)
+- [`get_voltage`](@ref)
+- [`set_voltage`](@ref)
+- [`get_current_limit`](@ref)
+- [`set_current_limit`](@ref)
+
+
+- [`remote_mode`](@ref) (automatically called by [`initialize`](@ref))
+- [`local_mode`](@ref) (automatically called by [`terminate`](@ref))
+
+This instrument has a remote mode and a local mode. Some commands do not
+work while the device is in local mode, therefore [`remote_mode`](@ref) 
+is called automatically upon initialization. By default, the device is 
+always in remote mode.
 
 These functions should not be directly needed but if
 for some reason you need to switch modes while using the device
-you can use `local_mode` to turn the device back to
+you can use [`local_mode`](@ref) to turn the device back to
 local mode.
 """
+abstract type VersatilePowerSupply <: PowerSupply end
 struct Versatile2005XRLXI <: VersatilePowerSupply end
 struct Versatile10010XRLXI <: VersatilePowerSupply end

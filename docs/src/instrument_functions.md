@@ -89,11 +89,11 @@ Filter = t -> typeof(t) !== DataType
 Pages = ["src/power_supply/srs_common.jl"]
 ```
 
-### VersatilePower
+### Versatile Power Supply
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/power_supply/VersatilePower.jl"]
+Pages = ["src/power_supply/versatile_common.jl"]
 ```
 
 
