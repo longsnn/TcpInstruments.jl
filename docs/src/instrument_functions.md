@@ -68,7 +68,7 @@ Filter = t -> typeof(t) !== DataType
 Pages = ["src/power_supply/agilent_common.jl"]
 ```
 
-### SRSPS310
+### SRS Power Supply
 This device needs a gpib adapter
 
 As of right now the prologix adapter interface is the only
@@ -86,7 +86,7 @@ set the channel.
 ```@autodocs
 Modules = [TcpInstruments]
 Filter = t -> typeof(t) !== DataType
-Pages = ["src/power_supply/SRSPS310.jl"]
+Pages = ["src/power_supply/srs_common.jl"]
 ```
 
 ### VersatilePower
