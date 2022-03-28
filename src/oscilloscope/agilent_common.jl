@@ -76,6 +76,7 @@ end
 
 
 function read_uint16(scope::Instr{<:AgilentScope})
+    set_data_transfer_byte_order(scope, :least_significant_first)
     request_waveform_data(scope)
     num_data_bytes = get_num_data_bytes(scope)
 
@@ -88,6 +89,22 @@ function read_uint16(scope::Instr{<:AgilentScope})
     end
 
     return data
+end
+
+
+function set_data_transfer_byte_order(scope::Instr{<:AgilentScope}, byte_order::Symbol)
+    if byte_order == :least_significant_first
+        write(scope, "WAVEFORM:BYTEORDER LSBFIRST")
+    elseif byte_order == :most_significant_first
+        write(scope, "WAVEFORM:BYTEORDER MSBFIRST")
+    else
+        error("Data transfer byte order ($byte_order) not recognized")
+    end
+    return nothing
+end
+
+function get_data_transfer_byte_order(scope::Instr{<:AgilentScope})
+    return query(scope, "WAVEFORM:BYTEORDER?")
 end
 
 
