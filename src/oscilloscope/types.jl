@@ -51,6 +51,15 @@ end
 
 function Base.show(io::IO, info::ScopeInfo)
     println(io, "scope_info: ")
+    if get(io, :compact, false)
+        show_core_fields(io, info)
+    else
+        show_core_fields(io, info)
+        show_additional_fields(io, info)
+    end
+end
+
+function show_core_fields(io::IO, info::ScopeInfo)
     println(io, "        channel: ", info.channel)
     println(io, "         format: ", info.format)
     println(io, "       acq_type: ", info.type)
@@ -58,6 +67,15 @@ function Base.show(io::IO, info::ScopeInfo)
     println(io, "      impedance: ", info.impedance)
     println(io, "       coupling: ", info.coupling)
     println(io, "low_pass_filter: ", info.low_pass_filter)
+end
+
+function show_additional_fields(io::IO, info::ScopeInfo)
+    println(io, "    x_reference: ", info.x_reference)
+    println(io, "       x_origin: ", info.x_origin)
+    println(io, "    x_increment: ", info.x_increment)
+    println(io, "    y_reference: ", info.y_reference)
+    println(io, "       y_origin: ", info.y_origin)
+    println(io, "    y_increment: ", info.y_increment)
 end
 
 
@@ -78,7 +96,7 @@ function Base.show(io::IO, ::MIME"text/plain", data_array::AbstractArray{ScopeDa
 end
 
 function Base.show(io::IO, data::ScopeData)
-    show(data.info)
+    show(IOContext(io, :compact=>true), data.info)
     println(io, "volt: ", size(data.volt), " ", unit(data.volt[1]))
     println(io, "time: ", size(data.time), " ", unit(data.time[1]))
 end
