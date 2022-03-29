@@ -12,6 +12,13 @@ function get_data(instr::Instr{<:AgilentScope})
     return get_data(instr, ch_vec; check_channels=false)
 end 
 
+function get_valid_channels(instr::Instr{<:AgilentScope})
+    statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
+    filter!(x -> x[2], statuses)
+    valid_channels = map(x -> x[begin], statuses)
+    return valid_channels
+end
+
 function get_data(instr::Instr{<:AgilentScope}, ch_vec::Vector{Int}; check_channels=true)
     if check_channels
         unique!(ch_vec)
@@ -30,21 +37,123 @@ end
 
 function get_data(instr::Instr{<:AgilentScope}, ch::Integer)
     set_waveform_source(instr, ch)
-    wfm_info = get_waveform_info(instr, ch)
     raw_data = read_raw_waveform(instr);
-    return parse_raw_waveform(raw_data, wfm_info)
-end
-
-
-function get_valid_channels(instr::Instr{<:AgilentScope})
-    statuses = asyncmap(x->(x, channel_is_displayed(instr, x)), 1:4)
-    filter!(x -> x[2], statuses)
-    valid_channels = map(x -> x[begin], statuses)
-    return valid_channels
+    info = get_waveform_info(instr, ch)
+    return parse_raw_waveform(raw_data, info)
 end
 
 
 set_waveform_source(instr::Instr{<:AgilentScope}, ch::Int) = write(instr, "WAVEFORM:SOURCE CHAN$ch")
+
+
+function read_raw_waveform(scope::Instr{<:AgilentScope})
+    data_transfer_format = get_data_transfer_format(scope)
+    if data_transfer_format == "BYTE"
+        raw_data = read_uint8(scope)
+    elseif data_transfer_format == "WORD"
+        raw_data = read_uint16(scope)
+    else
+        error("Data transfer format $data_transfer_format not yet supported")
+    end
+    return raw_data
+end
+
+
+function read_uint8(scope::Instr{<:AgilentScope})
+    request_waveform_data(scope)
+    num_data_bytes = get_num_data_bytes(scope)
+
+    data = read_num_bytes(scope, num_data_bytes)
+    read_end_of_line_character(scope)
+
+    num_data_points = get_num_data_points(scope)
+    if length(data) != num_data_points
+        error("Transferred data did not have the expected number of data points\nTransferred: $(length(data))\nExpected: $num_values ($num_data_points * $num_values_per_point)\n")
+    end
+
+    return data
+end
+
+
+function read_uint16(scope::Instr{<:AgilentScope})
+    set_data_transfer_byte_order(scope, :least_significant_first)
+    request_waveform_data(scope)
+    num_data_bytes = get_num_data_bytes(scope)
+
+    data = reinterpret(UInt16, read_num_bytes(scope, num_data_bytes))
+    read_end_of_line_character(scope)
+
+    num_data_points = get_num_data_points(scope)
+    if length(data) != num_data_points
+        error("Transferred data did not have the expected number of data points\nTransferred: $(length(data))\nExpected: $num_values ($num_data_points * $num_values_per_point)\n")
+    end
+
+    return data
+end
+
+
+function set_data_transfer_byte_order(scope::Instr{<:AgilentScope}, byte_order::Symbol)
+    if byte_order == :least_significant_first
+        write(scope, "WAVEFORM:BYTEORDER LSBFIRST")
+    elseif byte_order == :most_significant_first
+        write(scope, "WAVEFORM:BYTEORDER MSBFIRST")
+    else
+        error("Data transfer byte order ($byte_order) not recognized")
+    end
+    return nothing
+end
+
+function get_data_transfer_byte_order(scope::Instr{<:AgilentScope})
+    return query(scope, "WAVEFORM:BYTEORDER?")
+end
+
+
+function request_waveform_data(scope::Instr{<:AgilentScope})
+    write(scope, "WAV:DATA?")
+    return nothing
+end
+
+
+function get_num_data_bytes(scope::Instr{<:AgilentScope})
+    header = get_data_header(scope)
+    num_header_description_bytes = 2
+    num_data_points = parse(Int, header[num_header_description_bytes+1:end])
+    return num_data_points
+end
+
+
+function get_data_header(scope::Instr{<:AgilentScope})
+    # data header is an ASCII character string "#8DDDDDDDD", where the Ds indicate how many
+    # bytes follow (p.1433 of Keysight InfiniiVision 4000 X-Series Oscilloscopes
+    # Programmer's Guide)
+    num_header_description_bytes = 2
+    header_description_uint8 = read(scope.sock, num_header_description_bytes)
+    if header_description_uint8[1] != UInt8('#')
+        error("The waveform data format is not formatted as expected")
+    end
+    header_block_length = parse(Int, convert(Char, header_description_uint8[2]))
+    header_block_uint8 = read(scope.sock, header_block_length)
+    header = vcat(header_description_uint8, header_block_uint8)
+    header = String(convert.(Char, header))
+    return header
+end
+
+
+function read_num_bytes(scope::Instr{<:AgilentScope}, num_bytes)
+    output = read(scope.sock, num_bytes)
+    return output
+end
+
+
+function read_end_of_line_character(scope::Instr{<:AgilentScope})
+    read(scope)
+    return nothing
+end
+
+
+function get_num_data_points(scope::Instr{<:AgilentScope})
+    return i_query(scope, "WAVEFORM:POINTS?")
+end
 
 
 """
@@ -75,47 +184,22 @@ const RESOLUTION_MODE = Dict("+0" => "8bit", "+1" => "16bit", "+2" => "ASCII")
 const TYPE = Dict("+0" => "Normal", "+1" => "Peak", "+2" => "Average",  "+3" => "High Resolution")
 
 
-function read_raw_waveform(instr::Instr{<:AgilentScope})
-    write(instr, "WAV:DATA?")
-    num_waveform_samples = get_num_waveform_samples(instr)
-    raw_data = read(instr.sock, num_waveform_samples);
-    # read end of line character
-    dummy = readline(instr.sock)
-    return raw_data
+function parse_raw_waveform(data, scope_info::ScopeInfo)
+    voltage_trace = create_voltage_trace(data, scope_info)
+    time_trace = create_time_trace(data, scope_info)
+    return ScopeData(scope_info, voltage_trace, time_trace)
 end
 
 
-function get_num_waveform_samples(instr::Instr{<:AgilentScope})
-    header = get_data_header(instr)
-    num_header_description_bytes = 2
-    num_waveform_samples = parse(Int, header[num_header_description_bytes+1:end])
-    return num_waveform_samples
+function create_voltage_trace(data, scope_info::ScopeInfo)
+    voltage_trace = ((convert.(Float64, data) .- scope_info.y_reference) .* scope_info.y_increment) .+ scope_info.y_origin
+    return voltage_trace .* u"V"
 end
 
 
-function get_data_header(instr::Instr{<:AgilentScope})
-    # data header is an ASCII character string "#8DDDDDDDD", where the Ds indicate how many
-    # bytes follow (p.1433 of Keysight InfiniiVision 4000 X-Series Oscilloscopes
-    # Programmer's Guide)
-    num_header_description_bytes = 2
-    header_description_uint8 = read(instr.sock, num_header_description_bytes)
-    if header_description_uint8[1] != UInt8('#')
-        error("The waveform data format is not formatted as expected")
-    end
-    header_block_length = parse(Int, convert(Char, header_description_uint8[2]))
-    header_block_uint8 = read(instr.sock, header_block_length)
-    header = vcat(header_description_uint8, header_block_uint8)
-    header = String(convert.(Char, header))
-    return header
-end
-
-
-function parse_raw_waveform(wfm_data, wfm_info::ScopeInfo)
-    # From page 1398 in "Keysight InfiniiVision 4000 X-Series Oscilloscopes Programmer's Guide", version May 15, 2019:
-
-    volt = ((convert.(Float64, wfm_data) .- wfm_info.y_reference) .* wfm_info.y_increment) .+ wfm_info.y_origin
-    time = (( collect(0:(wfm_info.num_points-1))  .- wfm_info.x_reference) .* wfm_info.x_increment) .+ wfm_info.x_origin
-    return ScopeData(wfm_info, V .* volt, u"s" .* time)
+function create_time_trace(data, scope_info::ScopeInfo)
+    time_trace = ((collect(0:scope_info.num_points-1) .- scope_info.x_reference) .* scope_info.x_increment) .+ scope_info.x_origin
+    return time_trace * u"s"
 end
 
 
@@ -206,9 +290,9 @@ channel_is_displayed(instr::Instr{<:AgilentScope}, chan) = query(instr, "STAT? C
 get_waveform_preamble(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:PREAMBLE?")
 get_waveform_source(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:SOURCE?")
 
-get_waveform_mode(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:FORMAT?")
-set_waveform_mode_8bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT BYTE")
-set_waveform_mode_16bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT WORD")
+get_data_transfer_format(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:FORMAT?")
+set_data_transfer_format_8bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT BYTE")
+set_data_transfer_format_16bit(instr::Instr{<:AgilentScope}) = write(instr, "WAVEFORM:FORMAT WORD")
 
 get_waveform_num_points(instr::Instr{<:AgilentScope}) = query(instr, "WAVEFORM:POINTS?")
 set_waveform_num_points(instr::Instr{<:AgilentScope}, num_points::Integer) = write(instr, "WAVEFORM:POINTS $num_points")
@@ -239,16 +323,27 @@ end
 
 function set_speed_mode(instr::Instr{<:AgilentScope}, speed::Integer)
     if speed == 1
-        set_waveform_mode_16bit(instr)
+        set_data_transfer_format_16bit(instr)
         set_waveform_points_mode(instr, 1)
     elseif speed == 3
-        set_waveform_mode_16bit(instr)
+        set_data_transfer_format_16bit(instr)
         set_waveform_points_mode(instr, 0)
     elseif speed == 5
-        set_waveform_mode_8bit(instr)
+        set_data_transfer_format_8bit(instr)
         set_waveform_points_mode(instr, 1)
     elseif speed == 6
-        set_waveform_mode_8bit(instr)
+        set_data_transfer_format_8bit(instr)
         set_waveform_points_mode(instr, 0)
     end
 end
+
+
+function get_acquisition_type(scope::Instr{<:AgilentScope})
+    return query(scope, "ACQUIRE:TYPE?")
+end
+
+
+set_acquisition_type_normal(scope::Instr{<:AgilentScope}) = write(scope, "ACQUIRE:TYPE NORM")
+set_acquisition_type_average(scope::Instr{<:AgilentScope}) = write(scope, "ACQUIRE:TYPE AVER")
+set_acquisition_type_high_res(scope::Instr{<:AgilentScope}) = write(scope, "ACQUIRE:TYPE HRES")
+set_acquisition_type_peak(scope::Instr{<:AgilentScope}) = write(scope, "ACQUIRE:TYPE PEAK")
