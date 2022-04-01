@@ -66,7 +66,7 @@ Range                                              Resolution
 A single Float64 with unit of volt (from Unitful package).
 
 """
-get_voltage2(instr::KeysightDMM34465A; kwargs...) = get_voltage_worker(instr; kwargs...)
+get_voltage(instr::KeysightDMM34465A; kwargs...) = get_voltage_worker(instr; kwargs...)
 
 
 
