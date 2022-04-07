@@ -35,8 +35,8 @@ Supported Instruments:
     - Power supply
 
 # Returns
-- true if High Voltage Output is Off (<- check if this should state `On`)
-- false if High Voltage Output is On (<- check if this should state `Off`)
+- true if High Voltage Output is On
+- false if High Voltage Output is Off
 """
 get_output(obj::Instr{<:SRSPowerSupply}) = query(obj, "*STB? 7") == "1" ? true : false
 
