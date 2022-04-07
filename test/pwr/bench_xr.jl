@@ -21,10 +21,10 @@ remote_mode(pwr)
     @info get_output_status(pwr)
 
     enable_output(pwr)
-    @test get_output_status(pwr) == true
+    @test get_output_status(pwr) == "ON"
 
     disable_output(pwr)
-    @test get_output_status(pwr) == false
+    @test get_output_status(pwr) == "OFF"
 end
 
 @testset "Current" begin

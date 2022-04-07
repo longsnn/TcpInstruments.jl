@@ -30,10 +30,10 @@ end
 @testset "Output" begin
     @info get_output_status
     enable_output(p)
-    @test get_output_status(p) 
+    @test get_output_status(p) == "ON"
 
     disable_output(p)
-    @test get_output_status(p) == false
+    @test get_output_status(p) == "OFF"
 
     enable_output(p)
 end

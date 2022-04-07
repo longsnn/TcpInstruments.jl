@@ -134,14 +134,14 @@ Supported Instruments:
    - Power supply
 
 Returns:
-  String: {"0"|"1"}
+  String: {"OFF"|"ON"}
 """
 function get_output_status(obj::Instr{<:AgilentPowerSupply})
     output = query(obj, ":OUTPUT:STATE?")
     if output == "0"
-        return false
+        return "OFF"
     elseif output == "1"
-        return true
+        return "ON"
     else
         error("Undefined output: $output")
     end

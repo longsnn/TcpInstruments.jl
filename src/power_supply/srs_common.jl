@@ -35,10 +35,10 @@ Supported Instruments:
     - Power supply
 
 # Returns
-- true if High Voltage Output is On
-- false if High Voltage Output is Off
+- "ON" if High Voltage Output is On
+- "OFF" if High Voltage Output is Off
 """
-get_output_status(obj::Instr{<:SRSPowerSupply}) = query(obj, "*STB? 7") == "1" ? true : false
+get_output_status(obj::Instr{<:SRSPowerSupply}) = query(obj, "*STB? 7") == "1" ? "ON" : "OFF"
 
 
 """

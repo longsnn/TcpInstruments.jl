@@ -22,25 +22,25 @@ get_current_limit()
     @info get_output_status(pwr), "OUTPUT"
     disable_output(pwr)
     set_channel(pwr, 3)
-    @test get_output_status(pwr) == false
+    @test get_output_status(pwr) == "OFF"
     set_channel(pwr, 2)
     disable_output(pwr)
-    @test get_output_status(pwr) == false
+    @test get_output_status(pwr) == "OFF"
     set_channel(pwr, 1)
     disable_output(pwr)
-    @test get_output_status(pwr) == false
+    @test get_output_status(pwr) == "OFF"
 
     enable_output(pwr)
 
-    @test get_output_status(pwr) == true
+    @test get_output_status(pwr) == "ON"
     set_channel(pwr, 2)
-    @test get_output_status(pwr) == false
+    @test get_output_status(pwr) == "OFF"
     set_channel(pwr, 3)
-    @test get_output_status(pwr) == false
+    @test get_output_status(pwr) == "OFF"
 
     set_channel(pwr, 2)
     enable_output(pwr)
-    @test get_output_status(pwr) == true
+    @test get_output_status(pwr) == "ON"
 end
 
 @testset "Current" begin
