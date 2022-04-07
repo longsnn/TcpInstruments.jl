@@ -7,7 +7,7 @@ p = initialize(SRSPS310)
 # Available functions
 - enable_output()
 - disable_output()
-- get_output()
+- get_output_status()
 - set_voltage(volts)
 - get_voltage()
 - set_current_limit(current)
@@ -28,12 +28,12 @@ p = initialize(SRSPS310)
 end
 
 @testset "Output" begin
-    @info get_output
+    @info get_output_status
     enable_output(p)
-    @test get_output(p) 
+    @test get_output_status(p) 
 
     disable_output(p)
-    @test get_output(p) == false
+    @test get_output_status(p) == false
 
     enable_output(p)
 end

@@ -16,31 +16,31 @@ get_current_limit()
 """
 
 @testset "Output" begin
-    @info get_output(pwr)
+    @info get_output_status(pwr)
     enable_output(pwr)
 
-    @info get_output(pwr), "OUTPUT"
+    @info get_output_status(pwr), "OUTPUT"
     disable_output(pwr)
     set_channel(pwr, 3)
-    @test get_output(pwr) == false
+    @test get_output_status(pwr) == false
     set_channel(pwr, 2)
     disable_output(pwr)
-    @test get_output(pwr) == false
+    @test get_output_status(pwr) == false
     set_channel(pwr, 1)
     disable_output(pwr)
-    @test get_output(pwr) == false
+    @test get_output_status(pwr) == false
 
     enable_output(pwr)
 
-    @test get_output(pwr) == true
+    @test get_output_status(pwr) == true
     set_channel(pwr, 2)
-    @test get_output(pwr) == false
+    @test get_output_status(pwr) == false
     set_channel(pwr, 3)
-    @test get_output(pwr) == false
+    @test get_output_status(pwr) == false
 
     set_channel(pwr, 2)
     enable_output(pwr)
-    @test get_output(pwr) == true
+    @test get_output_status(pwr) == true
 end
 
 @testset "Current" begin
