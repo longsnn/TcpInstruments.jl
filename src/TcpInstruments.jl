@@ -67,7 +67,7 @@ export remote_mode, local_mode
 export query, write, info, connect!, close!
 
 # Power Supply
-export enable_output, disable_output, get_output
+export enable_output, disable_output, get_output_status
 export set_current_limit, get_current_limit
 export set_voltage, get_voltage
 export set_voltage_limit, get_voltage_limit

@@ -15,7 +15,7 @@ Supported functions
 - [`terminate`](@ref)
 
 
-- [`get_output`](@ref)
+- [`get_output_status`](@ref)
 - [`enable_output`](@ref)
 - [`disable_output`](@ref)
 - [`get_channel`](@ref)
@@ -38,7 +38,7 @@ Supported functions
 - [`terminate`](@ref)
 
 
-- [`get_output`](@ref)
+- [`get_output_status`](@ref)
 - [`enable_output`](@ref)
 - [`disable_output`](@ref)
 - [`get_voltage`](@ref)
@@ -62,7 +62,7 @@ Supported functions
 - [`terminate`](@ref)
 
 
-- [`get_output`](@ref)
+- [`get_output_status`](@ref)
 - [`enable_output`](@ref)
 - [`disable_output`](@ref)
 - [`get_voltage`](@ref)

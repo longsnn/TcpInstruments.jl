@@ -26,7 +26,7 @@ disable_output(obj::Instr{<:VersatilePowerSupply}) = write(obj, "OUTPUT OFF")
 
 
 """
-    get_output(obj::Instr{<:VersatilePowerSupply})
+    get_output_status(obj::Instr{<:VersatilePowerSupply})
 
 This will return the state of an output on a device.
 
@@ -39,7 +39,7 @@ Supported Instruments:
 Returns:
   String: {"OFF"|"ON"}
 """
-get_output(obj::Instr{<:VersatilePowerSupply}) = query(obj, "OUTPUT?")
+get_output_status(obj::Instr{<:VersatilePowerSupply}) = query(obj, "OUTPUT?")
 
 """
     set_voltage(obj::Instr{<:VersatilePowerSupply}, num::Voltage)
