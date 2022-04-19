@@ -179,7 +179,12 @@ end
     get_volt_dc(ia::Instr{<:AgilentImpedAnalyzer})
 
 """
-get_volt_dc(obj::Instr{<:AgilentImpedAnalyzer}) = f_query(obj, "DCV?") * V
+function get_volt_dc(ia::Instr{<:AgilentImpedAnalyzer})
+    write(ia, "DCV?")
+    volt_dc = parse(Float64, read(ia)) * u"V"
+    return volt_dc
+end
+
 
 """
     set_volt_dc(ia::Instr{<:AgilentImpedAnalyzer}, volts)
