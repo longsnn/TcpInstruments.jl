@@ -237,6 +237,7 @@ function read_with_timeout(instr::Instrument, timeout)
     if result == :ok
         return fetch(task)
     elseif result == :timed_out
+        schedule(task, InterruptException(), error=true)
         return nothing
     end
 end
