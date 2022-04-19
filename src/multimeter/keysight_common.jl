@@ -37,10 +37,10 @@ Returns the voltage from the multimeter.
 
 - `type`        --  "DC" | "AC" (Default DC)
 - `range`       --  Can be a String or a Unitful.Voltage.
-                    Valid string values: "AUTO", "DEF", "MIN", or "MAX"
+                    Valid string values: "AUTO", "DEF", "MIN", or "MAX".
                     Valid voltage values: See `Range` column in table below.
 - `resolution`  --  Can be a String or a Unitrful.Voltage.
-                    Valid String values: "DEF", "MIN", or "MAX"
+                    Valid String values: "DEF", "MIN", or "MAX".
                     Valid voltage values: After selecting a `range` see the resolution values on the same
                     row in the table below.
 
@@ -84,10 +84,10 @@ Returns the voltage from the multimeter.
 
 - `type`        --  "DC" | "AC" (Default DC)
 - `range`       --  Can be a String or a Unitful.Voltage.
-        Valid string values: "AUTO", "DEF", "MIN", or "MAX"
+        Valid string values: "AUTO", "DEF", "MIN", or "MAX".
         Valid voltage values: See `Range` column in table below.
 - `resolution`  --  Can be a String or a Unitrful.Voltage.
-        Valid String values: "DEF", "MIN", or "MAX"
+        Valid String values: "DEF", "MIN", or "MAX".
         Valid voltage values: After selecting a `range` see the resolution values on the same
         row in the table below.
 
@@ -127,6 +127,7 @@ verify_resolution(resolution::String) = !(resolution in ["", "DEF", "MIN", "MAX"
 
 function verify_resolution(resolution::Unitful.Voltage)
     # Valid values taken from page 453 in "Keysight Truevolt Series Operating and Service Guide"
+    # This assumes Keysight DMM 34465A
     plc100  = [30e-12, 300e-12, 3e-9, 3e-8, 3e-7, 3e-6, 3e-5, 3e-4, 3e-3, 3e-2, 3e-1, 3e0, 3e1, 3e2]*u"V"
     plc10   = [100e-12, 1e-9, 1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]*u"V"
     plc1    = [300]*u"V"
