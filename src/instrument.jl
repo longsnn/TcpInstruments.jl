@@ -218,3 +218,25 @@ f_query(obj, ins; timeout=0.5) = parse(Float64, query(obj, ins; timeout=timeout)
 Differs from [query](@ref) in that it will return an Int64 and not a String
 """
 i_query(obj, ins; timeout=0.5) = parse(Int64, query(obj, ins; timeout=timeout))
+
+
+"""
+    clear_buffer(instr::Instrument)
+
+Remove any unread data from the instrument buffer
+"""
+function clear_buffer(instr::Instrument)
+    while !isnothing(read_with_timeout(instr, 0.5))
+    end
+    return nothing
+end
+
+function read_with_timeout(instr::Instrument, timeout)
+    task = @spawn read(instr)
+    result = timedwait(() -> task.state != :runnable, timeout; pollint=0.05)
+    if result == :ok
+        return fetch(task)
+    elseif result == :timed_out
+        return nothing
+    end
+end

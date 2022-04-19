@@ -65,6 +65,7 @@ export save, load
 export initialize, terminate, reset
 export remote_mode, local_mode
 export query, write, info, connect!, close!
+export clear_buffer
 
 # Power Supply
 export enable_output, disable_output, get_output_status
