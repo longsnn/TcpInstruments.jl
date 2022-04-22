@@ -33,7 +33,11 @@ end
 
 Returns oscillator (ac) voltage
 """
-get_volt_ac(i::Instr{Agilent4294A}) = f_query(i, "POWE?") * V
+function get_volt_ac(ia::Instr{Agilent4294A})
+    write(ia, "POWE?")
+    volt_ac = parse(Float64, read(ia)) * u"V"
+    return volt_ac
+end
 
 """
     set_volt_ac(instr, voltage)
