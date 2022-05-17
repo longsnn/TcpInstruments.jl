@@ -67,7 +67,7 @@ Range                                              Resolution
 A single Float64 with unit of volt (from Unitful package).
 
 """
-get_voltage(instr::KeysightDMM34465A; kwargs...) = _get_voltage(instr; kwargs...)
+get_voltage(instr::KeysightDMM34465A; kwargs...) = get_voltage_worker(instr; kwargs...)
 
 
 
@@ -97,14 +97,14 @@ See the manual for the allowed range and resolution combinations.
 A single Float64 with unit of volt (from Unitful package).
 
 """
-get_voltage(instr::Instr{<:KeysightMultimeter}; args...) = _get_voltage(instr; args...)
+get_voltage(instr::Instr{<:KeysightMultimeter}; args...) = get_voltage_worker(instr; args...)
 
 
 """
-_get_voltage
+get_voltage_worker
 Internal function that's called by get_voltage()
 """
-function _get_voltage(instr::Instr{<:KeysightMultimeter};
+function get_voltage_worker(instr::Instr{<:KeysightMultimeter};
         type::String="DC",
         range::Union{String,Unitful.Voltage} = "AUTO",
         plc = 10
