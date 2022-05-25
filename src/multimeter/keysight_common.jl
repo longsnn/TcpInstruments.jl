@@ -76,6 +76,7 @@ function get_voltage(
 end
 
 """
+This is an internal function used by get_voltage
 
 Returns the voltage resolution from table on page 453 in "Keysight Truevolt Series Operating and Service Guide"
 
