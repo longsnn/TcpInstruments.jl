@@ -22,17 +22,101 @@ function set_tc_type(obj::Instr{<:KeysightMultimeter}; type="K")
 end
 
 """
-Returns voltage
 
-# Keywords
-- `type`: "DC" | "AC" (Default DC)
+Returns the voltage from the multimeter.
+
+### Input
+
+- `instr`
+        initialized DMM object
+- `type`
+        Valid string values:
+        "DC" | "AC" (Default DC)
+- `range`
+        Valid string values:
+        "0.1" | "1" | "10" | "100" | "1000" (Default 10)
+- `PLC`
+        Valid string values:
+        "0.001" | "0.002" | "0.006" | "0.02" | "0.06" | "0.2" | "1" | "10" | "100" (Default 0.001)
+
+See the manual for the allowed combinations
+
+### Output
+
+A single Float64 with unit of volt (from Unitful package).
 
 """
-function get_voltage(obj::Instr{<:KeysightMultimeter}; type="DC")
-    !(type in ["AC","DC"]) && error("$type not valid!\nMust be AC or DC")
-    f_query(obj, "MEASURE:VOLTAGE:$type?"; timeout=0) * V
+function get_voltage(
+        instr::Instr{<:KeysightMultimeter}, # DMM Instrument
+        type::String ="DC",     #   Voltage Type: "AC" or "DC"
+        range::String = "10",   #   Voltage Range: 0.1 to 1000 V
+        plc::String = "0.001"      #   PLC: 0.001 to 100
+    )
+
+    # Check if voltage type is valid
+    if !( type in ["AC", "DC"] )
+        error("Voltage type \"$type\" is not valid!")
+    end
+
+    # Check if voltage range is valid
+    if !( range in ["0.1", "1", "10", "100", "100", "1000"] )
+        error("Voltage range \"$range\" is not valid!")
+    end
+
+    # Check if voltage plc is valid
+    if !( plc in ["0.001", "0.002","0.006", "0.02", "0.06", "0.2", "1", "10", "100"] )
+        error("Voltage plc \"$plc\" is not valid!")
+    end
+
+    # Get voltage resolution corresponding to range and plc
+    resolution = _get_resolution(range, plc)
+
+    # DMM voltage command accepts type, range, resolution as parameters
+    f_query(instr, "MEASURE:VOLTAGE:$type? $range, $resolution "; timeout=0) * V
 end
 
+"""
+
+Returns the voltage resolution from table on page 453 in "Keysight Truevolt Series Operating and Service Guide"
+
+Resolution Table for Keysight DMM 34465A:
+        PLC 100	     10	     1	    0.2	    0.06	0.02	0.006	0.002	0.001
+Range(V)
+0.1		    3e-9	1e-8	3e-8	7e-8	1.5e-7	3e-7	6e-7	15e-7	30e-8
+1	      	3e-8	1e-7	3e-7	7e-7	1.5e-6	3e-6	6e-6	15e-6	30e-7
+10		    3e-7	1e-6	3e-6	7e-6	1.5e-5	3e-5	6e-5	15e-5	30e-6
+100		    3e-6	1e-5	3e-5	7e-5	1.5e-4	3e-4	6e-4	15e-4	30e-5
+1000 		3e-5	1e-4	3e-4	7e-4	1.5e-3	3e-3	6e-3	15e-3	30e-4
+
+"""
+function _get_resolution(range,plc::String)
+    # Valid values taken from page 453 in "Keysight Truevolt Series Operating and Service Guide"
+    # This assumes Keysight DMM 34465A
+
+    # Range table used to get resolution table range index
+    range_table = ["0.1","1","10","100","1000"]
+    # PLC table used to get resolution table plc index
+    plc_table = ["100", "10", "1", "0.2", "0.06", "0.02", "0.006", "0.002", "0.001"]
+
+    # Resolution table used to get resolution using range as row, plc and column
+                     #plc 1000     10      1       0.2     0.06     0.02    0.006   0.002    0.001
+    resolution_table = [                                                                              # Range [V}
+                        ["3e-9", "1e-8", "3e-8", "7e-8", "1.5e-7", "3e-7", "6e-7", "15e-7", "30e-8"], # 0.1
+                        ["3e-8", "1e-7", "3e-7", "7e-7", "1.5e-6", "3e-6", "6e-6", "15e-6", "30e-7"], # 1
+                        ["3e-7", "1e-6", "3e-6", "7e-6", "1.5e-5", "3e-5", "6e-5", "15e-5", "30e-6"], # 10
+                        ["3e-6", "1e-5", "3e-5", "7e-5", "1.5e-4", "3e-4", "6e-4", "15e-4", "30e-5"], # 100
+                        ["3e-5", "1e-4", "3e-4", "7e-4", "1.5e-3", "3e-3", "6e-3", "15e-3", "30e-4"]  # 1000
+                        ]
+
+    # get range index
+    range_idx = findfirst( x -> x == range, range_table)
+    #get PLC index
+    plc_idx = findfirst( x -> x == plc, plc_table)
+
+    # return resolution
+    resolution = resolution_table[range_idx][plc_idx]
+
+end
 
 """
     get_current(obj::Instr{<:KeysightMultimeter}; type="DC")

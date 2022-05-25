@@ -31,7 +31,7 @@ Once you have created a config file you can change it with
 edit_config()
 ```
 
-If the instrument has its address in the config file you can now connect with: 
+If the instrument has its address in the config file you can now connect with:
 ```
 handle = initialize({Instrument-Type})
 ```
@@ -100,6 +100,7 @@ export get_current
 export get_resistance
 export set_temp_unit_celsius, set_temp_unit_farenheit, set_temp_unit_kelvin
 export get_temp_unit
+export _get_resolution
 
 # Impedance
 export get_impedance
