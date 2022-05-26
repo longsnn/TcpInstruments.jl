@@ -34,7 +34,7 @@ Returns the voltage from the multimeter.
         "DC" | "AC" (Default DC)
 - `range`
         Valid string values:
-        "0.1" | "1" | "10" | "100" | "1000" (Default 10)
+        "0.1" | "1" | "10" | "100" | "1000" | "AUTO" (Default AUTO)
 - `PLC`
         Valid string values:
         "0.001" | "0.002" | "0.006" | "0.02" | "0.06" | "0.2" | "1" | "10" | "100" (Default 0.001)
@@ -48,9 +48,9 @@ A single Float64 with unit of volt (from Unitful package).
 """
 function get_voltage(
         instr::Instr{<:KeysightMultimeter}, # DMM Instrument
-        type::String ="DC",     #   Voltage Type: "AC" or "DC"
-        range::String = "10",   #   Voltage Range: 0.1 to 1000 V
-        plc::String = "0.001"      #   PLC: 0.001 to 100
+        type::String ="DC",       #   Voltage Type: "AC" or "DC"
+        range::String = "AUTO",   #   Voltage Range: 0.1 to 1000 V
+        plc::String = "0.001"          #   PLC: 0.001 to 100
     )
 
     # Check if voltage type is valid
@@ -59,7 +59,7 @@ function get_voltage(
     end
 
     # Check if voltage range is valid
-    if !( range in ["0.1", "1", "10", "100", "100", "1000"] )
+    if !( range in ["0.1", "1", "10", "100", "100", "1000", "AUTO"] )
         error("Voltage range \"$range\" is not valid!")
     end
 
@@ -68,11 +68,16 @@ function get_voltage(
         error("Voltage plc \"$plc\" is not valid!")
     end
 
-    # Get voltage resolution corresponding to range and plc
-    resolution = _get_resolution(range, plc)
-
-    # DMM voltage command accepts type, range, resolution as parameters
-    f_query(instr, "MEASURE:VOLTAGE:$type? $range, $resolution "; timeout=0) * V
+    # Get voltage measurement from DMM
+    if range == "AUTO"
+        # Auto-range does not accept resolution input
+        f_query(instr, "MEASURE:VOLTAGE:$type? $range "; timeout=0) * V
+    else
+        # Get voltage resolution corresponding to range and plc
+        resolution = _get_resolution(range, plc)
+        # DMM voltage command accepts type, range, resolution as parameters
+        f_query(instr, "MEASURE:VOLTAGE:$type? $range, $resolution "; timeout=0) * V
+    end
 end
 
 """
