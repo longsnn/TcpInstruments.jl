@@ -34,7 +34,7 @@ Returns the voltage from the multimeter.
         "DC" | "AC" (Default DC)
 - `range`
         Valid string values:
-        "0.1" | "1" | "10" | "100" | "1000" (Default 10)
+        "0.1" | "1" | "10" | "100" | "1000" | "AUTO" (Default AUTO)
 - `PLC`
         Valid string values:
         "0.001" | "0.002" | "0.006" | "0.02" | "0.06" | "0.2" | "1" | "10" | "100" (Default 0.001)
