@@ -25,7 +25,7 @@ Supported Instruments:
 disable_output(obj::Instr{<:SRSPowerSupply}) = write(obj, "HVOF")
 
 """
-    get_output(obj::Instr{<:SRSPowerSupply})
+    get_output_status(obj::Instr{<:SRSPowerSupply})
 This will get and return whether the output from SRSPS310 is enabled.
 
 Arguments:
@@ -35,10 +35,10 @@ Supported Instruments:
     - Power supply
 
 # Returns
-- true if High Voltage Output is Off (<- check if this should state `On`)
-- false if High Voltage Output is On (<- check if this should state `Off`)
+- "ON" if High Voltage Output is On
+- "OFF" if High Voltage Output is Off
 """
-get_output(obj::Instr{<:SRSPowerSupply}) = query(obj, "*STB? 7") == "1" ? true : false
+get_output_status(obj::Instr{<:SRSPowerSupply}) = query(obj, "*STB? 7") == "1" ? "ON" : "OFF"
 
 
 """

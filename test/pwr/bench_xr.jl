@@ -18,13 +18,13 @@ local_mode()
 
 remote_mode(pwr)
 @testset "Output" begin
-    @info get_output(pwr)
+    @info get_output_status(pwr)
 
     enable_output(pwr)
-    @test get_output(pwr) == true
+    @test get_output_status(pwr) == "ON"
 
     disable_output(pwr)
-    @test get_output(pwr) == false
+    @test get_output_status(pwr) == "OFF"
 end
 
 @testset "Current" begin

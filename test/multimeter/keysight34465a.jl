@@ -4,12 +4,15 @@ using Test
 m = initialize(KeysightDMM34465A, "10.1.30.36" )
 
 V = get_voltage(m, "DC", "1", "1")
-@info get_voltage V
 @test V isa Float64
 
 V = get_voltage(m, "AC", "1")
 @info get_voltage V
 @test V isa Float64
+
+V = get_voltage(m, "AC", "1")
+@info get_voltage V
+@test V isa Unitful.Voltage
 
 A = get_current(m)
 @info get_current A
