@@ -1,3 +1,5 @@
+include("./Keysight34465A.jl")
+
 """
     get_tc_temperature(multimeter)
 
@@ -21,107 +23,115 @@ function set_tc_type(obj::Instr{<:KeysightMultimeter}; type="K")
     write(obj, "CONFIGURE:TEMPERATURE TC,$type")
 end
 
+
+
+
 """
+    get_voltage(instr::KeysightDMM34465A};
+        type::String = "DC",
+        resolution::Union{String,Unitful.Voltage} = "",
+        plc::Union{String,Unitful.Voltage} = ""
+    )::Unitful.Voltage
 
 Returns the voltage from the multimeter.
 
 ### Input
 
-- `instr`
-        initialized DMM object
-- `type`
-        Valid string values:
-        "DC" | "AC" (Default DC)
-- `range`
-        Valid string values:
-        "0.1" | "1" | "10" | "100" | "1000" | "AUTO" (Default AUTO)
-- `PLC`
-        Valid string values:
-        "0.001" | "0.002" | "0.006" | "0.02" | "0.06" | "0.2" | "1" | "10" | "100" (Default 0.001)
+- `type`        --  "DC" | "AC" (Default DC)
+- `range`       --  Can be a String or a Unitful.Voltage.
+                    Valid string values: "AUTO", "DEF", "MIN", or "MAX".
+                    Valid voltage values: See `Range` column in table below.
+- `plc`         --  Can be a String or a Unitful.Voltage.
+                    Valid String values: "DEF", "MIN", or "MAX".
+                    Valid voltage values: See 'plc' column in table below.
 
-See the manual for the allowed combinations
+
+```
+Keysight 34465A
+Power Line Cycles (PLC)  100        10        1      0.2     0.06     0.02    0.006   0.002   0.001
+Aperture (60 Hz Power)  1.67 s   0.167 s   16.7 ms     3 ms     1 ms   0.3 ms  100 µs   40 µs   20 µs
+Aperture (50 Hz Power)     2 s     0.2 s     20 ms     3 ms     1 ms   0.3 ms  100 µs   40 µs   20 µs
+ResFactor               0.03 ppm   0.1 ppm  0.3 ppm  0.7 ppm  1.5 ppm    3 ppm   6 ppm  15 ppm  30 ppm
+Range                                              Resolution
+  1 mV                   30 pV     100 pV   300 pV   700 pV   1.5 nV     3 nV    6 nV   15 nV   30 nV
+ 10 mV                  300 pV       1 nV     3 nV     7 nV    15 nV    30 nV   60 nV  150 nV  300 nV
+100 mV                    3 nV      10 nV    30 nV    70 nV   150 nV   300 nV  600 nV  1.5 µV    3 µV
+  1 V                    30 nV     100 nV   300 nV   700 nV   1.5 µV     3 µV    6 µV   15 µV   30 µV
+ 10 V                   300 nV       1 µV     3 µV     7 µV    15 µV    30 µV   60 µV  150 µV  300 µV
+100 V                     3 V       10 V     30 V     70 V    150 V    300 V   600 V   1.5 V     3 V
+  1 kV                   30 V      100 V    300 V    700 V    1.5 V      3 V     6 V    15 V    30 V
+```
 
 ### Output
 
 A single Float64 with unit of volt (from Unitful package).
 
 """
-function get_voltage(
-        instr::Instr{<:KeysightMultimeter}, # DMM Instrument
-        type::String ="DC",       #   Voltage Type: "AC" or "DC"
-        range::String = "AUTO",   #   Voltage Range: 0.1 to 1000 V
-        plc::String = "0.001"          #   PLC: 0.001 to 100
+get_voltage(instr::KeysightDMM34465A; kwargs...) = _get_voltage(instr; kwargs...)
+
+
+
+
+"""
+    get_voltage(instr::Instr{<:KeysightMultimeter};
+        type::String = "DC",
+        resolution::Union{String,Unitful.Voltage} = "",
+        range::Union{String,Unitful.Voltage} = ""
+    )::Unitful.Voltage
+
+Returns the voltage from the multimeter.
+
+### Input
+
+- `type`        --  "DC" | "AC" (Default DC)
+- `range`       --  Can be a String or a Unitful.Voltage.
+        Valid string values: "AUTO", "DEF", "MIN", or "MAX".
+        Valid voltage values: See `Range` column in table below.
+- `plc`  --  Can be a String or a Unitful.Voltage.
+        Valid String values: "DEF", "MIN", or "MAX".
+        Valid voltage values: See 'plc' column in table below.
+See the manual for the allowed range and resolution combinations.
+
+### Output
+
+A single Float64 with unit of volt (from Unitful package).
+
+"""
+get_voltage(instr::Instr{<:KeysightMultimeter}; args...) = _get_voltage(instr; args...)
+
+
+"""
+_get_voltage
+Internal function that's called by get_voltage()
+"""
+function _get_voltage(instr::Instr{<:KeysightMultimeter};
+        type::String="DC",
+        range::Union{String,Unitful.Voltage} = "AUTO",
+        plc = 10
     )
+    verify_voltage_type(type)
+    verify_voltage_range(range)
+    verify_voltage_power_line_cycles(instr, plc)
 
-    # Check if voltage type is valid
-    if !( type in ["AC", "DC"] )
-        error("Voltage type \"$type\" is not valid!")
-    end
-
-    # Check if voltage range is valid
-    if !( range in ["0.1", "1", "10", "100", "100", "1000", "AUTO"] )
-        error("Voltage range \"$range\" is not valid!")
-    end
-
-    # Check if voltage plc is valid
-    if !( plc in ["0.001", "0.002","0.006", "0.02", "0.06", "0.2", "1", "10", "100"] )
-        error("Voltage plc \"$plc\" is not valid!")
-    end
-
-    # Get voltage measurement from DMM
-    if range == "AUTO"
-        # Auto-range does not accept resolution input
-        f_query(instr, "MEASURE:VOLTAGE:$type? $range "; timeout=0) * V
+    if range == "AUTO" || type == "AC"
+        return f_query(instr, "MEASURE:VOLTAGE:$type? $range "; timeout=0) * V
     else
-        # Get voltage resolution corresponding to range and plc
-        resolution = _get_resolution(range, plc)
-        # DMM voltage command accepts type, range, resolution as parameters
-        f_query(instr, "MEASURE:VOLTAGE:$type? $range, $resolution "; timeout=0) * V
+        resolution = range_plc_to_resolution(instr, range, plc)
+        return f_query(instr, "MEASURE:VOLTAGE:$type? $range, $resolution "; timeout=0) * V
     end
 end
 
-"""
-This is an internal function used by get_voltage
+verify_voltage_type(type) = !(type in ["AC","DC"]) && error("Voltage type \"$type\" is not valid!\nIt's value must be \"AC\" or \"DC\"")
+verify_voltage_range(range::Unitful.Voltage) = !(range in [100u"mV", 1u"V", 10u"V", 100u"V", 1u"kV"]) && error("range value of \"$range\" is not valid!\nIt's voltage value must be one of: 0.1 V, 1 V, 10 V, 100 V, or 1 kV.")
+verify_voltage_range(range::String) = !(range in ["", "AUTO", "DEFAULT", "DEF", "MIN", "MAX", ]) && error("range value of \"$range\" is not valid!\nIt's string value must be \"AUTO\", \"DEF\", \"MIN\", or \"MAX\".")
 
-Returns the voltage resolution from table on page 453 in "Keysight Truevolt Series Operating and Service Guide"
-
-Resolution Table for Keysight DMM 34465A:
-        PLC 100	     10	     1	    0.2	    0.06	0.02	0.006	0.002	0.001
-Range(V)
-0.1		    3e-9	1e-8	3e-8	7e-8	1.5e-7	3e-7	6e-7	15e-7	30e-8
-1	      	3e-8	1e-7	3e-7	7e-7	1.5e-6	3e-6	6e-6	15e-6	30e-7
-10		    3e-7	1e-6	3e-6	7e-6	1.5e-5	3e-5	6e-5	15e-5	30e-6
-100		    3e-6	1e-5	3e-5	7e-5	1.5e-4	3e-4	6e-4	15e-4	30e-5
-1000 		3e-5	1e-4	3e-4	7e-4	1.5e-3	3e-3	6e-3	15e-3	30e-4
-
-"""
-function _get_resolution(range,plc::String)
-    # Valid values taken from page 453 in "Keysight Truevolt Series Operating and Service Guide"
-    # This assumes Keysight DMM 34465A
-
-    # Range table used to get resolution table range index
-    range_table = ["0.1","1","10","100","1000"]
-    # PLC table used to get resolution table plc index
-    plc_table = ["100", "10", "1", "0.2", "0.06", "0.02", "0.006", "0.002", "0.001"]
-
-    # Resolution table used to get resolution using range as row, plc and column
-                     #plc 1000     10      1       0.2     0.06     0.02    0.006   0.002    0.001
-    resolution_table = [                                                                              # Range [V}
-                        ["3e-9", "1e-8", "3e-8", "7e-8", "1.5e-7", "3e-7", "6e-7", "15e-7", "30e-8"], # 0.1
-                        ["3e-8", "1e-7", "3e-7", "7e-7", "1.5e-6", "3e-6", "6e-6", "15e-6", "30e-7"], # 1
-                        ["3e-7", "1e-6", "3e-6", "7e-6", "1.5e-5", "3e-5", "6e-5", "15e-5", "30e-6"], # 10
-                        ["3e-6", "1e-5", "3e-5", "7e-5", "1.5e-4", "3e-4", "6e-4", "15e-4", "30e-5"], # 100
-                        ["3e-5", "1e-4", "3e-4", "7e-4", "1.5e-3", "3e-3", "6e-3", "15e-3", "30e-4"]  # 1000
-                        ]
-
-    # get range index
-    range_idx = findfirst( x -> x == range, range_table)
-    #get PLC index
-    plc_idx = findfirst( x -> x == plc, plc_table)
-
-    # return resolution
-    resolution = resolution_table[range_idx][plc_idx]
-
+function array_to_str(vs::AbstractArray)
+    array_str = "["
+    for v in vs
+        push!(array_str, "$v,")
+    end
+    push!(array_str, "]")
+    return array_str
 end
 
 """
