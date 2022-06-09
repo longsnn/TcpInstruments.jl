@@ -99,7 +99,6 @@ export get_current
 export get_resistance
 export set_temp_unit_celsius, set_temp_unit_farenheit, set_temp_unit_kelvin
 export get_temp_unit
-export _get_resolution
 
 # Impedance
 export get_impedance
