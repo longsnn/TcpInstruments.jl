@@ -6,13 +6,9 @@ m = initialize(KeysightDMM34465A)
 
 V = get_voltage(m)
 @info get_voltage V
-@test V isa Unitful.Voltage
+@test V isa Float64
 
 V = get_voltage(m; type = "AC")
-@info get_voltage V
-@test V isa Unitful.Voltage
-
-V = get_voltage(m; type = "DC", plc = 0.001, range = 0.1u"V")
 @info get_voltage V
 @test V isa Unitful.Voltage
 
