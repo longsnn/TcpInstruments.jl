@@ -27,10 +27,10 @@ end
 
 
 """
-    get_voltage(instr::KeysightDMM34465A};
+    get_voltage(instr::Instr{<:KeysightMultimeter};
         type::String = "DC",
-        resolution::Union{String,Unitful.Voltage} = "",
-        plc::Union{String,Unitful.Voltage} = ""
+        resolution::Union{String,Unitful.Voltage} = "AUTO",
+        plc} = 10
     )::Unitful.Voltage
 
 Returns the voltage from the multimeter.
@@ -41,9 +41,8 @@ Returns the voltage from the multimeter.
 - `range`       --  Can be a String or a Unitful.Voltage.
                     Valid string values: "AUTO", "DEF", "MIN", or "MAX".
                     Valid voltage values: See `Range` column in table below.
-- `plc`         --  Can be a String or a Unitful.Voltage.
-                    Valid String values: "DEF", "MIN", or "MAX".
-                    Valid voltage values: See 'plc' column in table below.
+- `plc`         --  Power-line cycles
+                    Valid values: See 'plc' row in table below.
 
 
 ```
@@ -67,7 +66,7 @@ Range                                              Resolution
 A single Float64 with unit of volt (from Unitful package).
 
 """
-get_voltage(instr::KeysightDMM34465A; kwargs...) = get_voltage_worker(instr; kwargs...)
+get_voltage(instr::KeysightDMM34465A; kwargs...) = _get_voltage(instr; kwargs...)
 
 
 
@@ -75,8 +74,8 @@ get_voltage(instr::KeysightDMM34465A; kwargs...) = get_voltage_worker(instr; kwa
 """
     get_voltage(instr::Instr{<:KeysightMultimeter};
         type::String = "DC",
-        resolution::Union{String,Unitful.Voltage} = "",
-        range::Union{String,Unitful.Voltage} = ""
+        resolution::Union{String,Unitful.Voltage} = "AUTO",
+        plc} = 10
     )::Unitful.Voltage
 
 Returns the voltage from the multimeter.
@@ -85,26 +84,23 @@ Returns the voltage from the multimeter.
 
 - `type`        --  "DC" | "AC" (Default DC)
 - `range`       --  Can be a String or a Unitful.Voltage.
-        Valid string values: "AUTO", "DEF", "MIN", or "MAX".
-        Valid voltage values: See `Range` column in table below.
-- `plc`  --  Can be a String or a Unitful.Voltage.
-        Valid String values: "DEF", "MIN", or "MAX".
-        Valid voltage values: See 'plc' column in table below.
-See the manual for the allowed range and resolution combinations.
+                    Valid string values: "AUTO", "DEF", "MIN", or "MAX".
+                    Valid voltage values: See `Range` column in table below.
+- `plc`         --  Power-line cycles
 
 ### Output
 
 A single Float64 with unit of volt (from Unitful package).
 
 """
-get_voltage(instr::Instr{<:KeysightMultimeter}; args...) = get_voltage_worker(instr; args...)
+get_voltage(instr::Instr{<:KeysightMultimeter}; args...) = _get_voltage(instr; args...)
 
 
 """
-get_voltage_worker
+_get_voltage
 Internal function that's called by get_voltage()
 """
-function get_voltage_worker(instr::Instr{<:KeysightMultimeter};
+function _get_voltage(instr::Instr{<:KeysightMultimeter};
         type::String="DC",
         range::Union{String,Unitful.Voltage} = "AUTO",
         plc = 10
